@@ -14,7 +14,7 @@ import frc.robot.subsystems.Swerve;
 @Logged
 public class RobotContainer {
 
-  @Logged private final Swerve swerve;
+  private final Swerve swerve;
 
   @NotLogged private final CommandXboxController xboxController;
 

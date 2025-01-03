@@ -15,7 +15,7 @@ import java.util.function.DoubleSupplier;
 @Logged
 public class Swerve extends SubsystemBase {
 
-  @Logged private Pose2d estimatedPose;
+  private Pose2d estimatedPose;
 
   public Swerve() {
 
