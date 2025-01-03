@@ -15,7 +15,7 @@ import java.util.function.DoubleSupplier;
 @Logged
 public class Swerve extends SubsystemBase {
 
-  private Pose2d estimatedPose;
+  @Logged private Pose2d estimatedPose;
 
   public Swerve() {
 
@@ -34,16 +34,17 @@ public class Swerve extends SubsystemBase {
    * @param omega field-relative angular velocity in radians/s
    */
   private void driveFieldRelative(LinearVelocity x, LinearVelocity y, AngularVelocity omega) {
-    System.out.println(x);
-    estimatedPose = estimatedPose.plus(
-        new Transform2d(
-            x.times(SwerveConstants.SWERVE_UPDATE_PERIOD),
-            y.times(SwerveConstants.SWERVE_UPDATE_PERIOD),
-            new Rotation2d(omega.times(SwerveConstants.SWERVE_UPDATE_PERIOD))));
+    estimatedPose =
+        estimatedPose.plus(
+            new Transform2d(
+                x.times(SwerveConstants.SWERVE_UPDATE_PERIOD),
+                y.times(SwerveConstants.SWERVE_UPDATE_PERIOD),
+                new Rotation2d(omega.times(SwerveConstants.SWERVE_UPDATE_PERIOD))));
   }
 
   /**
-   * Returns a Command that passes the input parameters into {@link #driveFieldRelative(LinearVelocity, LinearVelocity, AngularVelocity)}.
+   * Returns a Command that passes the input parameters into {@link
+   * #driveFieldRelative(LinearVelocity, LinearVelocity, AngularVelocity)}.
    *
    * @param x field-relative X with range of -1.0 to 1.0
    * @param y field-relative Y with range of -1.0 to 1.0
