@@ -4,29 +4,32 @@
 
 package frc.robot;
 
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.Swerve;
 
-// STEP 1: Add the epilogue @Logged annotation
+@Logged
 public class RobotContainer {
 
-  // STEP 2: Add a private final Swerve
+  private final Swerve swerve;
 
-  // STEP 4: Add a private final CommandXBoxController for the driver's controller
+  @NotLogged private final CommandXboxController xboxController;
 
   public RobotContainer() {
+    swerve = new Swerve();
 
-    // STEP 2: Initialize the Swerve
-
-    // STEP 4: Initialize the driver's CommandXboxController (slot 0)
+    xboxController = new CommandXboxController(0);
 
     configureBindings();
   }
 
   private void configureBindings() {
-
-    // STEP 4: Set the Swerve default command to Swerve's driveFieldRelative command.
-    // Pass in the CommandXBoxController supplier methods
+    swerve.setDefaultCommand(
+        swerve.driveFieldRelativeCommand(
+            xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
   }
 
   public void teleopInit() {}
