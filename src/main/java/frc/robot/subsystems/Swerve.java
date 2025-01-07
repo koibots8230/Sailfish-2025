@@ -53,13 +53,13 @@ public class Swerve extends SubsystemBase{
     System.out.println("rotaton speed is " + Math.pow(omega, SwerveConstants.RIGHT_STICK_SCAILING) * SwerveConstants.MAX_ROTATION.in(RadiansPerSecond));
     omega =  Math.pow(omega, SwerveConstants.RIGHT_STICK_SCAILING) * SwerveConstants.MAX_ROTATION.in(RadiansPerSecond);
 
-    driveFieldRelative(MetersPerSecond.of(MathUtil.applyDeadband(-x, Constants.SwerveConstants.DEADBAND)), MetersPerSecond.of(MathUtil.applyDeadband(y, Constants.SwerveConstants.DEADBAND)), DegreesPerSecond.of(MathUtil.applyDeadband(-omega, Constants.SwerveConstants.DEADBAND)));
+    driveFieldRelative(MetersPerSecond.of(MathUtil.applyDeadband(-x, Constants.SwerveConstants.DEADBAND)), MetersPerSecond.of(MathUtil.applyDeadband(y, Constants.SwerveConstants.DEADBAND)), RadiansPerSecond.of(MathUtil.applyDeadband(-omega, Constants.SwerveConstants.DEADBAND)));
   }
 
 
   private void driveFieldRelative(LinearVelocity x, LinearVelocity y, AngularVelocity omega){
 
-    estimatedPosition = estimatedPosition.transformBy(new Transform2d(x.times(Seconds.of(.02)).in(Meters), y.times(Seconds.of(.02)).in(Meters), new Rotation2d(omega.times(Seconds.of(.02)).in(Degrees))));
+    estimatedPosition = estimatedPosition.transformBy(new Transform2d(x.times(Seconds.of(.02)).in(Meters), y.times(Seconds.of(.02)).in(Meters), new Rotation2d(omega.times(Seconds.of(.02)).in(Radians))));
 
   }
     
