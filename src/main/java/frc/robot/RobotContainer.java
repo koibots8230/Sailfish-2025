@@ -33,7 +33,7 @@ public class RobotContainer {
   }
 
   private void defualtCommands(){
-    swerve.setDefaultCommand(swerve.driveFieldRelativeCommand(controller::getLeftY, controller::getLeftX, controller::getRightX));
+    swerve.setDefaultCommand(swerve.driveFieldRelativeCommand(controller::getLeftX, controller::getLeftX, controller::getLeftY));
   }
 
   public void teleopInit() {}

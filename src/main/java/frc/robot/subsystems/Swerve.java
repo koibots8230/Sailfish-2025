@@ -1,9 +1,13 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Degree;
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.function.DoubleSupplier;
@@ -44,7 +48,10 @@ public class Swerve extends SubsystemBase{
 
     y = liniarMagintued * -directions.getCos() * SwerveConstants.MAX_SPEED.in(MetersPerSecond);
     x = liniarMagintued * directions.getSin() * SwerveConstants.MAX_SPEED.in(MetersPerSecond);
-    omega =  Math.pow(omega, SwerveConstants.RIGHT_STICK_SCAILING) * SwerveConstants.MAX_ROTATION.in(DegreesPerSecond);
+
+    System.out.println("max speed in radians is " + SwerveConstants.MAX_ROTATION.in(RadiansPerSecond));
+    System.out.println("rotaton speed is " + Math.pow(omega, SwerveConstants.RIGHT_STICK_SCAILING) * SwerveConstants.MAX_ROTATION.in(RadiansPerSecond));
+    omega =  Math.pow(omega, SwerveConstants.RIGHT_STICK_SCAILING) * SwerveConstants.MAX_ROTATION.in(RadiansPerSecond);
 
     driveFieldRelative(MetersPerSecond.of(MathUtil.applyDeadband(-x, Constants.SwerveConstants.DEADBAND)), MetersPerSecond.of(MathUtil.applyDeadband(y, Constants.SwerveConstants.DEADBAND)), DegreesPerSecond.of(MathUtil.applyDeadband(-omega, Constants.SwerveConstants.DEADBAND)));
   }
@@ -52,9 +59,8 @@ public class Swerve extends SubsystemBase{
 
   private void driveFieldRelative(LinearVelocity x, LinearVelocity y, AngularVelocity omega){
 
-    estimatedPosition = estimatedPosition.transformBy(new Transform2d(x.times(Seconds.of(.02)).in(Meters), y.times(Seconds.of(.02)).in(Meters), new Rotation2d(omega.times(Seconds.of(.02)).in(Radians))));
+    estimatedPosition = estimatedPosition.transformBy(new Transform2d(x.times(Seconds.of(.02)).in(Meters), y.times(Seconds.of(.02)).in(Meters), new Rotation2d(omega.times(Seconds.of(.02)).in(Degrees))));
 
-    
   }
     
       /**

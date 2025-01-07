@@ -15,7 +15,7 @@ public class Constants {
 
     public static final LinearVelocity MAX_SPEED = MetersPerSecond.of(4.25);
 
-    public static final AngularVelocity MAX_ROTATION = RotationsPerSecond.of(Math.PI * 2);
+    public static final AngularVelocity MAX_ROTATION = RadiansPerSecond.of(2 * Math.PI);
 
     public static final double LEFT_STICK_SCAILING = 2;
 
