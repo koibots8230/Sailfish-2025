@@ -39,7 +39,7 @@ public class Swerve extends SubsystemBase{
 
   }
 
-  private void DriveFiledRelativeScailier(double x, double y, double omega){
+  private void DriveFiledRelativeBlueScailier(double x, double y, double omega){
 
 
     double liniarMagintued = Math.pow(Math.hypot(x, y), SwerveConstants.LEFT_STICK_SCAILING);
@@ -54,6 +54,23 @@ public class Swerve extends SubsystemBase{
     omega =  Math.pow(omega, SwerveConstants.RIGHT_STICK_SCAILING) * SwerveConstants.MAX_ROTATION.in(RadiansPerSecond);
 
     driveFieldRelative(MetersPerSecond.of(MathUtil.applyDeadband(-x, Constants.SwerveConstants.DEADBAND)), MetersPerSecond.of(MathUtil.applyDeadband(y, Constants.SwerveConstants.DEADBAND)), RadiansPerSecond.of(MathUtil.applyDeadband(-omega, Constants.SwerveConstants.DEADBAND)));
+  }
+
+  private void DriveFiledRelativeRedScailier(double x, double y, double omega){
+
+
+    double liniarMagintued = Math.pow(Math.hypot(x, y), SwerveConstants.LEFT_STICK_SCAILING);
+
+    Rotation2d directions = new Rotation2d(y, x);
+
+    y = liniarMagintued * -directions.getCos() * SwerveConstants.MAX_SPEED.in(MetersPerSecond);
+    x = liniarMagintued * directions.getSin() * SwerveConstants.MAX_SPEED.in(MetersPerSecond);
+
+    System.out.println("max speed in radians is " + SwerveConstants.MAX_ROTATION.in(RadiansPerSecond));
+    System.out.println("rotaton speed is " + Math.pow(omega, SwerveConstants.RIGHT_STICK_SCAILING) * SwerveConstants.MAX_ROTATION.in(RadiansPerSecond));
+    omega =  Math.pow(omega, SwerveConstants.RIGHT_STICK_SCAILING) * SwerveConstants.MAX_ROTATION.in(RadiansPerSecond);
+
+    driveFieldRelative(MetersPerSecond.of(MathUtil.applyDeadband(x, Constants.SwerveConstants.DEADBAND)), MetersPerSecond.of(MathUtil.applyDeadband(-y, Constants.SwerveConstants.DEADBAND)), RadiansPerSecond.of(MathUtil.applyDeadband(-omega, Constants.SwerveConstants.DEADBAND)));
   }
 
 
@@ -71,10 +88,17 @@ public class Swerve extends SubsystemBase{
    * @param Omega field-relative omega with range of -1.0 to 1.0
    */
 
-   public Command driveFieldRelativeCommand(DoubleSupplier x, DoubleSupplier y, DoubleSupplier omega){
+   public Command driveFieldRelativeBlueCommand(DoubleSupplier x, DoubleSupplier y, DoubleSupplier omega){
     return Commands.sequence(
       Commands.run(
-() -> DriveFiledRelativeScailier(x.getAsDouble(), y.getAsDouble(), omega.getAsDouble()), this)
+() -> DriveFiledRelativeBlueScailier(x.getAsDouble(), y.getAsDouble(), omega.getAsDouble()), this)
+);
+   }
+
+   public Command driveFieldRelativeRedCommand(DoubleSupplier x, DoubleSupplier y, DoubleSupplier omega){
+    return Commands.sequence(
+      Commands.run(
+() -> DriveFiledRelativeRedScailier(x.getAsDouble(), y.getAsDouble(), omega.getAsDouble()), this)
 );
    }
 
@@ -85,11 +109,5 @@ public class Swerve extends SubsystemBase{
    * @param Y field-relative Y with range of -1.0 to 1.0
    * @param Omega field-relative omega with range of -1.0 to 1.0
    */
-
-  // STEP 5: In the driveFieldRelative update the estimatedPose by scaling the input
-  // parameters and adding them to the current pose values.
-
-  // STEP 6: Use the MAX speeds constants to scale the field-relative inputs to update the
-  // estimatedPose
 
 }

@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -17,6 +18,7 @@ public class RobotContainer {
 
   private Swerve swerve;
   private final XboxController controller;
+  private boolean colour;
 
   public RobotContainer() {
     swerve = new Swerve();
@@ -33,10 +35,18 @@ public class RobotContainer {
   }
 
   private void defualtCommands(){
-    swerve.setDefaultCommand(swerve.driveFieldRelativeCommand(controller::getLeftX, controller::getLeftX, controller::getLeftY));
+    if (colour){
+    swerve.setDefaultCommand(swerve.driveFieldRelativeBlueCommand(controller::getLeftX, controller::getLeftY, controller::getRightX));
+    }
+
+    else{
+      swerve.setDefaultCommand(swerve.driveFieldRelativeRedCommand(controller::getLeftX, controller::getLeftY, controller::getRightX));
+    }
   }
 
-  public void teleopInit() {}
+  public void teleopInit() {
+    colour = (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) ? true : false;
+  }
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
