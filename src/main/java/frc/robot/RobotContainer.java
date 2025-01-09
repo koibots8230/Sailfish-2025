@@ -36,11 +36,11 @@ public class RobotContainer {
 
   private void defualtCommands(){
     if (colour){
-    swerve.setDefaultCommand(swerve.driveFieldRelativeBlueCommand(controller::getLeftX, controller::getLeftY, controller::getRightX));
+    swerve.setDefaultCommand(swerve.driveFieldRelativeBlueCommand(controller::getLeftY, controller::getLeftX, controller::getRightX));
     }
 
     else{
-      swerve.setDefaultCommand(swerve.driveFieldRelativeRedCommand(controller::getLeftX, controller::getLeftY, controller::getRightX));
+      swerve.setDefaultCommand(swerve.driveFieldRelativeRedCommand(controller::getLeftY, controller::getLeftX, controller::getRightX));
     }
   }
 

@@ -88,14 +88,14 @@ public class Swerve extends SubsystemBase{
    * @param Omega field-relative omega with range of -1.0 to 1.0
    */
 
-   public Command driveFieldRelativeBlueCommand(DoubleSupplier x, DoubleSupplier y, DoubleSupplier omega){
+   public Command driveFieldRelativeRedCommand(DoubleSupplier x, DoubleSupplier y, DoubleSupplier omega){
     return Commands.sequence(
       Commands.run(
 () -> DriveFiledRelativeBlueScailier(x.getAsDouble(), y.getAsDouble(), omega.getAsDouble()), this)
 );
    }
 
-   public Command driveFieldRelativeRedCommand(DoubleSupplier x, DoubleSupplier y, DoubleSupplier omega){
+   public Command driveFieldRelativeBlueCommand(DoubleSupplier x, DoubleSupplier y, DoubleSupplier omega){
     return Commands.sequence(
       Commands.run(
 () -> DriveFiledRelativeRedScailier(x.getAsDouble(), y.getAsDouble(), omega.getAsDouble()), this)
