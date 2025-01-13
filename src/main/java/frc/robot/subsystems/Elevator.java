@@ -80,7 +80,7 @@ public class Elevator extends SubsystemBase {
 
     position = Distance.ofBaseUnits(motorEncoder.getPosition(), Meters);
     velocity = LinearVelocity.ofBaseUnits(motorEncoder.getVelocity(), MetersPerSecond);
-    voltage = Voltage.ofBaseUnits(motor.getBusVoltage(), Volts);
+    voltage = Voltage.ofBaseUnits(motor.getBusVoltage() * motor.getAppliedOutput(), Volts);
     current = Current.ofBaseUnits(motor.getOutputCurrent(), Amps);
   }
 
@@ -100,7 +100,7 @@ public class Elevator extends SubsystemBase {
             ClosedLoopSlot.kSlot0,
             feedforward.calculate(motorSetpoint.velocity));
 
-    voltage = Voltage.ofBaseUnits(motor.getBusVoltage(), Volts);
+    voltage = Voltage.ofBaseUnits(motor.getBusVoltage() * motor.getAppliedOutput(), Volts);
     current = Current.ofBaseUnits(motor.getOutputCurrent(), Amps);
     position = Distance.ofBaseUnits(motorEncoder.getPosition(), Meters);
     velocity = LinearVelocity.ofBaseUnits(motorEncoder.getVelocity(), MetersPerSecond);
