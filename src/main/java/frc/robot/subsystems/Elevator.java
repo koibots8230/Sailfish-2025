@@ -61,10 +61,11 @@ public class Elevator extends SubsystemBase {
         .closedLoop
         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
         .pid(ElevatorConstants.PID.kp, ElevatorConstants.PID.ki, ElevatorConstants.PID.kd);
+    motorConfig.smartCurrentLimit((int) ElevatorConstants.CURRENT_LIMIT.in(Amps));
     motorConfig.absoluteEncoder.positionConversionFactor(
-        ElevatorConstants.POSITION_CONVERSION_FACTOR);
+        ElevatorConstants.CONVERSION_FACTOR);
     motorConfig.absoluteEncoder.velocityConversionFactor(
-        ElevatorConstants.VELOCITY_CONVERSION_FACTOR);
+        ElevatorConstants.CONVERSION_FACTOR);
     motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     motorEncoder = motor.getAbsoluteEncoder();
 
