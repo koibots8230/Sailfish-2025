@@ -60,10 +60,7 @@ public class Elevator extends SubsystemBase {
     motorConfig
         .closedLoop
         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-        .pid(
-            ElevatorConstants.PID.kp,
-            ElevatorConstants.PID.ki,
-            ElevatorConstants.PID.kd);
+        .pid(ElevatorConstants.PID.kp, ElevatorConstants.PID.ki, ElevatorConstants.PID.kd);
     motorConfig.absoluteEncoder.positionConversionFactor(
         ElevatorConstants.POSITION_CONVERSION_FACTOR);
     motorConfig.absoluteEncoder.velocityConversionFactor(

@@ -6,8 +6,8 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
-import frc.lib.util.PIDGains;
 import frc.lib.util.FeedforwardGains;
+import frc.lib.util.PIDGains;
 
 public class Constants {
 
@@ -34,8 +34,8 @@ public class Constants {
     public static final double POSITION_CONVERSION_FACTOR = 1;
     public static final double VELOCITY_CONVERSION_FACTOR = 1;
 
-    public static final PIDGains PID = new PIDGains.Builder().build();
-    public static final FeedforwardGains FEEDFORWARD = new FeedforwardGains.Builder().build();
+    public static final PIDGains PID = new PIDGains.Builder().kp(0).build();
+    public static final FeedforwardGains FEEDFORWARD = new FeedforwardGains.Builder().kv(0).kg(0).build();
 
     public static final Distance START_SETPOINT = Distance.ofBaseUnits(0, Units.Meters);
 
