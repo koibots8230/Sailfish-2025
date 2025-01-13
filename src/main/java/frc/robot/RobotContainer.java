@@ -10,9 +10,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Swerve;
-import frc.robot.Constants.ElevatorConstants;
 
 @Logged
 public class RobotContainer {
@@ -35,7 +35,7 @@ public class RobotContainer {
     swerve.setDefaultCommand(
         swerve.driveFieldRelativeCommand(
             xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
-    
+
     Trigger L1 = xboxController.a();
     L1.onTrue(elevator.setPositionCommand(ElevatorConstants.L1_SETPOINT));
     Trigger L2 = xboxController.b();

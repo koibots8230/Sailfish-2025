@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.AngularAcceleration;
@@ -31,6 +32,7 @@ public class Constants {
     public static final double POSITION_CONVERSION_FACTOR = 1;
 
     public static final PIDController PID = new PIDController(0, 0, 0);
+    public static final ElevatorFeedforward FEEDFORWARD = new ElevatorFeedforward(0, 0, 0, 0);
 
     public static final Distance START_SETPOINT = Distance.ofBaseUnits(0, Units.Meters);
 
