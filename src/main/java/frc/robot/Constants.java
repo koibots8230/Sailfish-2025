@@ -4,6 +4,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 
@@ -31,6 +32,11 @@ public class Constants {
 
     public static final PIDController PID = new PIDController(0, 0, 0);
 
-    public static final double START_SETPOINT = 0;
+    public static final Distance START_SETPOINT = Distance.ofBaseUnits(0, Units.Meters);
+
+    public static final Distance L1_SETPOINT = Distance.ofBaseUnits(1, Units.Meters);
+    public static final Distance L2_SETPOINT = Distance.ofBaseUnits(2, Units.Meters);
+    public static final Distance L3_SETPOINT = Distance.ofBaseUnits(3, Units.Meters);
+    public static final Distance L4_SETPOINT = Distance.ofBaseUnits(4, Units.Meters);
   }
 }

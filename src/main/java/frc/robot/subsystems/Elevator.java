@@ -31,10 +31,10 @@ public class Elevator extends SubsystemBase {
   private TrapezoidProfile profile;
   private AbsoluteEncoder motorEncoder;
   private TrapezoidProfile.State goal;
-  private double setpoint;
+  private Distance setpoint;
   private TrapezoidProfile.State motorSetpoint;
   private Distance position;
-  private LinearVelocity velocity;
+  private LinearVelocity velocity;;
 
   public Elevator() {
     profile =
@@ -68,15 +68,20 @@ public class Elevator extends SubsystemBase {
 
   @Override
   public void periodic() {
-    goal = new TrapezoidProfile.State(setpoint, 0);
+    goal = new TrapezoidProfile.State(setpoint.in(Meters), 0);
 
     motorSetpoint = profile.calculate(0, motorSetpoint, goal);
 
     motor.getClosedLoopController().setReference(motorSetpoint.position, ControlType.kPosition);
   }
 
+  @Override
+  public void simulationPeriodic() {
+      position = setpoint;
+  }
+
   private void setPosition(Distance position) {
-    setpoint = position.in(Meters);
+    setpoint = position;
   }
 
   public Command setPositionCommand(Distance position) {
