@@ -1,13 +1,13 @@
 package frc.robot;
 
-import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
+import frc.lib.util.PIDGains;
+import frc.lib.util.FeedforwardGains;
 
 public class Constants {
 
@@ -34,8 +34,8 @@ public class Constants {
     public static final double POSITION_CONVERSION_FACTOR = 1;
     public static final double VELOCITY_CONVERSION_FACTOR = 1;
 
-    public static final PIDController PID = new PIDController(0, 0, 0);
-    public static final ElevatorFeedforward FEEDFORWARD = new ElevatorFeedforward(0, 0, 0, 0);
+    public static final PIDGains PID = new PIDGains.Builder().build();
+    public static final FeedforwardGains FEEDFORWARD = new FeedforwardGains.Builder().build();
 
     public static final Distance START_SETPOINT = Distance.ofBaseUnits(0, Units.Meters);
 

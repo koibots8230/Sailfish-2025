@@ -61,9 +61,9 @@ public class Elevator extends SubsystemBase {
         .closedLoop
         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
         .pid(
-            ElevatorConstants.PID.getP(),
-            ElevatorConstants.PID.getI(),
-            ElevatorConstants.PID.getD());
+            ElevatorConstants.PID.kp,
+            ElevatorConstants.PID.ki,
+            ElevatorConstants.PID.kd);
     motorConfig.absoluteEncoder.positionConversionFactor(
         ElevatorConstants.POSITION_CONVERSION_FACTOR);
     motorConfig.absoluteEncoder.velocityConversionFactor(
@@ -73,10 +73,10 @@ public class Elevator extends SubsystemBase {
 
     feedforward =
         new ElevatorFeedforward(
-            ElevatorConstants.FEEDFORWARD.getKs(),
-            ElevatorConstants.FEEDFORWARD.getKg(),
-            ElevatorConstants.FEEDFORWARD.getKv(),
-            ElevatorConstants.FEEDFORWARD.getKa());
+            ElevatorConstants.FEEDFORWARD.ks,
+            ElevatorConstants.FEEDFORWARD.kg,
+            ElevatorConstants.FEEDFORWARD.kv,
+            ElevatorConstants.FEEDFORWARD.ka);
 
     goal = new TrapezoidProfile.State();
     setpoint = ElevatorConstants.START_SETPOINT;
