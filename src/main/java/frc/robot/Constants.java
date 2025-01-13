@@ -11,7 +11,9 @@ import edu.wpi.first.units.measure.Time;
 
 public class Constants {
 
-  public static class RobotConstants {}
+  public static class RobotConstants {
+    public static final Time ROBOT_CLOCK_SPEED = Time.ofBaseUnits(20, Units.Milliseconds);
+  }
 
   public static class SwerveConstants {
     public static final LinearVelocity MAX_SPEED =
@@ -30,6 +32,7 @@ public class Constants {
         AngularAcceleration.ofBaseUnits(0, Units.RotationsPerSecondPerSecond);
 
     public static final double POSITION_CONVERSION_FACTOR = 1;
+    public static final double VELOCITY_CONVERSION_FACTOR = 1;
 
     public static final PIDController PID = new PIDController(0, 0, 0);
     public static final ElevatorFeedforward FEEDFORWARD = new ElevatorFeedforward(0, 0, 0, 0);

@@ -44,6 +44,8 @@ public class RobotContainer {
     L3.onTrue(elevator.setPositionCommand(ElevatorConstants.L3_SETPOINT));
     Trigger L4 = xboxController.y();
     L4.onTrue(elevator.setPositionCommand(ElevatorConstants.L4_SETPOINT));
+    Trigger ElevatorDown = xboxController.rightBumper();
+    ElevatorDown.onTrue(elevator.setPositionCommand(ElevatorConstants.START_SETPOINT));
   }
 
   public void teleopInit() {}
