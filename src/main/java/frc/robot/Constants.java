@@ -32,7 +32,9 @@ public class Constants {
     public static final Distance L4_SETPOINT = Distance.ofBaseUnits(4, Units.Meters);
 
     public static final PIDGains PID = new PIDGains.Builder().kp(0).build();
-    public static final FeedforwardGains FEEDFORWARD = new FeedforwardGains.Builder().kv(0).kg(0).build();
+    public static final FeedforwardGains FEEDFORWARD =
+        new FeedforwardGains.Builder().kv(0).kg(0).build();
+
     public static final AngularVelocity MAX_VELOCITY =
         AngularVelocity.ofBaseUnits(0, Units.RotationsPerSecond);
     public static final AngularAcceleration MAX_ACCELRATION =
@@ -41,7 +43,6 @@ public class Constants {
     public static final double CONVERSION_FACTOR = 1;
 
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(60, Units.Amps);
-    
 
     public static final int MOTOR_ID = 0;
   }
