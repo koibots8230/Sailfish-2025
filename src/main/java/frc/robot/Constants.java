@@ -53,6 +53,8 @@ public class Constants {
   public static class IntakePivotConstants {
     public static final int PIVOT_MOTOR_ID = 9998;
     public static final Angle START_SETPOINT = Angle.ofBaseUnits(0, Units.Degrees);
+    public static final int PID_kP = 1;
+    public static final int PID_kV = 1;
   }
   //the purpose of this comment is solely to iritate jake >:D
   public static class IntakeConstants {
