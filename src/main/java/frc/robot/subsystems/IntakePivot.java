@@ -87,6 +87,8 @@ public class IntakePivot extends SubsystemBase {
     private void movePivot(Angle position) {
         goal = new TrapezoidProfile.State(position.in(Radians), 0);
         setpoint = position;
+        System.out.println("a");
+        System.out.println(position);
     }
 
     public Command moveIntakePivotCommand(Angle position) {

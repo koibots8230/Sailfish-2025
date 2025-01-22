@@ -12,6 +12,8 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
@@ -57,13 +59,12 @@ public class RobotContainer {
     Trigger ElevatorDown = xboxController.rightBumper();
     ElevatorDown.onTrue(elevator.setPositionCommand(ElevatorConstants.START_SETPOINT));
 
-    Trigger spinIntake = new Trigger(xboxController.a());
+    Trigger spinIntake = new Trigger(xboxController.b());
     spinIntake.onTrue(intake.IntakeCommand(IntakeConstants.INTAKE_VELOCITY));
     spinIntake.onFalse(intake.IntakeCommand(AngularVelocity.ofBaseUnits(0, RPM)));
 
-    Trigger intakePivotOut = new Trigger(xboxController.b());
+    Trigger intakePivotOut = new Trigger(xboxController.a());
     intakePivotOut.onTrue(intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION));
-
 
   }
 
