@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -69,7 +70,7 @@ public class IntakePivot extends SubsystemBase {
             motorSetpoint.position,
             ControlType.kPosition,
             ClosedLoopSlot.kSlot0,
-            feedforward.calculate(motorSetpoint.velocity));
+            feedforward.calculate(motorSetpoint.position, motorSetpoint.velocity));
             
         position = Angle.ofBaseUnits(Encoder.getPosition(), Degrees);
         velocity = AngularVelocity.ofBaseUnits(Encoder.getVelocity(), DegreesPerSecond);
@@ -80,11 +81,12 @@ public class IntakePivot extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
-        //????
+        position = setpoint;
     }
 
     private void movePivot(Angle position) {
-        goal = new TrapezoidProfile.State(position.in(Degrees), 0);
+        goal = new TrapezoidProfile.State(position.in(Radians), 0);
+        setpoint = position;
     }
 
     public Command moveIntakePivotCommand(Angle position) {
