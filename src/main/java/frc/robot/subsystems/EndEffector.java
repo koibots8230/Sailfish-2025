@@ -101,6 +101,7 @@ public class EndEffector extends SubsystemBase {
                 Commands.runOnce(() -> this.setVelocity(EndEffectorConstants.OUTTAKE_SPEED), this),
                 Commands.waitUntil(() -> !(laserCAN.getMeasurement().distance_mm <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeter)))
             ),
+            Commands.waitSeconds(0.5),
             Commands.runOnce(() -> this.setVelocity(AngularVelocity.ofBaseUnits(0, Units.RPM)), this)
         );
     }
