@@ -59,13 +59,12 @@ public class RobotContainer {
     Trigger ElevatorDown = xboxController.rightBumper();
     ElevatorDown.onTrue(elevator.setPositionCommand(ElevatorConstants.START_SETPOINT));
 
-    Trigger spinIntake = new Trigger(xboxController.b());
+    Trigger spinIntake = new Trigger(xboxController.a());
     spinIntake.onTrue(intake.IntakeCommand(IntakeConstants.INTAKE_VELOCITY));
     spinIntake.onFalse(intake.IntakeCommand(AngularVelocity.ofBaseUnits(0, RPM)));
 
-    Trigger intakePivotOut = new Trigger(xboxController.a());
+    Trigger intakePivotOut = new Trigger(xboxController.b());
     intakePivotOut.onTrue(intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION));
-
   }
 
 

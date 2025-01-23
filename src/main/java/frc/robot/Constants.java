@@ -2,6 +2,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Radians;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.Units;
@@ -59,8 +60,8 @@ public class Constants {
     public static final int PIVOT_MOTOR_ID = 9997; 
     public static final int PID_kP = 0;
     public static final int PID_kV = 0;
-    public static final Angle OUT_POSITION = Angle.ofBaseUnits(10, Degrees);
-    public static final Angle START_POSITION = Angle.ofBaseUnits(0, Degrees);
+    public static final Angle OUT_POSITION = Angle.ofBaseUnits(10, Radians);
+    public static final Angle START_POSITION = Angle.ofBaseUnits(0, Radians);
   }
 
   public static class IntakeConstants {
@@ -68,7 +69,7 @@ public class Constants {
     public static final int PID_kP = 0;
     public static final int PID_kV = 0;
     
-    public static final AngularVelocity INTAKE_VELOCITY = AngularVelocity.ofBaseUnits(0, RPM);
+    public static final AngularVelocity INTAKE_VELOCITY = AngularVelocity.ofBaseUnits(10, RPM);
   }
 
 }
