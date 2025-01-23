@@ -6,12 +6,16 @@ package frc.robot;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.EndEffectorConstants;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.EndEffector;
 import frc.robot.subsystems.Swerve;
 
 @Logged
@@ -20,11 +24,14 @@ public class RobotContainer {
   private final Swerve swerve;
   private final Elevator elevator;
 
+  private final EndEffector endEffector;
+
   @NotLogged private final CommandXboxController xboxController;
 
   public RobotContainer() {
     swerve = new Swerve();
     elevator = new Elevator();
+    endEffector = new EndEffector();
 
     xboxController = new CommandXboxController(0);
 
@@ -36,16 +43,17 @@ public class RobotContainer {
         swerve.driveFieldRelativeCommand(
             xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
 
-    Trigger L1 = xboxController.a();
-    L1.onTrue(elevator.setPositionCommand(ElevatorConstants.L1_SETPOINT));
-    Trigger L2 = xboxController.b();
-    L2.onTrue(elevator.setPositionCommand(ElevatorConstants.L2_SETPOINT));
-    Trigger L3 = xboxController.x();
-    L3.onTrue(elevator.setPositionCommand(ElevatorConstants.L3_SETPOINT));
-    Trigger L4 = xboxController.y();
-    L4.onTrue(elevator.setPositionCommand(ElevatorConstants.L4_SETPOINT));
-    Trigger ElevatorDown = xboxController.rightBumper();
-    ElevatorDown.onTrue(elevator.setPositionCommand(ElevatorConstants.START_SETPOINT));
+    Trigger testEffector = xboxController.axisGreaterThan(0, 0.05);
+    testEffector.onTrue(endEffector.setVelocityCommand(EndEffectorConstants.INTAKE_SPEED));
+    testEffector.onFalse(endEffector.setVelocityCommand(AngularVelocity.ofBaseUnits(0, Units.RPM)));
+
+    Trigger intakeEffector = xboxController.a();
+    intakeEffector.onTrue(endEffector.intakeCommand());
+    intakeEffector.onFalse(endEffector.setVelocityCommand(AngularVelocity.ofBaseUnits(0, Units.RPM)));
+
+    Trigger outtakeEffector = xboxController.b();
+    outtakeEffector.onTrue(endEffector.intakeCommand());
+    outtakeEffector.onFalse(endEffector.setVelocityCommand(AngularVelocity.ofBaseUnits(0, Units.RPM)));
   }
 
   public void teleopInit() {}
