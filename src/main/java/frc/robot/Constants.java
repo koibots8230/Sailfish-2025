@@ -5,6 +5,7 @@ import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import frc.lib.util.FeedforwardGains;
@@ -35,15 +36,16 @@ public class Constants {
     public static final FeedforwardGains FEEDFORWARD =
         new FeedforwardGains.Builder().kv(0).kg(0).build();
 
-    public static final AngularVelocity MAX_VELOCITY =
-        AngularVelocity.ofBaseUnits(0, Units.RotationsPerSecond);
-    public static final AngularAcceleration MAX_ACCELRATION =
-        AngularAcceleration.ofBaseUnits(0, Units.RotationsPerSecondPerSecond);
+    public static final LinearVelocity MAX_VELOCITY =
+        LinearVelocity.ofBaseUnits(0, Units.MetersPerSecond);
+    public static final LinearAcceleration MAX_ACCELRATION =
+        LinearAcceleration.ofBaseUnits(0, Units.MetersPerSecondPerSecond);
 
     public static final double CONVERSION_FACTOR = 1;
 
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(60, Units.Amps);
 
-    public static final int MOTOR_ID = 0;
+    public static final int LEFT_MOTOR_ID = 0;
+    public static final int RIGHT_MOTOR_ID = 1;
   }
 }

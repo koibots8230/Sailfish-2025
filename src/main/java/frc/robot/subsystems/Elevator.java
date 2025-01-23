@@ -3,8 +3,7 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -34,27 +33,34 @@ import frc.robot.Constants.RobotConstants;
 @Logged
 public class Elevator extends SubsystemBase {
 
-  private final SparkMax motor;
+  private final SparkMax leftMotor;
+  private final SparkMax rightMotor;
   private final SparkMaxConfig motorConfig;
   private final TrapezoidProfile profile;
-  private final AbsoluteEncoder motorEncoder;
+  private final AbsoluteEncoder leftMotorEncoder;
+  private final AbsoluteEncoder rightMotorEncoder;
   private final ElevatorFeedforward feedforward;
   private TrapezoidProfile.State goal;
   private TrapezoidProfile.State motorSetpoint;
   private Distance setpoint;
-  private Distance position;
-  private LinearVelocity velocity;
-  private Voltage voltage;
-  private Current current;
+  private Distance leftPosition;
+  private Distance rightPosition;
+  private LinearVelocity leftVelocity;
+  private LinearVelocity rightVelocity;
+  private Voltage leftVoltage;
+  private Voltage rightVoltage;
+  private Current leftCurrent;
+  private Current rightCurrent;
 
   public Elevator() {
     profile =
         new TrapezoidProfile(
             new TrapezoidProfile.Constraints(
-                ElevatorConstants.MAX_VELOCITY.in(RotationsPerSecond),
-                ElevatorConstants.MAX_ACCELRATION.in(RotationsPerSecondPerSecond)));
+                ElevatorConstants.MAX_VELOCITY.in(MetersPerSecond),
+                ElevatorConstants.MAX_ACCELRATION.in(MetersPerSecondPerSecond)));
 
-    motor = new SparkMax(ElevatorConstants.MOTOR_ID, MotorType.kBrushless);
+    leftMotor = new SparkMax(ElevatorConstants.LEFT_MOTOR_ID, MotorType.kBrushless);
+    rightMotor = new SparkMax(ElevatorConstants.RIGHT_MOTOR_ID, MotorType.kBrushless);
     motorConfig = new SparkMaxConfig();
     motorConfig.idleMode(IdleMode.kBrake);
     motorConfig
@@ -64,8 +70,10 @@ public class Elevator extends SubsystemBase {
     motorConfig.smartCurrentLimit((int) ElevatorConstants.CURRENT_LIMIT.in(Amps));
     motorConfig.absoluteEncoder.positionConversionFactor(ElevatorConstants.CONVERSION_FACTOR);
     motorConfig.absoluteEncoder.velocityConversionFactor(ElevatorConstants.CONVERSION_FACTOR);
-    motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    motorEncoder = motor.getAbsoluteEncoder();
+    leftMotor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    rightMotor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    leftMotorEncoder = leftMotor.getAbsoluteEncoder();
+    rightMotorEncoder = rightMotor.getAbsoluteEncoder();
 
     feedforward =
         new ElevatorFeedforward(
@@ -78,21 +86,33 @@ public class Elevator extends SubsystemBase {
     setpoint = ElevatorConstants.START_SETPOINT;
     motorSetpoint = new TrapezoidProfile.State();
 
-    position = Distance.ofBaseUnits(motorEncoder.getPosition(), Meters);
-    velocity = LinearVelocity.ofBaseUnits(motorEncoder.getVelocity(), MetersPerSecond);
-    voltage = Voltage.ofBaseUnits(motor.getBusVoltage() * motor.getAppliedOutput(), Volts);
-    current = Current.ofBaseUnits(motor.getOutputCurrent(), Amps);
+    leftPosition = Distance.ofBaseUnits(leftMotorEncoder.getPosition(), Meters);
+    rightPosition = Distance.ofBaseUnits(rightMotorEncoder.getPosition(), Meters);
+    leftVelocity = LinearVelocity.ofBaseUnits(leftMotorEncoder.getVelocity(), MetersPerSecond);
+    rightVelocity = LinearVelocity.ofBaseUnits(rightMotorEncoder.getVelocity(), MetersPerSecond);
+    leftVoltage = Voltage.ofBaseUnits(leftMotor.getBusVoltage() * leftMotor.getAppliedOutput(), Volts);
+    rightVoltage = Voltage.ofBaseUnits(rightMotor.getBusVoltage() * rightMotor.getAppliedOutput(), Volts);
+    leftCurrent = Current.ofBaseUnits(leftMotor.getOutputCurrent(), Amps);
+    rightCurrent = Current.ofBaseUnits(rightMotor.getOutputCurrent(), Amps);
   }
 
   @Override
   public void periodic() {
     goal =
         new TrapezoidProfile.State(
-            setpoint.in(Meters), RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds));
+            setpoint.in(Meters), 0);
 
-    motorSetpoint = profile.calculate(0, motorSetpoint, goal);
+    motorSetpoint = profile.calculate(RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds), motorSetpoint, goal);
 
-    motor
+    leftMotor
+        .getClosedLoopController()
+        .setReference(
+            motorSetpoint.position,
+            ControlType.kPosition,
+            ClosedLoopSlot.kSlot0,
+            feedforward.calculate(motorSetpoint.velocity));
+    
+    rightMotor
         .getClosedLoopController()
         .setReference(
             motorSetpoint.position,
@@ -100,15 +120,20 @@ public class Elevator extends SubsystemBase {
             ClosedLoopSlot.kSlot0,
             feedforward.calculate(motorSetpoint.velocity));
 
-    voltage = Voltage.ofBaseUnits(motor.getBusVoltage() * motor.getAppliedOutput(), Volts);
-    current = Current.ofBaseUnits(motor.getOutputCurrent(), Amps);
-    position = Distance.ofBaseUnits(motorEncoder.getPosition(), Meters);
-    velocity = LinearVelocity.ofBaseUnits(motorEncoder.getVelocity(), MetersPerSecond);
+    leftPosition = Distance.ofBaseUnits(leftMotorEncoder.getPosition(), Meters);
+    rightPosition = Distance.ofBaseUnits(rightMotorEncoder.getPosition(), Meters);
+    leftVelocity = LinearVelocity.ofBaseUnits(leftMotorEncoder.getVelocity(), MetersPerSecond);
+    rightVelocity = LinearVelocity.ofBaseUnits(rightMotorEncoder.getVelocity(), MetersPerSecond);
+    leftVoltage = Voltage.ofBaseUnits(leftMotor.getBusVoltage() * leftMotor.getAppliedOutput(), Volts);
+    rightVoltage = Voltage.ofBaseUnits(rightMotor.getBusVoltage() * rightMotor.getAppliedOutput(), Volts);
+    leftCurrent = Current.ofBaseUnits(leftMotor.getOutputCurrent(), Amps);
+    rightCurrent = Current.ofBaseUnits(rightMotor.getOutputCurrent(), Amps);
   }
 
   @Override
   public void simulationPeriodic() {
-    position = setpoint;
+    leftPosition = setpoint;
+    rightPosition = setpoint;
   }
 
   private void setPosition(Distance position) {
