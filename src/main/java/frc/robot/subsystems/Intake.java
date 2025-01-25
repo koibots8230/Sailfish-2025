@@ -35,8 +35,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 @Logged 
 public class Intake extends SubsystemBase {
     
-    private final RelativeEncoder motorEncoder;
-    private final SparkMax intakeMotor;
+    private final RelativeEncoder encoder;
+    private final SparkMax motor;
     private SparkMaxConfig config;
     private SparkClosedLoopController closedLoopController;
 
@@ -47,24 +47,24 @@ public class Intake extends SubsystemBase {
 
 
     public Intake() {
-        intakeMotor = new SparkMax(IntakeConstants.INTAKE_MOTOR_ID, MotorType.kBrushless);
-        motorEncoder = intakeMotor.getEncoder();
+        motor = new SparkMax(IntakeConstants.INTAKE_MOTOR_ID, MotorType.kBrushless);
+        encoder = motor.getEncoder();
         
         config = new SparkMaxConfig();
         config.closedLoop.p(IntakeConstants.PID_kP);
         config.closedLoop.velocityFF(IntakeConstants.PID_kV);
 
-        intakeMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        closedLoopController = intakeMotor.getClosedLoopController();
+        motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        closedLoopController = motor.getClosedLoopController();
 
         setpoint = AngularVelocity.ofBaseUnits(0, RPM);
     }
 
     @Override
     public void periodic() {
-        velocity = AngularVelocity.ofBaseUnits(motorEncoder.getVelocity(), RPM);
-        voltage = Voltage.ofBaseUnits(intakeMotor.getBusVoltage() * intakeMotor.getAppliedOutput(), Volts);
-        current = Current.ofBaseUnits(intakeMotor.getOutputCurrent(), Amps);
+        velocity = AngularVelocity.ofBaseUnits(encoder.getVelocity(), RPM);
+        voltage = Voltage.ofBaseUnits(motor.getBusVoltage() * motor.getAppliedOutput(), Volts);
+        current = Current.ofBaseUnits(motor.getOutputCurrent(), Amps);
     }
 
     @Override

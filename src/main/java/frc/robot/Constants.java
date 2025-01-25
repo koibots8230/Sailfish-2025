@@ -56,20 +56,30 @@ public class Constants {
     public static final int MOTOR_ID = 0;
   }
 
-  public static class IntakePivotConstants {
-    public static final int PIVOT_MOTOR_ID = 9997; 
-    public static final int PID_kP = 0;
-    public static final int PID_kV = 0;
+  public static class IntakePivotConstants {     
     public static final Angle OUT_POSITION = Angle.ofBaseUnits(10, Radians);
     public static final Angle START_POSITION = Angle.ofBaseUnits(0, Radians);
+    public static final AngularVelocity MAX_VELOCITY =
+        AngularVelocity.ofBaseUnits(0, Units.RotationsPerSecond);
+    public static final AngularAcceleration MAX_ACCELRATION =
+        AngularAcceleration.ofBaseUnits(0, Units.RotationsPerSecondPerSecond);
+
+    public static final int PID_kP = 0;
+    public static final int PID_kV = 0;
+    public static final PIDGains PID = new PIDGains.Builder().kp(0).build();
+    public static final FeedforwardGains FEEDFORWARD =
+        new FeedforwardGains.Builder().kv(0).kg(0).build();
+
+    public static final int PIVOT_MOTOR_ID = 9997;
   }
 
   public static class IntakeConstants {
-    public static final int INTAKE_MOTOR_ID = 9998;
+    public static final AngularVelocity INTAKE_VELOCITY = AngularVelocity.ofBaseUnits(10, RPM);
+    
     public static final int PID_kP = 0;
     public static final int PID_kV = 0;
-    
-    public static final AngularVelocity INTAKE_VELOCITY = AngularVelocity.ofBaseUnits(10, RPM);
+
+    public static final int INTAKE_MOTOR_ID = 9998;
   }
 
 }
