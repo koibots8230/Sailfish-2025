@@ -51,8 +51,8 @@ public class Intake extends SubsystemBase {
         encoder = motor.getEncoder();
         
         config = new SparkMaxConfig();
-        config.closedLoop.p(IntakeConstants.PID_kP);
-        config.closedLoop.velocityFF(IntakeConstants.PID_kV);
+        config.closedLoop.p(IntakeConstants.PID.kp);
+        config.closedLoop.velocityFF(IntakeConstants.FEEDFORWARD.kv);
 
         motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         closedLoopController = motor.getClosedLoopController();

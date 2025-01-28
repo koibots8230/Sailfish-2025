@@ -13,6 +13,8 @@ import static edu.wpi.first.units.Units.Volts;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -36,10 +38,10 @@ import frc.robot.Constants.RobotConstants;
 @Logged 
 public class IntakePivot extends SubsystemBase {
     
-    private final SparkMax Motor;
+    private final SparkMax motor;
     private final TrapezoidProfile profile;
     private final ArmFeedforward feedforward;
-    private final AbsoluteEncoder Encoder;
+    private final AbsoluteEncoder encoder;
     private TrapezoidProfile.State goal;
     private TrapezoidProfile.State motorSetpoint;
     private SparkMaxConfig config;
@@ -51,12 +53,17 @@ public class IntakePivot extends SubsystemBase {
     private Angle position;
     
     public IntakePivot() {
-        Motor = new SparkMax(IntakePivotConstants.PIVOT_MOTOR_ID, MotorType.kBrushless);
-        Encoder = Motor.getAbsoluteEncoder();
+        motor = new SparkMax(IntakePivotConstants.INTAKE_PIVOT_MOTOR_ID, MotorType.kBrushless);
+        encoder =motor.getAbsoluteEncoder();
 
         config = new SparkMaxConfig();
-        config.closedLoop.p(IntakePivotConstants.PID_kP);
-        config.closedLoop.velocityFF(IntakePivotConstants.PID_kV);
+        config.closedLoop.p(IntakePivotConstants.PID.kp);
+        config.closedLoop.velocityFF(IntakePivotConstants.FEEDFORWARD.kv);
+
+        config.absoluteEncoder.positionConversionFactor(IntakePivotConstants.POSITION_CONVERSION_FACTOR);
+        config.absoluteEncoder.velocityConversionFactor(IntakePivotConstants.VELCOITY_CONVERSION_FACTOR);
+
+    motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     
         profile = new TrapezoidProfile(new Constraints(
             IntakePivotConstants.MAX_VELOCITY.in(RotationsPerSecond), 
@@ -79,9 +86,12 @@ public class IntakePivot extends SubsystemBase {
         new TrapezoidProfile.State(
             setpoint.in(Radians), 0);
 
-    motorSetpoint = profile.calculate(RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds), motorSetpoint, goal);
+    motorSetpoint = 
+        profile.calculate(RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds), 
+        motorSetpoint, 
+        goal);
 
-    Motor
+motor
         .getClosedLoopController()
         .setReference(
             motorSetpoint.position,
@@ -89,10 +99,10 @@ public class IntakePivot extends SubsystemBase {
             ClosedLoopSlot.kSlot0,
             feedforward.calculate(motorSetpoint.position, motorSetpoint.velocity));
             
-        position = Angle.ofBaseUnits(Encoder.getPosition(), Degrees);
-        velocity = AngularVelocity.ofBaseUnits(Encoder.getVelocity(), DegreesPerSecond);
-        voltage = Voltage.ofBaseUnits(Motor.getBusVoltage() * Motor.getAppliedOutput(), Volts);
-        current = Current.ofBaseUnits(Motor.getOutputCurrent(), Amps);
+        position = Angle.ofBaseUnits(encoder.getPosition(), Degrees);
+        velocity = AngularVelocity.ofBaseUnits(encoder.getVelocity(), DegreesPerSecond);
+        voltage = Voltage.ofBaseUnits(motor.getBusVoltage() * motor.getAppliedOutput(), Volts);
+        current = Current.ofBaseUnits(motor.getOutputCurrent(), Amps);
     }
 
     @Override

@@ -63,23 +63,27 @@ public class Constants {
         AngularVelocity.ofBaseUnits(0, Units.RotationsPerSecond);
     public static final AngularAcceleration MAX_ACCELRATION =
         AngularAcceleration.ofBaseUnits(0, Units.RotationsPerSecondPerSecond);
+      
+    public static final double POSITION_CONVERSION_FACTOR = 2.0 * Math.PI;
+    public static final double VELCOITY_CONVERSION_FACTOR = 2.0 * Math.PI;
 
-    public static final int PID_kP = 0;
-    public static final int PID_kV = 0;
     public static final PIDGains PID = new PIDGains.Builder().kp(0).build();
     public static final FeedforwardGains FEEDFORWARD =
         new FeedforwardGains.Builder().kv(0).kg(0).build();
 
-    public static final int PIVOT_MOTOR_ID = 9997;
+    public static final int INTAKE_PIVOT_MOTOR_ID = 11;
   }
 
   public static class IntakeConstants {
     public static final AngularVelocity INTAKE_VELOCITY = AngularVelocity.ofBaseUnits(10, RPM);
     
-    public static final int PID_kP = 0;
-    public static final int PID_kV = 0;
+    public static final PIDGains PID = new PIDGains.Builder().kp(0).build();
+    public static final FeedforwardGains FEEDFORWARD =
+        new FeedforwardGains.Builder().kv(0).kg(0).build();
 
-    public static final int INTAKE_MOTOR_ID = 9998;
+    public static final double
+
+    public static final int INTAKE_MOTOR_ID = 10;
   }
 
 }
