@@ -14,6 +14,8 @@ import java.util.function.DoubleSupplier;
 
 import org.opencv.core.Mat;
 
+import com.ctre.phoenix6.hardware.Pigeon2;
+
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -41,9 +43,11 @@ public class Swerve extends SubsystemBase{
   private SwerveModuleState frontRight;
   private SwerveModuleState backLeft;
   private SwerveModuleState backRight;
-  private 
+  private final Pigeon2 gyro;
 
   public Swerve() {
+
+    gyro = new Pigeon2(SwerveConstants.GYRO_ID);
 
     simHeading = new Rotation2d(0.0);
 
@@ -94,7 +98,7 @@ public class Swerve extends SubsystemBase{
   private void driveFieldRelative(LinearVelocity x, LinearVelocity y, AngularVelocity omega){
     simHeading = simHeading.plus(new Rotation2d(omega.times(Seconds.of(.02))));
     estimatedPosition = estimatedPosition.transformBy(new Transform2d(x.times(Seconds.of(.02)).in(Meters), y.times(Seconds.of(.02)).in(Meters), new Rotation2d(omega.times(Seconds.of(.02)).in(Radians))));
-    ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x.times(Seconds.of(.02)).in(Meters), y.times(Seconds.of(.02)).in(Meters), omega.times(Seconds.of(.02)).in(Radians), simHeading);
+    ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x.times(Seconds.of(.02)).in(Meters), y.times(Seconds.of(.02)).in(Meters), omega.times(Seconds.of(.02)).in(Radians), gyro.getRotation2d());
     swerveModuleStates = RobotConstants.KINEMATICS.toSwerveModuleStates(speeds);
     //front left
     frontLeft = swerveModuleStates[0];

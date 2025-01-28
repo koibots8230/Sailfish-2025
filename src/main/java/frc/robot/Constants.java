@@ -31,10 +31,10 @@ public class Constants {
 
   // STEP 6: Add a LinearVelocity MAX_SPEED and a AngularVelocity MAX_ANGULAR_VELOCITY
   public static class SwerveConstants {
-    public static final PIDGains TURN_PID = new PIDGains.Builder().kp(0).build();
-    public static final PIDGains DRIVE_PID = new PIDGains.Builder().kp(0).build();
-    public static final FeedforwardGains TURN_FEEDFORWARD = new FeedforwardGains .Builder().kv(0).build();
-    public static final FeedforwardGains DRIVE_FEEDFORWARD = new FeedforwardGains .Builder().kv(0).build();
+    public static final PIDGains TURN_PID = new PIDGains.Builder().kp(0.2).build();
+    public static final PIDGains DRIVE_PID = new PIDGains.Builder().kp(0.1).build();
+    public static final FeedforwardGains TURN_FEEDFORWARD = new FeedforwardGains .Builder().kv(0.2).build();
+    public static final FeedforwardGains DRIVE_FEEDFORWARD = new FeedforwardGains .Builder().kv(0.26).build();
     public static final Current TURN_CURRENT_LIMIT = Current.ofBaseUnits(20, Units.Amps);
     public static final Current DRIVE_CURRENT_LIMIT = Current.ofBaseUnits(211, Units.Amps);
     public static final double DRIVE_CONVERSION_FACTOR = 1;
@@ -49,6 +49,17 @@ public class Constants {
     public static final double LEFT_STICK_SCAILING = 2;
 
     public static final double RIGHT_STICK_SCAILING = 3;
+
+    public static final int FRONT_LEFT_DRIVE_ID = 1;
+    public static final int FRONT_LEFT_TURN_ID = 2;
+    public static final int FRONT_RIGHT_DRIVE_ID = 3;
+    public static final int FRONT_RIGHT_TURN_ID = 4;
+    public static final int BACK_LEFT_DRIVE_ID = 5;
+    public static final int BACK_LEFT_TURN_ID = 6;
+    public static final int BACK_RIGHT_DRIVE_ID = 7;
+    public static final int BACK_RIGHT_TURN_ID = 8;
+
+    public static final int GYRO_ID = 18;
 
   }
 }
