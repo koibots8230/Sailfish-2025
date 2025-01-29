@@ -81,9 +81,6 @@ public class Constants {
     public static final FeedforwardGains FEEDFORWARD =
         new FeedforwardGains.Builder().kv(0).kg(0).build();
 
-    public static final double
-
     public static final int INTAKE_MOTOR_ID = 10;
   }
-
 }
