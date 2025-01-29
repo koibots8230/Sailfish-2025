@@ -21,8 +21,6 @@ import frc.robot.Constants.EndEffectorConstants;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.EndEffector;
 import frc.robot.subsystems.Swerve;
-
-@Logged
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Swerve;
@@ -44,7 +42,6 @@ public class RobotContainer {
     swerve = new Swerve();
     elevator = new Elevator();
     endEffector = new EndEffector();
-    swerve = new Swerve();
     controller = new XboxController(0);
 
     xboxController = new CommandXboxController(0);
