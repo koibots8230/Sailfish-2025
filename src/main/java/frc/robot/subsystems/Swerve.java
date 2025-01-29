@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Microseconds;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -38,6 +39,7 @@ public class Swerve extends SubsystemBase{
 
   private Pose2d estimatedPosition;
   private Rotation2d simHeading;
+  private Rotation2d gyroAngle;
   private SwerveModuleState[] swerveModuleStates;
   private SwerveModuleState frontLeft;
   private SwerveModuleState frontRight;
@@ -60,6 +62,17 @@ public class Swerve extends SubsystemBase{
     backLeft = new SwerveModuleState();
     backRight = new SwerveModuleState();
 
+  }
+
+  @Override
+  public void simulationPeriodic(){
+    gyroAngle = simHeading;
+    System.out.println("anlge of robot in sim is " + gyroAngle);
+  }
+
+  @Override
+  public void periodic() {
+    gyroAngle = gyro.getRotation2d();
   }
 
   private void DriveFiledRelativeBlueScailier(double x, double y, double omega){
@@ -97,8 +110,8 @@ public class Swerve extends SubsystemBase{
 
   private void driveFieldRelative(LinearVelocity x, LinearVelocity y, AngularVelocity omega){
     simHeading = simHeading.plus(new Rotation2d(omega.times(Seconds.of(.02))));
-    estimatedPosition = estimatedPosition.transformBy(new Transform2d(x.times(Seconds.of(.02)).in(Meters), y.times(Seconds.of(.02)).in(Meters), new Rotation2d(omega.times(Seconds.of(.02)).in(Radians))));
-    ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x.times(Seconds.of(.02)).in(Meters), y.times(Seconds.of(.02)).in(Meters), omega.times(Seconds.of(.02)).in(Radians), gyro.getRotation2d());
+    estimatedPosition = new Pose2d(estimatedPosition.getX() + x.times(RobotConstants.CLOCK_TIME).in(Meters), estimatedPosition.getY() + (y.times(RobotConstants.CLOCK_TIME).in(Meters)), new Rotation2d(estimatedPosition.getRotation().getRadians() + omega.times(Seconds.of(.02)).in(Radians)));
+    ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x.times(Seconds.of(.02)).in(Meters), y.times(Seconds.of(.02)).in(Meters), omega.times(Seconds.of(.02)).in(Radians), gyroAngle);
     swerveModuleStates = RobotConstants.KINEMATICS.toSwerveModuleStates(speeds);
     //front left
     frontLeft = swerveModuleStates[0];

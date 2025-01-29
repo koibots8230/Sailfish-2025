@@ -6,6 +6,8 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Time;
+
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -26,10 +28,11 @@ public class Constants {
       new Translation2d(RobotConstants.LENGTH.divide(-2), RobotConstants.WIDTH.divide(2)),
       new Translation2d(RobotConstants.LENGTH.divide(-2), RobotConstants.WIDTH.divide(-2))
       );    
+
+    public static final Time CLOCK_TIME = Second.of(.02);
     
   }
 
-  // STEP 6: Add a LinearVelocity MAX_SPEED and a AngularVelocity MAX_ANGULAR_VELOCITY
   public static class SwerveConstants {
     public static final PIDGains TURN_PID = new PIDGains.Builder().kp(0.2).build();
     public static final PIDGains DRIVE_PID = new PIDGains.Builder().kp(0.1).build();
