@@ -110,7 +110,7 @@ public class Swerve extends SubsystemBase{
 
   private void driveFieldRelative(LinearVelocity x, LinearVelocity y, AngularVelocity omega){
     simHeading = simHeading.plus(new Rotation2d(omega.times(Seconds.of(.02))));
-    estimatedPosition = new Pose2d(estimatedPosition.getX() + x.times(RobotConstants.CLOCK_TIME).in(Meters), estimatedPosition.getY() + (y.times(RobotConstants.CLOCK_TIME).in(Meters)), new Rotation2d(estimatedPosition.getRotation().getRadians() + omega.times(Seconds.of(.02)).in(Radians)));
+    estimatedPosition = new Pose2d(estimatedPosition.getX() + x.times(RobotConstants.ROBOT_CLOCK_SPEED).in(Meters), estimatedPosition.getY() + (y.times(RobotConstants.ROBOT_CLOCK_SPEED).in(Meters)), new Rotation2d(estimatedPosition.getRotation().getRadians() + omega.times(Seconds.of(.02)).in(Radians)));
     ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x.times(Seconds.of(.02)).in(Meters), y.times(Seconds.of(.02)).in(Meters), omega.times(Seconds.of(.02)).in(Radians), gyroAngle);
     swerveModuleStates = RobotConstants.KINEMATICS.toSwerveModuleStates(speeds);
     //front left

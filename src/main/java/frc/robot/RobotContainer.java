@@ -37,7 +37,6 @@ public class RobotContainer {
   private final EndEffector endEffector;
 
   @NotLogged private final CommandXboxController xboxController;
-  private Swerve swerve;
   private final XboxController controller;
   private boolean colour;
 
@@ -55,9 +54,6 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    swerve.setDefaultCommand(
-        swerve.driveFieldRelativeCommand(
-            xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
 
     Trigger testEffector = xboxController.axisGreaterThan(0, 0.05);
     testEffector.onTrue(endEffector.setVelocityCommand(EndEffectorConstants.INTAKE_SPEED));
