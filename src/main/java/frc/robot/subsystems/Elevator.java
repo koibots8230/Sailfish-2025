@@ -4,10 +4,11 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Millimeters;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
-import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -24,6 +25,7 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -37,9 +39,10 @@ public class Elevator extends SubsystemBase {
   private final SparkMax rightMotor;
   private final SparkMaxConfig motorConfig;
   private final TrapezoidProfile profile;
-  private final AbsoluteEncoder leftMotorEncoder;
-  private final AbsoluteEncoder rightMotorEncoder;
+  private final RelativeEncoder leftMotorEncoder;
+  private final RelativeEncoder rightMotorEncoder;
   private final ElevatorFeedforward feedforward;
+  private final DigitalInput HallEffectsSensor;
   private TrapezoidProfile.State goal;
   private TrapezoidProfile.State motorSetpoint;
   private Distance setpoint;
@@ -65,15 +68,15 @@ public class Elevator extends SubsystemBase {
     motorConfig.idleMode(IdleMode.kBrake);
     motorConfig
         .closedLoop
-        .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+        .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
         .pid(ElevatorConstants.PID.kp, ElevatorConstants.PID.ki, ElevatorConstants.PID.kd);
     motorConfig.smartCurrentLimit((int) ElevatorConstants.CURRENT_LIMIT.in(Amps));
-    motorConfig.absoluteEncoder.positionConversionFactor(ElevatorConstants.CONVERSION_FACTOR);
-    motorConfig.absoluteEncoder.velocityConversionFactor(ElevatorConstants.CONVERSION_FACTOR);
+    motorConfig.alternateEncoder.positionConversionFactor(ElevatorConstants.CONVERSION_FACTOR);
+    motorConfig.alternateEncoder.velocityConversionFactor(ElevatorConstants.CONVERSION_FACTOR);
     leftMotor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     rightMotor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    leftMotorEncoder = leftMotor.getAbsoluteEncoder();
-    rightMotorEncoder = rightMotor.getAbsoluteEncoder();
+    leftMotorEncoder = leftMotor.getAlternateEncoder();
+    rightMotorEncoder = rightMotor.getAlternateEncoder();
 
     feedforward =
         new ElevatorFeedforward(
@@ -82,12 +85,16 @@ public class Elevator extends SubsystemBase {
             ElevatorConstants.FEEDFORWARD.kv,
             ElevatorConstants.FEEDFORWARD.ka);
 
+    HallEffectsSensor = new DigitalInput(0);
+
     goal = new TrapezoidProfile.State();
     setpoint = ElevatorConstants.START_SETPOINT;
     motorSetpoint = new TrapezoidProfile.State();
 
-    leftPosition = Distance.ofBaseUnits(leftMotorEncoder.getPosition(), Meters);
-    rightPosition = Distance.ofBaseUnits(rightMotorEncoder.getPosition(), Meters);
+    leftPosition = Distance.ofBaseUnits(0, Meters);
+    rightPosition = Distance.ofBaseUnits(0, Meters);
+    leftMotorEncoder.setPosition(0);
+    rightMotorEncoder.setPosition(0);
     leftVelocity = LinearVelocity.ofBaseUnits(leftMotorEncoder.getVelocity(), MetersPerSecond);
     rightVelocity = LinearVelocity.ofBaseUnits(rightMotorEncoder.getVelocity(), MetersPerSecond);
     leftVoltage = Voltage.ofBaseUnits(leftMotor.getBusVoltage() * leftMotor.getAppliedOutput(), Volts);
@@ -142,5 +149,16 @@ public class Elevator extends SubsystemBase {
 
   public Command setPositionCommand(Distance position) {
     return Commands.runOnce(() -> this.setPosition(position), this);
+  }
+
+  public Command setZeroPositionCommand() {
+    return Commands.sequence(
+      Commands.race(
+        Commands.run(() -> setPosition(Distance.ofBaseUnits(setpoint.in(Millimeters) - 5, Millimeters)), this),
+        Commands.waitUntil(() -> HallEffectsSensor.get() == true)
+      ),
+      Commands.runOnce(() -> leftMotorEncoder.setPosition(0), this),
+      Commands.runOnce(() -> rightMotorEncoder.setPosition(0), this)
+    );
   }
 }
