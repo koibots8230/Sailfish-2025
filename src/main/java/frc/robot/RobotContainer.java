@@ -43,17 +43,17 @@ public class RobotContainer {
         swerve.driveFieldRelativeCommand(
             xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
 
-    Trigger testEffector = xboxController.axisGreaterThan(0, 0.05);
+    Trigger testEffector = xboxController.x();
     testEffector.onTrue(endEffector.setVelocityCommand(EndEffectorConstants.INTAKE_SPEED));
-    testEffector.onFalse(endEffector.setVelocityCommand(AngularVelocity.ofBaseUnits(0, Units.RPM)));
+    testEffector.onFalse(endEffector.setVelocityCommand(0));
 
     Trigger intakeEffector = xboxController.a();
     intakeEffector.onTrue(endEffector.intakeCommand());
-    intakeEffector.onFalse(endEffector.setVelocityCommand(AngularVelocity.ofBaseUnits(0, Units.RPM)));
+    intakeEffector.onFalse(endEffector.setVelocityCommand(0));
 
     Trigger outtakeEffector = xboxController.b();
-    outtakeEffector.onTrue(endEffector.intakeCommand());
-    outtakeEffector.onFalse(endEffector.setVelocityCommand(AngularVelocity.ofBaseUnits(0, Units.RPM)));
+    outtakeEffector.onTrue(endEffector.outtakeCommand());
+    outtakeEffector.onFalse(endEffector.setVelocityCommand(0));
   }
 
   public void teleopInit() {}
