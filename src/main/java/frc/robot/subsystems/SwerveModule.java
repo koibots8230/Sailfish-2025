@@ -1,15 +1,16 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Volt;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkMaxAlternateEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkBase;
@@ -19,21 +20,25 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.MutCurrent;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.RobotConstants;
 import frc.robot.Constants.SwerveConstants;
 
-public class SwerveModule extends SubsystemBase{
+@Logged
+public class SwerveModule {
 
   private final SparkFlex driveMotor;
   private final SparkMax turnMotor;
@@ -54,8 +59,17 @@ public class SwerveModule extends SubsystemBase{
   private Current driveCurrent;
   private SparkClosedLoopController turnController;
   private SparkClosedLoopController driveController;
-  
+  private Distance drivePosition;
+  private final TrapezoidProfile turnProfile;
+  private final TrapezoidProfile.State turnGoalState;
+  private final TrapezoidProfile.State turnSetpointState;
+
     public SwerveModule(int driveID, int turnID){
+
+      turnProfile = new TrapezoidProfile(new TrapezoidProfile.Constraints(SwerveConstants.MAX_SPEED.in(MetersPerSecond), SwerveConstants.MAX_ROTATION.in(RadiansPerSecond)));
+
+      turnGoalState = new TrapezoidProfile.State(0,0);
+      turnSetpointState = new TrapezoidProfile.State(0,0);
   
       turnMotor = new SparkMax(turnID, MotorType.kBrushless);
       driveMotor = new SparkFlex(driveID, MotorType.kBrushless);
@@ -88,6 +102,7 @@ public class SwerveModule extends SubsystemBase{
     turnSetpoint = Radians.of(0);
     driveSetpoint = LinearVelocity.ofBaseUnits(0, Units.MetersPerSecond);
     turnPosition = Radians.of(turnEncoder.getPosition());
+    drivePosition = Meters.of(driveEncoder.getPosition());
     driveVelocity = LinearVelocity.ofBaseUnits(driveEncoder.getVelocity(), Units.MetersPerSecond);
     turnVelocity = AngularVelocity.ofBaseUnits(turnEncoder.getVelocity(), Units.RadiansPerSecond);
     driveVoltage = Voltage.ofBaseUnits(driveMotor.getBusVoltage() * driveMotor.getAppliedOutput(), Volts);
@@ -99,14 +114,35 @@ public class SwerveModule extends SubsystemBase{
   public void setState(SwerveModuleState swerveModuleState){
     turnController.setReference(swerveModuleState.angle.getRadians(), SparkBase.ControlType.kPosition);
     driveController.setReference(swerveModuleState.speedMetersPerSecond, SparkBase.ControlType.kVelocity);
+
+    driveSetpoint = MetersPerSecond.of(swerveModuleState.speedMetersPerSecond);
+    turnSetpoint = Radians.of(swerveModuleState.angle.getRadians());
+
+  //  turnGoalState = new TrapezoidProfile(optimizedState.angle.getRadians())
+  } 
+
+  public void periodic() {
     driveCurrent =  Current.ofBaseUnits(driveMotor.getOutputCurrent(), Units.Amps);
     turnCurrent = Current.ofBaseUnits(turnMotor.getOutputCurrent(), Units.Amps);
     driveVoltage = Voltage.ofBaseUnits(driveMotor.getBusVoltage() * driveMotor.getAppliedOutput(), Volts);
     turnVoltage = Voltage.ofBaseUnits(turnMotor.getBusVoltage() * turnMotor.getAppliedOutput(), Volts);
-  } 
+    drivePosition = Meters.of(driveEncoder.getPosition());
+    turnPosition = Radians.of(turnEncoder.getPosition());
+    driveVelocity = LinearVelocity.ofBaseUnits(driveEncoder.getVelocity(), Units.MetersPerSecond);
+    turnVelocity = AngularVelocity.ofBaseUnits(turnEncoder.getVelocity(), Units.RadiansPerSecond);
+  }
+
+  public void simulationPeriodic() {
+    drivePosition = drivePosition.plus(driveSetpoint.times(RobotConstants.ROBOT_CLOCK_SPEED));
+    turnPosition = turnSetpoint;
+    driveVelocity = driveSetpoint;
+  }
 
   public SwerveModuleState getModuleState(){
-    return new SwerveModuleState(driveEncoder.getVelocity(), new Rotation2d(turnEncoder.getPosition()));
+    return new SwerveModuleState(driveVelocity, new Rotation2d(turnPosition));
+  }
 
+  public SwerveModulePosition getPosition(){
+    return new SwerveModulePosition(drivePosition, new Rotation2d(turnPosition));
   }
 }

@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
+import java.lang.Thread.State;
 import java.util.function.DoubleSupplier;
 
 import org.opencv.core.Mat;
@@ -19,11 +20,13 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.Kinematics;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -36,18 +39,29 @@ import frc.robot.Constants.SwerveConstants;
 
 @Logged
 public class Swerve extends SubsystemBase{
-
+  @Logged(name = "modules")
   private Pose2d estimatedPosition;
   private Rotation2d simHeading;
   private Rotation2d gyroAngle;
-  private SwerveModuleState[] swerveModuleStates;
-  private SwerveModuleState frontLeft;
-  private SwerveModuleState frontRight;
-  private SwerveModuleState backLeft;
-  private SwerveModuleState backRight;
+  private SwerveModuleState[] setpointStates;
   private final Pigeon2 gyro;
+  private final SwerveModule modules[];
+  private final SwerveModuleState[] messuredStates;
+
+  // private final SwerveDrivePoseEstimator odometry;
 
   public Swerve() {
+
+    // odometry = new SwerveDrivePoseEstimator(Constants.SwerveConstants.KINEMATICS, gyroAngle, this.getModulePostition(), estimatedPosition);
+
+    modules = new SwerveModule[4];
+
+    modules[0] = new SwerveModule(SwerveConstants.FRONT_LEFT_DRIVE_ID, SwerveConstants.FRONT_LEFT_TURN_ID);
+    modules[1] =  new SwerveModule(SwerveConstants.FRONT_RIGHT_DRIVE_ID, SwerveConstants.FRONT_RIGHT_TURN_ID);
+    modules[2] =  new SwerveModule(SwerveConstants.BACK_LEFT_DRIVE_ID, SwerveConstants.BACK_LEFT_TURN_ID);
+    modules[3] =  new SwerveModule(SwerveConstants.BACK_RIGHT_DRIVE_ID, SwerveConstants.BACK_RIGHT_TURN_ID);
+
+    
 
     gyro = new Pigeon2(SwerveConstants.GYRO_ID);
 
@@ -55,28 +69,53 @@ public class Swerve extends SubsystemBase{
 
     estimatedPosition = new Pose2d();
 
-    swerveModuleStates = new SwerveModuleState[4];
+    setpointStates = new SwerveModuleState[4];
+    messuredStates = new SwerveModuleState[4];
 
-    frontLeft = new SwerveModuleState();
-    frontRight = new SwerveModuleState();
-    backLeft = new SwerveModuleState();
-    backRight = new SwerveModuleState();
-
-  }
-
-  @Override
-  public void simulationPeriodic(){
-    gyroAngle = simHeading;
-    System.out.println("anlge of robot in sim is " + gyroAngle);
   }
 
   @Override
   public void periodic() {
+    
+    modules[0].periodic();
+    modules[1].periodic();
+    modules[2].periodic();
+    modules[3].periodic();
+
     gyroAngle = gyro.getRotation2d();
+
+    messuredStates[0] = modules[0].getModuleState();
+    messuredStates[1] = modules[1].getModuleState();
+    messuredStates[2] = modules[2].getModuleState();
+    messuredStates[3] = modules[3].getModuleState();
+
+  //  estimatedPosition = odometry.update(gyroAngle, this.getModulePostition());
   }
 
-  private void DriveFiledRelativeBlueScailier(double x, double y, double omega){
+  @Override
+  public void simulationPeriodic() {
+    gyroAngle = simHeading;
 
+    modules[0].simulationPeriodic();
+    modules[1].simulationPeriodic();
+    modules[2].simulationPeriodic();
+    modules[3].simulationPeriodic();
+  }
+
+  public SwerveModulePosition[] getModulePostition(){
+    return new SwerveModulePosition[] {
+      modules[0].getPosition(),
+      modules[1].getPosition(),
+      modules[2].getPosition(),
+      modules[3].getPosition()
+    };
+  }
+
+ // public Pose2d getOdometryPose(){
+   // return odometry.getEstimatedPosition();
+ // }
+
+  private void DriveFiledRelativeBlueScailier(double x, double y, double omega){
 
     double liniarMagintued = Math.pow(Math.hypot(x, y), SwerveConstants.LEFT_STICK_SCAILING);
 
@@ -92,7 +131,6 @@ public class Swerve extends SubsystemBase{
 
   private void DriveFiledRelativeRedScailier(double x, double y, double omega){
 
-
     double liniarMagintued = Math.pow(Math.hypot(x, y), SwerveConstants.LEFT_STICK_SCAILING);
 
     Rotation2d directions = new Rotation2d(y, x);
@@ -107,20 +145,16 @@ public class Swerve extends SubsystemBase{
     driveFieldRelative(MetersPerSecond.of(MathUtil.applyDeadband(x, Constants.SwerveConstants.DEADBAND)), MetersPerSecond.of(MathUtil.applyDeadband(-y, Constants.SwerveConstants.DEADBAND)), RadiansPerSecond.of(MathUtil.applyDeadband(-omega, Constants.SwerveConstants.DEADBAND)));
   }
 
-
   private void driveFieldRelative(LinearVelocity x, LinearVelocity y, AngularVelocity omega){
     simHeading = simHeading.plus(new Rotation2d(omega.times(Seconds.of(.02))));
     estimatedPosition = new Pose2d(estimatedPosition.getX() + x.times(RobotConstants.ROBOT_CLOCK_SPEED).in(Meters), estimatedPosition.getY() + (y.times(RobotConstants.ROBOT_CLOCK_SPEED).in(Meters)), new Rotation2d(estimatedPosition.getRotation().getRadians() + omega.times(Seconds.of(.02)).in(Radians)));
     ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x.times(Seconds.of(.02)).in(Meters), y.times(Seconds.of(.02)).in(Meters), omega.times(Seconds.of(.02)).in(Radians), gyroAngle);
-    swerveModuleStates = RobotConstants.KINEMATICS.toSwerveModuleStates(speeds);
-    //front left
-    frontLeft = swerveModuleStates[0];
-    //front Right
-    frontRight = swerveModuleStates[1];
-    //back Left
-    backLeft = swerveModuleStates[2];
-    //back Right
-    backRight = swerveModuleStates[3];
+    setpointStates = SwerveConstants.KINEMATICS.toSwerveModuleStates(speeds);
+    
+    modules[0].setState(setpointStates[0]);
+    modules[1].setState(setpointStates[1]);
+    modules[2].setState(setpointStates[2]);
+    modules[3].setState(setpointStates[3]);
   }
 
   public void zeroing(boolean colour){
