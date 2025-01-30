@@ -39,27 +39,34 @@ import frc.robot.Constants.SwerveConstants;
 
 @Logged
 public class SwerveModule {
-
   private final SparkFlex driveMotor;
   private final SparkMax turnMotor;
+
   private final AbsoluteEncoder turnEncoder;
   private final RelativeEncoder driveEncoder;
+
   private final SparkMaxConfig turnConfig;
   private final SparkFlexConfig driveConfig;
+
   private final SimpleMotorFeedforward turnFeedforward;
   private final SimpleMotorFeedforward driveFeedforward;
+
   private Angle turnSetpoint;
   private LinearVelocity driveSetpoint;
+
+  private Distance drivePosition;
   private Angle turnPosition;
   private LinearVelocity driveVelocity;
   private AngularVelocity turnVelocity;
+
   private Voltage turnVoltage;
   private Voltage driveVoltage;
   private Current turnCurrent;
   private Current driveCurrent;
-  private SparkClosedLoopController turnController;
-  private SparkClosedLoopController driveController;
-  private Distance drivePosition;
+
+  private final SparkClosedLoopController turnController;
+  private final SparkClosedLoopController driveController;
+
   private final TrapezoidProfile turnProfile;
   private final TrapezoidProfile.State turnGoalState;
   private final TrapezoidProfile.State turnSetpointState;
@@ -73,17 +80,25 @@ public class SwerveModule {
   
       turnMotor = new SparkMax(turnID, MotorType.kBrushless);
       driveMotor = new SparkFlex(driveID, MotorType.kBrushless);
+
       turnConfig = new SparkMaxConfig();
+
       turnConfig.idleMode(IdleMode.kBrake);
+
       turnConfig.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder).pid
-      (SwerveConstants.TURN_PID.kp, SwerveConstants.TURN_PID.ki, SwerveConstants.TURN_PID.kd);
+        (SwerveConstants.TURN_PID.kp, SwerveConstants.TURN_PID.ki, SwerveConstants.TURN_PID.kd);
+
       turnConfig.smartCurrentLimit((int) SwerveConstants.TURN_CURRENT_LIMIT.in(Amps));
+
       turnConfig.absoluteEncoder.positionConversionFactor(SwerveConstants.TURN_CONVERSION_FACTOR);
       turnConfig.absoluteEncoder.velocityConversionFactor(SwerveConstants.TURN_CONVERSION_FACTOR);
   
       driveConfig = new SparkFlexConfig();
+
       driveConfig.idleMode(IdleMode.kBrake);
+
       driveConfig.closedLoop.pid(SwerveConstants.DRIVE_PID.kp, SwerveConstants.DRIVE_PID.ki, SwerveConstants.DRIVE_PID.kd);
+
       driveConfig.smartCurrentLimit((int) SwerveConstants.DRIVE_CURRENT_LIMIT.in(Amps));
   
       turnMotor.configure(turnConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -91,6 +106,7 @@ public class SwerveModule {
   
       turnEncoder = turnMotor.getAbsoluteEncoder();
       turnController = turnMotor.getClosedLoopController();
+
       driveEncoder = driveMotor.getEncoder();
       driveController = driveMotor.getClosedLoopController();
 

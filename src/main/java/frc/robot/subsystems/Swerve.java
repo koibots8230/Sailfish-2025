@@ -39,13 +39,29 @@ import frc.robot.Constants.SwerveConstants;
 
 @Logged
 public class Swerve extends SubsystemBase{
-  @Logged(name = "modules")
   private Pose2d estimatedPosition;
   private Rotation2d simHeading;
   private Rotation2d gyroAngle;
   private SwerveModuleState[] setpointStates;
   private final Pigeon2 gyro;
-  private final SwerveModule modules[];
+
+  @Logged
+  public class Modules {
+    final SwerveModule frontLeft;
+    final SwerveModule frontRight;
+    final SwerveModule backLeft;
+    final SwerveModule backRight;
+
+    public Modules() {
+      frontLeft = new SwerveModule(SwerveConstants.FRONT_LEFT_DRIVE_ID, SwerveConstants.FRONT_LEFT_TURN_ID);
+      frontRight =  new SwerveModule(SwerveConstants.FRONT_RIGHT_DRIVE_ID, SwerveConstants.FRONT_RIGHT_TURN_ID);
+      backLeft =  new SwerveModule(SwerveConstants.BACK_LEFT_DRIVE_ID, SwerveConstants.BACK_LEFT_TURN_ID);
+      backRight =  new SwerveModule(SwerveConstants.BACK_RIGHT_DRIVE_ID, SwerveConstants.BACK_RIGHT_TURN_ID);
+    }
+  }
+
+  private final Modules modules;
+
   private final SwerveModuleState[] messuredStates;
 
   // private final SwerveDrivePoseEstimator odometry;
@@ -54,15 +70,8 @@ public class Swerve extends SubsystemBase{
 
     // odometry = new SwerveDrivePoseEstimator(Constants.SwerveConstants.KINEMATICS, gyroAngle, this.getModulePostition(), estimatedPosition);
 
-    modules = new SwerveModule[4];
-
-    modules[0] = new SwerveModule(SwerveConstants.FRONT_LEFT_DRIVE_ID, SwerveConstants.FRONT_LEFT_TURN_ID);
-    modules[1] =  new SwerveModule(SwerveConstants.FRONT_RIGHT_DRIVE_ID, SwerveConstants.FRONT_RIGHT_TURN_ID);
-    modules[2] =  new SwerveModule(SwerveConstants.BACK_LEFT_DRIVE_ID, SwerveConstants.BACK_LEFT_TURN_ID);
-    modules[3] =  new SwerveModule(SwerveConstants.BACK_RIGHT_DRIVE_ID, SwerveConstants.BACK_RIGHT_TURN_ID);
-
+    modules = new Modules();
     
-
     gyro = new Pigeon2(SwerveConstants.GYRO_ID);
 
     simHeading = new Rotation2d(0.0);
@@ -77,17 +86,17 @@ public class Swerve extends SubsystemBase{
   @Override
   public void periodic() {
     
-    modules[0].periodic();
-    modules[1].periodic();
-    modules[2].periodic();
-    modules[3].periodic();
+    modules.frontLeft.periodic();
+    modules.frontRight.periodic();
+    modules.backLeft.periodic();
+    modules.backRight.periodic();
 
     gyroAngle = gyro.getRotation2d();
 
-    messuredStates[0] = modules[0].getModuleState();
-    messuredStates[1] = modules[1].getModuleState();
-    messuredStates[2] = modules[2].getModuleState();
-    messuredStates[3] = modules[3].getModuleState();
+    messuredStates[0] = modules.frontLeft.getModuleState();
+    messuredStates[1] = modules.frontRight.getModuleState();
+    messuredStates[2] = modules.backLeft.getModuleState();
+    messuredStates[3] = modules.backRight.getModuleState();
 
   //  estimatedPosition = odometry.update(gyroAngle, this.getModulePostition());
   }
@@ -96,18 +105,18 @@ public class Swerve extends SubsystemBase{
   public void simulationPeriodic() {
     gyroAngle = simHeading;
 
-    modules[0].simulationPeriodic();
-    modules[1].simulationPeriodic();
-    modules[2].simulationPeriodic();
-    modules[3].simulationPeriodic();
+    modules.frontLeft.simulationPeriodic();
+    modules.frontRight.simulationPeriodic();
+    modules.backLeft.simulationPeriodic();
+    modules.backRight.simulationPeriodic();
   }
 
   public SwerveModulePosition[] getModulePostition(){
     return new SwerveModulePosition[] {
-      modules[0].getPosition(),
-      modules[1].getPosition(),
-      modules[2].getPosition(),
-      modules[3].getPosition()
+      modules.frontLeft.getPosition(),
+      modules.frontRight.getPosition(),
+      modules.backLeft.getPosition(),
+      modules.backRight.getPosition()
     };
   }
 
@@ -151,10 +160,10 @@ public class Swerve extends SubsystemBase{
     ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x.times(Seconds.of(.02)).in(Meters), y.times(Seconds.of(.02)).in(Meters), omega.times(Seconds.of(.02)).in(Radians), gyroAngle);
     setpointStates = SwerveConstants.KINEMATICS.toSwerveModuleStates(speeds);
     
-    modules[0].setState(setpointStates[0]);
-    modules[1].setState(setpointStates[1]);
-    modules[2].setState(setpointStates[2]);
-    modules[3].setState(setpointStates[3]);
+    modules.frontLeft.setState(setpointStates[0]);
+    modules.frontRight.setState(setpointStates[1]);
+    modules.backLeft.setState(setpointStates[2]);
+    modules.backRight.setState(setpointStates[3]);
   }
 
   public void zeroing(boolean colour){

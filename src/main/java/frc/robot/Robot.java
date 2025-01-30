@@ -4,12 +4,16 @@
 
 package frc.robot;
 
+import edu.wpi.first.epilogue.CustomLoggerFor;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
+import edu.wpi.first.epilogue.logging.EpilogueBackend;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.SwerveModule;
 
 @Logged
 public class Robot extends TimedRobot {
