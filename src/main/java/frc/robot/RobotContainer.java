@@ -48,23 +48,25 @@ public class RobotContainer {
         swerve.driveFieldRelativeCommand(
             xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
 
-    //Trigger L1 = xboxController.a();
-    //L1.onTrue(elevator.setPositionCommand(ElevatorConstants.L1_SETPOINT));
-    Trigger L2 = xboxController.b();
+    Trigger L2 = xboxController.a();
     L2.onTrue(elevator.setPositionCommand(ElevatorConstants.L2_SETPOINT));
-    Trigger L3 = xboxController.x();
+    Trigger L3 = xboxController.y();
     L3.onTrue(elevator.setPositionCommand(ElevatorConstants.L3_SETPOINT));
-    Trigger L4 = xboxController.y();
-    L4.onTrue(elevator.setPositionCommand(ElevatorConstants.L4_SETPOINT));
     Trigger ElevatorDown = xboxController.rightBumper();
     ElevatorDown.onTrue(elevator.setPositionCommand(ElevatorConstants.START_SETPOINT));
 
-    Trigger spinIntake = new Trigger(xboxController.a());
+    Trigger spinIntake = new Trigger(xboxController.rightTrigger());
     spinIntake.onTrue(intake.IntakeCommand(IntakeConstants.INTAKE_VELOCITY));
     spinIntake.onFalse(intake.IntakeCommand(AngularVelocity.ofBaseUnits(0, RPM)));
 
+    Trigger reverseIntake = new Trigger(xboxController.leftTrigger());
+    reverseIntake.onTrue(intake.IntakeCommand(IntakeConstants.REVERSE_INTAKE_VELOCITY));
+    reverseIntake.onFalse(intake.IntakeCommand(AngularVelocity.ofBaseUnits(0, RPM)));
+
     Trigger intakePivotOut = new Trigger(xboxController.b());
     intakePivotOut.onTrue(intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION));
+
+
   }
 
 

@@ -76,6 +76,7 @@ public class Constants {
 
   public static class IntakeConstants {
     public static final AngularVelocity INTAKE_VELOCITY = AngularVelocity.ofBaseUnits(10, RPM);
+    public static final AngularVelocity REVERSE_INTAKE_VELOCITY = AngularVelocity.ofBaseUnits(10, RPM);
     
     public static final PIDGains PID = new PIDGains.Builder().kp(0).build();
     public static final FeedforwardGains FEEDFORWARD =
