@@ -36,7 +36,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Intake extends SubsystemBase {
     
     private final RelativeEncoder encoder;
-    private final SparkMax motor;
+    private final SparkMax leftMotor;
+    private final SparkMax rightMotor;
     private SparkMaxConfig config;
     private SparkClosedLoopController closedLoopController;
 
@@ -47,15 +48,22 @@ public class Intake extends SubsystemBase {
 
 
     public Intake() {
-        motor = new SparkMax(IntakeConstants.INTAKE_MOTOR_ID, MotorType.kBrushless);
-        encoder = motor.getEncoder();
+        leftMotor = new SparkMax(IntakeConstants.INTAKE_LEFT_MOTOR_ID, MotorType.kBrushless);
+        rightMotor = new SparkMax(IntakeConstants.INTAKE_RIGHT_MOTOR_ID, MotorType.kBrushless);
+        encoder = leftMotor.getEncoder();
         
         config = new SparkMaxConfig();
         config.closedLoop.p(IntakeConstants.PID.kp);
         config.closedLoop.velocityFF(IntakeConstants.FEEDFORWARD.kv);
 
-        motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        closedLoopController = motor.getClosedLoopController();
+        leftMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+        config.follow(IntakeConstants.INTAKE_RIGHT_MOTOR_ID);
+        config.inverted(true);
+
+        rightMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+        closedLoopController = leftMotor.getClosedLoopController();
 
         setpoint = AngularVelocity.ofBaseUnits(0, RPM);
     }
@@ -63,8 +71,8 @@ public class Intake extends SubsystemBase {
     @Override
     public void periodic() {
         velocity = AngularVelocity.ofBaseUnits(encoder.getVelocity(), RPM);
-        voltage = Voltage.ofBaseUnits(motor.getBusVoltage() * motor.getAppliedOutput(), Volts);
-        current = Current.ofBaseUnits(motor.getOutputCurrent(), Amps);
+        voltage = Voltage.ofBaseUnits(leftMotor.getBusVoltage() * leftMotor.getAppliedOutput(), Volts);
+        current = Current.ofBaseUnits(leftMotor.getOutputCurrent(), Amps);
     }
 
     @Override
