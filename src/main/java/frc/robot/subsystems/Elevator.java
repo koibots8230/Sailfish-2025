@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
@@ -71,8 +72,8 @@ public class Elevator extends SubsystemBase {
         .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
         .pid(ElevatorConstants.PID.kp, ElevatorConstants.PID.ki, ElevatorConstants.PID.kd);
     motorConfig.smartCurrentLimit((int) ElevatorConstants.CURRENT_LIMIT.in(Amps));
-    motorConfig.alternateEncoder.positionConversionFactor(ElevatorConstants.CONVERSION_FACTOR);
-    motorConfig.alternateEncoder.velocityConversionFactor(ElevatorConstants.CONVERSION_FACTOR);
+    motorConfig.alternateEncoder.positionConversionFactor(ElevatorConstants.CONVERSION_FACTOR.in(Meters));
+    motorConfig.alternateEncoder.velocityConversionFactor(ElevatorConstants.CONVERSION_FACTOR.in(Meters));
     leftMotor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     rightMotor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     leftMotorEncoder = leftMotor.getAlternateEncoder();

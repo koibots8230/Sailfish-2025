@@ -38,13 +38,7 @@ public class RobotContainer {
 
     Trigger L1 = xboxController.a();
     L1.onTrue(elevator.setPositionCommand(ElevatorConstants.L1_SETPOINT));
-    Trigger L2 = xboxController.b();
-    L2.onTrue(elevator.setPositionCommand(ElevatorConstants.L2_SETPOINT));
-    Trigger L3 = xboxController.x();
-    L3.onTrue(elevator.setPositionCommand(ElevatorConstants.L3_SETPOINT));
-    Trigger L4 = xboxController.y();
-    L4.onTrue(elevator.setPositionCommand(ElevatorConstants.L4_SETPOINT));
-    Trigger ElevatorDown = xboxController.rightBumper();
+    Trigger ElevatorDown = xboxController.b();
     ElevatorDown.onTrue(elevator.setPositionCommand(ElevatorConstants.START_SETPOINT));
     Trigger ElevatorSetZero = xboxController.leftBumper();
     ElevatorSetZero.onTrue(elevator.setZeroPositionCommand());
