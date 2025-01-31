@@ -29,14 +29,12 @@ public class RobotContainer {
   private final EndEffector endEffector;
 
   @NotLogged private final CommandXboxController xboxController;
-  private final XboxController controller;
   private boolean colour;
 
   public RobotContainer() {
     swerve = new Swerve();
     elevator = new Elevator();
     endEffector = new EndEffector();
-    controller = new XboxController(0);
 
     xboxController = new CommandXboxController(0);
 
@@ -58,25 +56,18 @@ public class RobotContainer {
     outtakeEffector.onTrue(endEffector.intakeCommand());
     outtakeEffector.onFalse(endEffector.setVelocityCommand(AngularVelocity.ofBaseUnits(0, Units.RPM)));
 
-    Trigger zero = new Trigger(() -> controller.getAButton());
+    Trigger zero = xboxController.a();
 
     zero.onTrue(swerve.zeroRobotCommad(colour));
   }
 
   private void defualtCommands(){
-    if (colour){
-    swerve.setDefaultCommand(swerve.driveFieldRelativeBlueCommand(controller::getLeftY, controller::getLeftX, controller::getRightX));
-    }
-
-    else{
-      swerve.setDefaultCommand(swerve.driveFieldRelativeRedCommand(controller::getLeftY, controller::getLeftX, controller::getRightX));
-    }
-
-
+      swerve.setDefaultCommand(swerve.driveFieldRelativeCommand(xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
   }
 
   public void teleopInit() {
     colour = (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
+    swerve.setColourAllicanceIsBlueFIRSTRoboticCompotionFRCIsBlue(colour);
   }
 
   public Command getAutonomousCommand() {

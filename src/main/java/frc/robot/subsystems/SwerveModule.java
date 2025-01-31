@@ -54,9 +54,9 @@ public class SwerveModule {
   private Angle turnSetpoint;
   private LinearVelocity driveSetpoint;
 
-  private Distance drivePosition;
-  private Angle turnPosition;
-  private LinearVelocity driveVelocity;
+  double drivePosition; //TODO: Put back to measures when fixed
+  double turnPosition;
+  double driveVelocity;
   private AngularVelocity turnVelocity;
 
   private Voltage turnVoltage;
@@ -117,9 +117,9 @@ public class SwerveModule {
     
     turnSetpoint = Radians.of(0);
     driveSetpoint = LinearVelocity.ofBaseUnits(0, Units.MetersPerSecond);
-    turnPosition = Radians.of(turnEncoder.getPosition());
-    drivePosition = Meters.of(driveEncoder.getPosition());
-    driveVelocity = LinearVelocity.ofBaseUnits(driveEncoder.getVelocity(), Units.MetersPerSecond);
+    // turnPosition = Radians.of(turnEncoder.getPosition());
+    // drivePosition = Meters.of(driveEncoder.getPosition());
+    // driveVelocity = LinearVelocity.ofBaseUnits(driveEncoder.getVelocity(), Units.MetersPerSecond);
     turnVelocity = AngularVelocity.ofBaseUnits(turnEncoder.getVelocity(), Units.RadiansPerSecond);
     driveVoltage = Voltage.ofBaseUnits(driveMotor.getBusVoltage() * driveMotor.getAppliedOutput(), Volts);
     turnVoltage = Voltage.ofBaseUnits(turnMotor.getBusVoltage() * turnMotor.getAppliedOutput(), Volts);
@@ -133,8 +133,6 @@ public class SwerveModule {
 
     driveSetpoint = MetersPerSecond.of(swerveModuleState.speedMetersPerSecond);
     turnSetpoint = Radians.of(swerveModuleState.angle.getRadians());
-
-  //  turnGoalState = new TrapezoidProfile(optimizedState.angle.getRadians())
   } 
 
   public void periodic() {
@@ -142,16 +140,17 @@ public class SwerveModule {
     turnCurrent = Current.ofBaseUnits(turnMotor.getOutputCurrent(), Units.Amps);
     driveVoltage = Voltage.ofBaseUnits(driveMotor.getBusVoltage() * driveMotor.getAppliedOutput(), Volts);
     turnVoltage = Voltage.ofBaseUnits(turnMotor.getBusVoltage() * turnMotor.getAppliedOutput(), Volts);
-    drivePosition = Meters.of(driveEncoder.getPosition());
-    turnPosition = Radians.of(turnEncoder.getPosition());
-    driveVelocity = LinearVelocity.ofBaseUnits(driveEncoder.getVelocity(), Units.MetersPerSecond);
+    // drivePosition = Meters.of(driveEncoder.getPosition());
+    // turnPosition = Radians.of(turnEncoder.getPosition());
+    // driveVelocity = LinearVelocity.ofBaseUnits(driveEncoder.getVelocity(), Units.MetersPerSecond);
     turnVelocity = AngularVelocity.ofBaseUnits(turnEncoder.getVelocity(), Units.RadiansPerSecond);
+
   }
 
   public void simulationPeriodic() {
-    drivePosition = drivePosition.plus(driveSetpoint.times(RobotConstants.ROBOT_CLOCK_SPEED));
-    turnPosition = turnSetpoint;
-    driveVelocity = driveSetpoint;
+    drivePosition = drivePosition + driveSetpoint.times(RobotConstants.ROBOT_CLOCK_SPEED).in(Meters);
+    turnPosition = turnSetpoint.in(Radians);
+    driveVelocity = driveSetpoint.in(MetersPerSecond);
   }
 
   public SwerveModuleState getModuleState(){

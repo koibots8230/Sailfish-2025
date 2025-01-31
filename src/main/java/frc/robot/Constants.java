@@ -71,7 +71,7 @@ public class Constants {
     public static final Distance WIDTH = Inches.of(23.5);
     public static final Distance LENGTH = Inches.of(23.5);
 
-      public static final Time ROBOT_CLOCK_SPEED = Time.ofBaseUnits(20, Units.Milliseconds);
+      public static final Time ROBOT_CLOCK_SPEED = Time.ofBaseUnits(0.02, Units.Seconds);
     
   }
 
