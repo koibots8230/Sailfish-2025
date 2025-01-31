@@ -68,13 +68,13 @@ public class Swerve extends SubsystemBase{
 
   private final SwerveDrivePoseEstimator odometry;
 
-  private boolean isColourAllianceBlueFIRSTRoboticsSwerveSubsytsm;
+  private boolean isBlue;
     
     
       
       public Swerve() {
     
-        this.isColourAllianceBlueFIRSTRoboticsSwerveSubsytsm = true;
+        this.isBlue = true;
         
         modules = new Modules();
     
@@ -93,8 +93,8 @@ public class Swerve extends SubsystemBase{
     
       }
   
-      public void setColourAllicanceIsBlueFIRSTRoboticCompotionFRCIsBlue(boolean colour){
-        isColourAllianceBlueFIRSTRoboticsSwerveSubsytsm = colour;
+      public void getColour(boolean colour){
+        isBlue = colour;
     }
   
     @Override
@@ -105,7 +105,7 @@ public class Swerve extends SubsystemBase{
       modules.backLeft.periodic();
       modules.backRight.periodic();
 
-      estimatedPosition = odometry.update(isColourAllianceBlueFIRSTRoboticsSwerveSubsytsm ? gyroAngle : gyroAngle.minus(new Rotation2d(Math.PI)), this.getModulePostition());
+      estimatedPosition = odometry.update(isBlue ? gyroAngle : gyroAngle.minus(new Rotation2d(Math.PI)), this.getModulePostition());
   
       gyroAngle = gyro.getRotation2d();
 
@@ -169,9 +169,8 @@ public class Swerve extends SubsystemBase{
     modules.backRight.setState(setpointStates[3]);
   }
 
-  public void zeroing(boolean colour){
-    System.out.println(colour);
-    simHeading = colour == true ?  new Rotation2d(0.0) :  new Rotation2d(Math.PI);
+  public void zeroing(){
+    gyro.setYaw(0);
   }   
 
   public Pose2d getEstimatedPosition(){
@@ -186,7 +185,7 @@ public class Swerve extends SubsystemBase{
    }
 
    public Command zeroRobotCommad(boolean colour){
-    return Commands.runOnce(() -> zeroing(colour), this);
+    return Commands.runOnce(() -> zeroing(), this);
    }
 
   /**

@@ -86,10 +86,6 @@ public class Constants {
     public static final PIDGains DRIVE_PID = new PIDGains.Builder().kp(0.043).build();
     public static final FeedforwardGains TURN_FEEDFORWARD = new FeedforwardGains .Builder().kv(0.35).build();
     public static final FeedforwardGains DRIVE_FEEDFORWARD = new FeedforwardGains .Builder().kv(0.221).build();
-    public static final Current TURN_CURRENT_LIMIT = Current.ofBaseUnits(30, Units.Amps);
-    public static final Current DRIVE_CURRENT_LIMIT = Current.ofBaseUnits(80, Units.Amps);
-    public static final double DRIVE_CONVERSION_FACTOR = 2 * Math.PI;
-    public static final double TURN_CONVERSION_FACTOR = 2 * Math.PI;
 
     public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(
       new Translation2d(RobotConstants.LENGTH.divide(2), RobotConstants.WIDTH.divide(2)),
@@ -97,6 +93,12 @@ public class Constants {
       new Translation2d(RobotConstants.LENGTH.divide(-2), RobotConstants.WIDTH.divide(2)),
       new Translation2d(RobotConstants.LENGTH.divide(-2), RobotConstants.WIDTH.divide(-2))
       );   
+
+      public static final double DRIVE_CONVERSION_FACTOR = 2 * Math.PI;
+      public static final double TURN_CONVERSION_FACTOR = 2 * Math.PI;
+
+    public static final Current TURN_CURRENT_LIMIT = Current.ofBaseUnits(30, Units.Amps);
+    public static final Current DRIVE_CURRENT_LIMIT = Current.ofBaseUnits(80, Units.Amps);  
       
     public static final Wheel SWERVE_WHEEL = new Wheel(Inches.of(1.5));  
 

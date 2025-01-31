@@ -67,7 +67,7 @@ public class RobotContainer {
 
   public void teleopInit() {
     colour = (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
-    swerve.setColourAllicanceIsBlueFIRSTRoboticCompotionFRCIsBlue(colour);
+    swerve.getColour(colour);
   }
 
   public Command getAutonomousCommand() {

@@ -117,9 +117,9 @@ public class SwerveModule {
     
     turnSetpoint = Radians.of(0);
     driveSetpoint = LinearVelocity.ofBaseUnits(0, Units.MetersPerSecond);
-    // turnPosition = Radians.of(turnEncoder.getPosition());
-    // drivePosition = Meters.of(driveEncoder.getPosition());
-    // driveVelocity = LinearVelocity.ofBaseUnits(driveEncoder.getVelocity(), Units.MetersPerSecond);
+    turnPosition = turnEncoder.getPosition();
+    drivePosition = driveEncoder.getPosition();
+    driveVelocity = driveEncoder.getVelocity();
     turnVelocity = AngularVelocity.ofBaseUnits(turnEncoder.getVelocity(), Units.RadiansPerSecond);
     driveVoltage = Voltage.ofBaseUnits(driveMotor.getBusVoltage() * driveMotor.getAppliedOutput(), Volts);
     turnVoltage = Voltage.ofBaseUnits(turnMotor.getBusVoltage() * turnMotor.getAppliedOutput(), Volts);
@@ -140,9 +140,9 @@ public class SwerveModule {
     turnCurrent = Current.ofBaseUnits(turnMotor.getOutputCurrent(), Units.Amps);
     driveVoltage = Voltage.ofBaseUnits(driveMotor.getBusVoltage() * driveMotor.getAppliedOutput(), Volts);
     turnVoltage = Voltage.ofBaseUnits(turnMotor.getBusVoltage() * turnMotor.getAppliedOutput(), Volts);
-    // drivePosition = Meters.of(driveEncoder.getPosition());
-    // turnPosition = Radians.of(turnEncoder.getPosition());
-    // driveVelocity = LinearVelocity.ofBaseUnits(driveEncoder.getVelocity(), Units.MetersPerSecond);
+    drivePosition = driveEncoder.getPosition();
+    turnPosition = turnEncoder.getPosition();
+    driveVelocity = driveEncoder.getVelocity();
     turnVelocity = AngularVelocity.ofBaseUnits(turnEncoder.getVelocity(), Units.RadiansPerSecond);
 
   }
