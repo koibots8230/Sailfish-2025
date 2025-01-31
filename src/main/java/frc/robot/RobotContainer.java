@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
@@ -48,28 +49,33 @@ public class RobotContainer {
         swerve.driveFieldRelativeCommand(
             xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
 
-    Trigger L2 = xboxController.a();
-    L2.onTrue(elevator.setPositionCommand(ElevatorConstants.L2_SETPOINT));
-    Trigger L3 = xboxController.y();
-    L3.onTrue(elevator.setPositionCommand(ElevatorConstants.L3_SETPOINT));
-    Trigger ElevatorDown = xboxController.rightBumper();
-    ElevatorDown.onTrue(elevator.setPositionCommand(ElevatorConstants.START_SETPOINT));
-
+    
     Trigger spinIntake = new Trigger(xboxController.rightTrigger());
-    spinIntake.onTrue(intake.IntakeCommand(IntakeConstants.INTAKE_VELOCITY));
-    spinIntake.onFalse(intake.IntakeCommand(AngularVelocity.ofBaseUnits(0, RPM)));
-
     Trigger reverseIntake = new Trigger(xboxController.leftTrigger());
-    reverseIntake.onTrue(intake.IntakeCommand(IntakeConstants.REVERSE_INTAKE_VELOCITY));
-    reverseIntake.onFalse(intake.IntakeCommand(AngularVelocity.ofBaseUnits(0, RPM)));
 
-    Trigger intakePivotOut = new Trigger(xboxController.b());
-    intakePivotOut.onTrue(intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION));
+    //spinIntake.onTrue(intake.IntakeCommand(IntakeConstants.INTAKE_VELOCITY));
+    //spinIntake.onFalse(intake.IntakeCommand(AngularVelocity.ofBaseUnits(0, RPM)));
+    spinIntake.onTrue(Commands.parallel(
+      intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION),
+      intake.IntakeCommand(IntakeConstants.INTAKE_VELOCITY)));
+    spinIntake.onFalse(Commands.sequence(
+      intake.IntakeCommand(AngularVelocity.ofBaseUnits(0, RPM)),
+      intakePivot.moveIntakePivotCommand(IntakePivotConstants.START_POSITION)));
+    
+    //reverseIntake.onTrue(intake.IntakeCommand(IntakeConstants.REVERSE_INTAKE_VELOCITY));
+    //reverseIntake.onFalse(intake.IntakeCommand(AngularVelocity.ofBaseUnits(0, RPM)));
+    reverseIntake.onTrue(Commands.sequence(
+      intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION),
+      intake.IntakeCommand(IntakeConstants.REVERSE_INTAKE_VELOCITY)));
+    reverseIntake.onFalse(Commands.parallel(
+      intake.IntakeCommand(AngularVelocity.ofBaseUnits(0, RPM)),
+      intakePivot.moveIntakePivotCommand(IntakePivotConstants.START_POSITION)));
 
+
+    //Trigger intakePivotOut = new Trigger(xboxController.b());
+    //intakePivotOut.onTrue(intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION));
 
   }
-
-
 
 
   public void teleopInit() {}
