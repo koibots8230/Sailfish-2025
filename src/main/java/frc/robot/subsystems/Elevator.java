@@ -36,25 +36,23 @@ import frc.robot.Constants.RobotConstants;
 @Logged
 public class Elevator extends SubsystemBase {
 
-  private final SparkMax leftMotor;
-  private final SparkMax rightMotor;
-  private final SparkMaxConfig motorConfig;
+  private final SparkMax mainMotor;
+  private final SparkMax secondaryMotor;
+  private final SparkMaxConfig mainMotorConfig;
+  private final SparkMaxConfig secondaryMotorConfig;
   private final TrapezoidProfile profile;
-  private final RelativeEncoder leftMotorEncoder;
-  private final RelativeEncoder rightMotorEncoder;
+  private final RelativeEncoder motorEncoder;
   private final ElevatorFeedforward feedforward;
   private final DigitalInput HallEffectsSensor;
   private TrapezoidProfile.State goal;
   private TrapezoidProfile.State motorSetpoint;
   private Distance setpoint;
-  private Distance leftPosition;
-  private Distance rightPosition;
-  private LinearVelocity leftVelocity;
-  private LinearVelocity rightVelocity;
-  private Voltage leftVoltage;
-  private Voltage rightVoltage;
-  private Current leftCurrent;
-  private Current rightCurrent;
+  private Distance position;
+  private LinearVelocity velocity;
+  private Voltage mainVoltage;
+  private Voltage secondaryVoltage;
+  private Current mainCurrent;
+  private Current secondaryCurrent;
 
   public Elevator() {
     profile =
@@ -63,21 +61,27 @@ public class Elevator extends SubsystemBase {
                 ElevatorConstants.MAX_VELOCITY.in(MetersPerSecond),
                 ElevatorConstants.MAX_ACCELRATION.in(MetersPerSecondPerSecond)));
 
-    leftMotor = new SparkMax(ElevatorConstants.LEFT_MOTOR_ID, MotorType.kBrushless);
-    rightMotor = new SparkMax(ElevatorConstants.RIGHT_MOTOR_ID, MotorType.kBrushless);
-    motorConfig = new SparkMaxConfig();
-    motorConfig.idleMode(IdleMode.kBrake);
-    motorConfig
+    mainMotor = new SparkMax(ElevatorConstants.LEFT_MOTOR_ID, MotorType.kBrushless);
+    secondaryMotor = new SparkMax(ElevatorConstants.RIGHT_MOTOR_ID, MotorType.kBrushless);
+    mainMotorConfig = new SparkMaxConfig();
+    mainMotorConfig.idleMode(IdleMode.kBrake);
+    mainMotorConfig
         .closedLoop
         .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
         .pid(ElevatorConstants.PID.kp, ElevatorConstants.PID.ki, ElevatorConstants.PID.kd);
-    motorConfig.smartCurrentLimit((int) ElevatorConstants.CURRENT_LIMIT.in(Amps));
-    motorConfig.alternateEncoder.positionConversionFactor(ElevatorConstants.CONVERSION_FACTOR.in(Meters));
-    motorConfig.alternateEncoder.velocityConversionFactor(ElevatorConstants.CONVERSION_FACTOR.in(Meters));
-    leftMotor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    rightMotor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    leftMotorEncoder = leftMotor.getAlternateEncoder();
-    rightMotorEncoder = rightMotor.getAlternateEncoder();
+    mainMotorConfig.smartCurrentLimit((int) ElevatorConstants.CURRENT_LIMIT.in(Amps));
+    mainMotorConfig.alternateEncoder.positionConversionFactor(ElevatorConstants.CONVERSION_FACTOR.in(Meters));
+    mainMotorConfig.alternateEncoder.velocityConversionFactor(ElevatorConstants.CONVERSION_FACTOR.in(Meters));
+    secondaryMotorConfig = new SparkMaxConfig();
+    secondaryMotorConfig.idleMode(IdleMode.kBrake);
+    secondaryMotorConfig
+        .closedLoop
+        .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
+        .pid(ElevatorConstants.PID.kp, ElevatorConstants.PID.ki, ElevatorConstants.PID.kd);
+    secondaryMotorConfig.smartCurrentLimit((int) ElevatorConstants.CURRENT_LIMIT.in(Amps));
+    mainMotor.configure(mainMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    secondaryMotor.configure(secondaryMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    motorEncoder = mainMotor.getAlternateEncoder();
 
     feedforward =
         new ElevatorFeedforward(
@@ -92,16 +96,13 @@ public class Elevator extends SubsystemBase {
     setpoint = ElevatorConstants.START_SETPOINT;
     motorSetpoint = new TrapezoidProfile.State();
 
-    leftPosition = Distance.ofBaseUnits(0, Meters);
-    rightPosition = Distance.ofBaseUnits(0, Meters);
-    leftMotorEncoder.setPosition(0);
-    rightMotorEncoder.setPosition(0);
-    leftVelocity = LinearVelocity.ofBaseUnits(leftMotorEncoder.getVelocity(), MetersPerSecond);
-    rightVelocity = LinearVelocity.ofBaseUnits(rightMotorEncoder.getVelocity(), MetersPerSecond);
-    leftVoltage = Voltage.ofBaseUnits(leftMotor.getBusVoltage() * leftMotor.getAppliedOutput(), Volts);
-    rightVoltage = Voltage.ofBaseUnits(rightMotor.getBusVoltage() * rightMotor.getAppliedOutput(), Volts);
-    leftCurrent = Current.ofBaseUnits(leftMotor.getOutputCurrent(), Amps);
-    rightCurrent = Current.ofBaseUnits(rightMotor.getOutputCurrent(), Amps);
+    position = Distance.ofBaseUnits(0, Meters);
+    motorEncoder.setPosition(0);
+    velocity = LinearVelocity.ofBaseUnits(motorEncoder.getVelocity(), MetersPerSecond);
+    mainVoltage = Voltage.ofBaseUnits(mainMotor.getBusVoltage() * mainMotor.getAppliedOutput(), Volts);
+    secondaryVoltage = Voltage.ofBaseUnits(secondaryMotor.getBusVoltage() * secondaryMotor.getAppliedOutput(), Volts);
+    mainCurrent = Current.ofBaseUnits(mainMotor.getOutputCurrent(), Amps);
+    secondaryCurrent = Current.ofBaseUnits(secondaryMotor.getOutputCurrent(), Amps);
   }
 
   @Override
@@ -112,7 +113,7 @@ public class Elevator extends SubsystemBase {
 
     motorSetpoint = profile.calculate(RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds), motorSetpoint, goal);
 
-    leftMotor
+    mainMotor
         .getClosedLoopController()
         .setReference(
             motorSetpoint.position,
@@ -120,7 +121,7 @@ public class Elevator extends SubsystemBase {
             ClosedLoopSlot.kSlot0,
             feedforward.calculate(motorSetpoint.velocity));
     
-    rightMotor
+    secondaryMotor
         .getClosedLoopController()
         .setReference(
             motorSetpoint.position,
@@ -128,20 +129,17 @@ public class Elevator extends SubsystemBase {
             ClosedLoopSlot.kSlot0,
             feedforward.calculate(motorSetpoint.velocity));
 
-    leftPosition = Distance.ofBaseUnits(leftMotorEncoder.getPosition(), Meters);
-    rightPosition = Distance.ofBaseUnits(rightMotorEncoder.getPosition(), Meters);
-    leftVelocity = LinearVelocity.ofBaseUnits(leftMotorEncoder.getVelocity(), MetersPerSecond);
-    rightVelocity = LinearVelocity.ofBaseUnits(rightMotorEncoder.getVelocity(), MetersPerSecond);
-    leftVoltage = Voltage.ofBaseUnits(leftMotor.getBusVoltage() * leftMotor.getAppliedOutput(), Volts);
-    rightVoltage = Voltage.ofBaseUnits(rightMotor.getBusVoltage() * rightMotor.getAppliedOutput(), Volts);
-    leftCurrent = Current.ofBaseUnits(leftMotor.getOutputCurrent(), Amps);
-    rightCurrent = Current.ofBaseUnits(rightMotor.getOutputCurrent(), Amps);
+    position = Distance.ofBaseUnits(motorEncoder.getPosition(), Meters);
+    velocity = LinearVelocity.ofBaseUnits(motorEncoder.getVelocity(), MetersPerSecond);
+    mainVoltage = Voltage.ofBaseUnits(mainMotor.getBusVoltage() * mainMotor.getAppliedOutput(), Volts);
+    secondaryVoltage = Voltage.ofBaseUnits(secondaryMotor.getBusVoltage() * secondaryMotor.getAppliedOutput(), Volts);
+    mainCurrent = Current.ofBaseUnits(mainMotor.getOutputCurrent(), Amps);
+    secondaryCurrent = Current.ofBaseUnits(secondaryMotor.getOutputCurrent(), Amps);
   }
 
   @Override
   public void simulationPeriodic() {
-    leftPosition = setpoint;
-    rightPosition = setpoint;
+    position = setpoint;
   }
 
   private void setPosition(Distance position) {
@@ -158,8 +156,7 @@ public class Elevator extends SubsystemBase {
         Commands.run(() -> setPosition(Distance.ofBaseUnits(setpoint.in(Millimeters) - 5, Millimeters)), this),
         Commands.waitUntil(() -> HallEffectsSensor.get() == true)
       ),
-      Commands.runOnce(() -> leftMotorEncoder.setPosition(0), this),
-      Commands.runOnce(() -> rightMotorEncoder.setPosition(0), this)
+      Commands.runOnce(() -> motorEncoder.setPosition(0), this)
     );
   }
 }
