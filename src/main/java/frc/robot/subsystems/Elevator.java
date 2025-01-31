@@ -61,26 +61,34 @@ public class Elevator extends SubsystemBase {
                 ElevatorConstants.MAX_VELOCITY.in(MetersPerSecond),
                 ElevatorConstants.MAX_ACCELRATION.in(MetersPerSecondPerSecond)));
 
-    mainMotor = new SparkMax(ElevatorConstants.LEFT_MOTOR_ID, MotorType.kBrushless);
-    secondaryMotor = new SparkMax(ElevatorConstants.RIGHT_MOTOR_ID, MotorType.kBrushless);
+    mainMotor = new SparkMax(ElevatorConstants.MAIN_MOTOR_ID, MotorType.kBrushless);
+    secondaryMotor = new SparkMax(ElevatorConstants.SECONDARY_MOTOR_ID, MotorType.kBrushless);
+
     mainMotorConfig = new SparkMaxConfig();
+
     mainMotorConfig.idleMode(IdleMode.kBrake);
+
     mainMotorConfig
         .closedLoop
         .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
         .pid(ElevatorConstants.PID.kp, ElevatorConstants.PID.ki, ElevatorConstants.PID.kd);
+
     mainMotorConfig.smartCurrentLimit((int) ElevatorConstants.CURRENT_LIMIT.in(Amps));
+
     mainMotorConfig.alternateEncoder.positionConversionFactor(ElevatorConstants.CONVERSION_FACTOR.in(Meters));
     mainMotorConfig.alternateEncoder.velocityConversionFactor(ElevatorConstants.CONVERSION_FACTOR.in(Meters));
+
     secondaryMotorConfig = new SparkMaxConfig();
+
     secondaryMotorConfig.idleMode(IdleMode.kBrake);
-    secondaryMotorConfig
-        .closedLoop
-        .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
-        .pid(ElevatorConstants.PID.kp, ElevatorConstants.PID.ki, ElevatorConstants.PID.kd);
+
+    secondaryMotorConfig.follow(ElevatorConstants.MAIN_MOTOR_ID);
+
     secondaryMotorConfig.smartCurrentLimit((int) ElevatorConstants.CURRENT_LIMIT.in(Amps));
+    
     mainMotor.configure(mainMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     secondaryMotor.configure(secondaryMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
     motorEncoder = mainMotor.getAlternateEncoder();
 
     feedforward =
@@ -97,7 +105,6 @@ public class Elevator extends SubsystemBase {
     motorSetpoint = new TrapezoidProfile.State();
 
     position = Distance.ofBaseUnits(0, Meters);
-    motorEncoder.setPosition(0);
     velocity = LinearVelocity.ofBaseUnits(motorEncoder.getVelocity(), MetersPerSecond);
     mainVoltage = Voltage.ofBaseUnits(mainMotor.getBusVoltage() * mainMotor.getAppliedOutput(), Volts);
     secondaryVoltage = Voltage.ofBaseUnits(secondaryMotor.getBusVoltage() * secondaryMotor.getAppliedOutput(), Volts);
@@ -114,14 +121,6 @@ public class Elevator extends SubsystemBase {
     motorSetpoint = profile.calculate(RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds), motorSetpoint, goal);
 
     mainMotor
-        .getClosedLoopController()
-        .setReference(
-            motorSetpoint.position,
-            ControlType.kPosition,
-            ClosedLoopSlot.kSlot0,
-            feedforward.calculate(motorSetpoint.velocity));
-    
-    secondaryMotor
         .getClosedLoopController()
         .setReference(
             motorSetpoint.position,
@@ -153,7 +152,7 @@ public class Elevator extends SubsystemBase {
   public Command setZeroPositionCommand() {
     return Commands.sequence(
       Commands.race(
-        Commands.run(() -> setPosition(Distance.ofBaseUnits(setpoint.in(Millimeters) - 5, Millimeters)), this),
+        Commands.run(() -> setPosition(Distance.ofBaseUnits(setpoint.in(Millimeters) - 0.05, Millimeters)), this),
         Commands.waitUntil(() -> HallEffectsSensor.get() == true)
       ),
       Commands.runOnce(() -> motorEncoder.setPosition(0), this)

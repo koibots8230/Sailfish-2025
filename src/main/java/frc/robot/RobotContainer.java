@@ -40,8 +40,6 @@ public class RobotContainer {
     L1.onTrue(elevator.setPositionCommand(ElevatorConstants.L1_SETPOINT));
     Trigger ElevatorDown = xboxController.b();
     ElevatorDown.onTrue(elevator.setPositionCommand(ElevatorConstants.START_SETPOINT));
-    Trigger ElevatorSetZero = xboxController.leftBumper();
-    ElevatorSetZero.onTrue(elevator.setZeroPositionCommand());
   }
 
   public void teleopInit() {}
