@@ -31,7 +31,7 @@ import frc.robot.Constants.RobotConstants;
 import frc.robot.Constants.SwerveConstants;
 
 @Logged
-public class Swerve extends SubsystemBase{
+public class Swerve extends SubsystemBase {
   private Pose2d estimatedPosition;
   private Rotation2d simHeading;
   private Rotation2d gyroAngle;
@@ -46,10 +46,15 @@ public class Swerve extends SubsystemBase{
     final SwerveModule backRight;
 
     public Modules() {
-      frontLeft = new SwerveModule(SwerveConstants.FRONT_LEFT_DRIVE_ID, SwerveConstants.FRONT_LEFT_TURN_ID);
-      frontRight =  new SwerveModule(SwerveConstants.FRONT_RIGHT_DRIVE_ID, SwerveConstants.FRONT_RIGHT_TURN_ID);
-      backLeft =  new SwerveModule(SwerveConstants.BACK_LEFT_DRIVE_ID, SwerveConstants.BACK_LEFT_TURN_ID);
-      backRight =  new SwerveModule(SwerveConstants.BACK_RIGHT_DRIVE_ID, SwerveConstants.BACK_RIGHT_TURN_ID);
+      frontLeft =
+          new SwerveModule(SwerveConstants.FRONT_LEFT_DRIVE_ID, SwerveConstants.FRONT_LEFT_TURN_ID);
+      frontRight =
+          new SwerveModule(
+              SwerveConstants.FRONT_RIGHT_DRIVE_ID, SwerveConstants.FRONT_RIGHT_TURN_ID);
+      backLeft =
+          new SwerveModule(SwerveConstants.BACK_LEFT_DRIVE_ID, SwerveConstants.BACK_LEFT_TURN_ID);
+      backRight =
+          new SwerveModule(SwerveConstants.BACK_RIGHT_DRIVE_ID, SwerveConstants.BACK_RIGHT_TURN_ID);
     }
   }
 
@@ -95,10 +100,6 @@ public class Swerve extends SubsystemBase{
         AutoBuilder.configure(this::getEstimatedPosition, this::setOdometry, this::getChassisSpeeds, this::driveRobotRelative, SwerveConstants.pathPlannerFF, config, () -> setColour(), this);
     
       }
-  
-      public void getColour(boolean colour){
-        isBlue = colour;
-    }
 
     public boolean setColour(){
       return isBlue;
@@ -107,24 +108,30 @@ public class Swerve extends SubsystemBase{
     public void setOdometry(Pose2d angle){
       odometry.resetPose(angle);
     }
-  
-    @Override
-    public void periodic() {
-      
-      modules.frontLeft.periodic();
-      modules.frontRight.periodic();
-      modules.backLeft.periodic();
-      modules.backRight.periodic();
 
-      estimatedPosition = odometry.update(isBlue ? gyroAngle : gyroAngle.minus(new Rotation2d(Math.PI)), this.getModulePostition());
-  
-      gyroAngle = gyro.getRotation2d();
+  public void getColour(boolean colour) {
+    isBlue = colour;
+  }
+
+  @Override
+  public void periodic() {
+
+    modules.frontLeft.periodic();
+    modules.frontRight.periodic();
+    modules.backLeft.periodic();
+    modules.backRight.periodic();
+
+    estimatedPosition =
+        odometry.update(
+            isBlue ? gyroAngle : gyroAngle.minus(new Rotation2d(Math.PI)),
+            this.getModulePostition());
+
+    gyroAngle = gyro.getRotation2d();
 
     messuredStates[0] = modules.frontLeft.getModuleState();
     messuredStates[1] = modules.frontRight.getModuleState();
     messuredStates[2] = modules.backLeft.getModuleState();
     messuredStates[3] = modules.backRight.getModuleState();
-    
   }
 
   @Override
@@ -138,7 +145,7 @@ public class Swerve extends SubsystemBase{
     modules.backRight.simulationPeriodic();
   }
 
-  public SwerveModulePosition[] getModulePostition(){
+  public SwerveModulePosition[] getModulePostition() {
     return new SwerveModulePosition[] {
       modules.frontLeft.getPosition(),
       modules.frontRight.getPosition(),
@@ -156,9 +163,14 @@ public class Swerve extends SubsystemBase{
     y = linearMagnitude * -direction.getCos() * SwerveConstants.MAX_SPEED.in(MetersPerSecond);
     x = linearMagnitude * direction.getSin() * SwerveConstants.MAX_SPEED.in(MetersPerSecond);
 
-    omega =  Math.pow(omega, SwerveConstants.RIGHT_STICK_SCAILING) * SwerveConstants.MAX_ROTATION.in(RadiansPerSecond);
+    omega =
+        Math.pow(omega, SwerveConstants.RIGHT_STICK_SCAILING)
+            * SwerveConstants.MAX_ROTATION.in(RadiansPerSecond);
 
-    driveFieldRelative(MetersPerSecond.of(MathUtil.applyDeadband(-x, Constants.SwerveConstants.DEADBAND)), MetersPerSecond.of(MathUtil.applyDeadband(y, Constants.SwerveConstants.DEADBAND)), RadiansPerSecond.of(MathUtil.applyDeadband(-omega, Constants.SwerveConstants.DEADBAND)));
+    driveFieldRelative(
+        MetersPerSecond.of(MathUtil.applyDeadband(-x, Constants.SwerveConstants.DEADBAND)),
+        MetersPerSecond.of(MathUtil.applyDeadband(y, Constants.SwerveConstants.DEADBAND)),
+        RadiansPerSecond.of(MathUtil.applyDeadband(-omega, Constants.SwerveConstants.DEADBAND)));
   }
 
   public ChassisSpeeds getChassisSpeeds() {
@@ -167,8 +179,9 @@ public class Swerve extends SubsystemBase{
 
   public void driveRobotRelative(ChassisSpeeds speeds, DriveFeedforwards feedforwards){
     setpointStates = SwerveConstants.KINEMATICS.toSwerveModuleStates(speeds);
-    
-    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, Constants.SwerveConstants.MAX_SPEED);
+
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        setpointStates, Constants.SwerveConstants.MAX_SPEED);
 
     modules.frontLeft.setState(setpointStates[0]);
     modules.frontRight.setState(setpointStates[1]);
@@ -186,9 +199,9 @@ public class Swerve extends SubsystemBase{
 
   public void zeroing(){
     gyro.setYaw(0);
-  }   
+  }
 
-  public Pose2d getEstimatedPosition(){
+  public Pose2d getEstimatedPosition() {
     return estimatedPosition;
   }
 
@@ -197,16 +210,16 @@ public class Swerve extends SubsystemBase{
 () -> driveFeildRelativeScaler(x.getAsDouble(), y.getAsDouble(), omega.getAsDouble()), this);
    }
 
-   public Command zeroRobotCommad(boolean colour){
+  public Command zeroRobotCommad(boolean colour) {
     return Commands.runOnce(() -> zeroing(), this);
-   }
+  }
 
   /**
-   * Step 3b: Public command factory driveFieldRelativeCommand that takes field-relative inputs
-   * and returns a command that passes the input parameters into the private driveFieldRelative
+   * Step 3b: Public command factory driveFieldRelativeCommand that takes field-relative inputs and
+   * returns a command that passes the input parameters into the private driveFieldRelative
+   *
    * @param X field-relative X with range of -1.0 to 1.0
    * @param Y field-relative Y with range of -1.0 to 1.0
    * @param Omega field-relative omega with range of -1.0 to 1.0
    */
-
 }

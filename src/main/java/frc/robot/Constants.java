@@ -1,7 +1,10 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.*;
+
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -11,23 +14,8 @@ import edu.wpi.first.units.measure.Time;
 import frc.lib.util.FeedforwardGains;
 import frc.lib.util.PIDGains;
 import frc.lib.util.Wheel;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.Time;
-
-import static edu.wpi.first.units.Units.*;
-
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import frc.lib.util.FeedforwardGains;
-import frc.lib.util.PIDGains;
 
 
 public class Constants {
@@ -57,10 +45,12 @@ public class Constants {
 
   public static class EndEffectorConstants {
     public static final AngularVelocity INTAKE_SPEED = AngularVelocity.ofBaseUnits(3000, Units.RPM);
-    public static final AngularVelocity OUTTAKE_SPEED = AngularVelocity.ofBaseUnits(3000, Units.RPM);
+    public static final AngularVelocity OUTTAKE_SPEED =
+        AngularVelocity.ofBaseUnits(3000, Units.RPM);
 
     public static final PIDGains PID_GAINS = new PIDGains.Builder().kp(0).build();
-    public static final FeedforwardGains FEEDFORWARD_GAINS = new FeedforwardGains.Builder().kv(0).build();
+    public static final FeedforwardGains FEEDFORWARD_GAINS =
+        new FeedforwardGains.Builder().kv(0).build();
 
     public static final double CONVERSION_FACTOR = 1;
 
@@ -71,13 +61,13 @@ public class Constants {
     public static final int MOTOR_ID = 98;
     public static final int LASERCAN_ID = 99;
   }
+
   public static class RobotConstants {
 
     public static final Distance WIDTH = Inches.of(23.5);
     public static final Distance LENGTH = Inches.of(23.5);
 
-      public static final Time ROBOT_CLOCK_SPEED = Time.ofBaseUnits(0.02, Units.Seconds);
-    
+    public static final Time ROBOT_CLOCK_SPEED = Time.ofBaseUnits(0.02, Units.Seconds);
   }
 
   public static class SwerveConstants {
@@ -92,8 +82,10 @@ public class Constants {
 
     public static final PIDGains TURN_PID = new PIDGains.Builder().kp(0.04).build();
     public static final PIDGains DRIVE_PID = new PIDGains.Builder().kp(0.043).build();
-    public static final FeedforwardGains TURN_FEEDFORWARD = new FeedforwardGains .Builder().kv(0.35).build();
-    public static final FeedforwardGains DRIVE_FEEDFORWARD = new FeedforwardGains .Builder().kv(0.221).build();
+    public static final FeedforwardGains TURN_FEEDFORWARD =
+        new FeedforwardGains.Builder().kv(0.35).build();
+    public static final FeedforwardGains DRIVE_FEEDFORWARD =
+        new FeedforwardGains.Builder().kv(0.221).build();
 
     public static final PPHolonomicDriveController pathPlannerFF = new PPHolonomicDriveController(new PIDConstants(0,0,0), new PIDConstants(0,0,0));
 
@@ -104,13 +96,13 @@ public class Constants {
       new Translation2d(RobotConstants.LENGTH.divide(-2), RobotConstants.WIDTH.divide(-2))
       );   
 
-      public static final double DRIVE_CONVERSION_FACTOR = 2 * Math.PI;
-      public static final double TURN_CONVERSION_FACTOR = 2 * Math.PI;
+    public static final double DRIVE_CONVERSION_FACTOR = 2 * Math.PI;
+    public static final double TURN_CONVERSION_FACTOR = 2 * Math.PI;
 
     public static final Current TURN_CURRENT_LIMIT = Current.ofBaseUnits(30, Units.Amps);
-    public static final Current DRIVE_CURRENT_LIMIT = Current.ofBaseUnits(80, Units.Amps);  
-      
-    public static final Wheel SWERVE_WHEEL = new Wheel(Inches.of(1.5));  
+    public static final Current DRIVE_CURRENT_LIMIT = Current.ofBaseUnits(80, Units.Amps);
+
+    public static final Wheel SWERVE_WHEEL = new Wheel(Inches.of(1.5));
 
     public static final double SWERVE_GEARING = 5.08;
 
@@ -130,6 +122,5 @@ public class Constants {
     public static final int BACK_RIGHT_TURN_ID = 8;
 
     public static final int GYRO_ID = 18;
-
   }
 }
