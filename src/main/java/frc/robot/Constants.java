@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -19,6 +20,10 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 
 import static edu.wpi.first.units.Units.*;
+
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import frc.lib.util.FeedforwardGains;
@@ -82,10 +87,15 @@ public class Constants {
     public static final LinearVelocity MAX_SPEED = MetersPerSecond.of(4.25);
     public static final AngularVelocity MAX_ROTATION = RadiansPerSecond.of(2 * Math.PI);
 
+    public static final AngularVelocity MAX_TURN_VECLOCITY = RadiansPerSecond.of(2 * Math.PI);
+    public static final AngularAcceleration MAX_TURN_ACCELERATION = RadiansPerSecondPerSecond.of(4 * Math.PI);
+
     public static final PIDGains TURN_PID = new PIDGains.Builder().kp(0.04).build();
     public static final PIDGains DRIVE_PID = new PIDGains.Builder().kp(0.043).build();
     public static final FeedforwardGains TURN_FEEDFORWARD = new FeedforwardGains .Builder().kv(0.35).build();
     public static final FeedforwardGains DRIVE_FEEDFORWARD = new FeedforwardGains .Builder().kv(0.221).build();
+
+    public static final PPHolonomicDriveController pathPlannerFF = new PPHolonomicDriveController(new PIDConstants(0,0,0), new PIDConstants(0,0,0));
 
     public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(
       new Translation2d(RobotConstants.LENGTH.divide(2), RobotConstants.WIDTH.divide(2)),

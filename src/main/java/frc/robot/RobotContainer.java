@@ -4,12 +4,15 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -28,6 +31,8 @@ public class RobotContainer {
 
   private final EndEffector endEffector;
 
+  SendableChooser<Command> chooser = new SendableChooser<>();
+
   @NotLogged private final CommandXboxController xboxController;
   private boolean colour;
 
@@ -37,6 +42,8 @@ public class RobotContainer {
     endEffector = new EndEffector();
 
     xboxController = new CommandXboxController(0);
+
+    chooser = AutoBuilder.buildAutoChooser();
 
     configureBindings();
     defualtCommands();
@@ -56,7 +63,7 @@ public class RobotContainer {
     outtakeEffector.onTrue(endEffector.intakeCommand());
     outtakeEffector.onFalse(endEffector.setVelocityCommand(AngularVelocity.ofBaseUnits(0, Units.RPM)));
 
-    Trigger zero = xboxController.a();
+    Trigger zero = xboxController.y();
 
     zero.onTrue(swerve.zeroRobotCommad(colour));
   }
@@ -71,6 +78,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return chooser.getSelected();
   }
 }

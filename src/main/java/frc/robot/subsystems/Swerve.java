@@ -1,31 +1,23 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Degree;
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Microseconds;
-import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
-import java.lang.Thread.State;
 import java.util.function.DoubleSupplier;
 
-import org.opencv.core.Mat;
-
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.util.DriveFeedforwards;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.Kinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -35,7 +27,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.RobotContainer;
 import frc.robot.Constants.RobotConstants;
 import frc.robot.Constants.SwerveConstants;
 
@@ -69,6 +60,8 @@ public class Swerve extends SubsystemBase{
   private final SwerveDrivePoseEstimator odometry;
 
   private boolean isBlue;
+
+  RobotConfig config;
     
     
       
@@ -90,11 +83,29 @@ public class Swerve extends SubsystemBase{
     
         setpointStates = new SwerveModuleState[4];
         messuredStates = new SwerveModuleState[4];
+
+
+        try{
+          config = RobotConfig.fromGUISettings();
+        }
+        catch (Exception e){
+          e.printStackTrace();
+        }
+
+        AutoBuilder.configure(this::getEstimatedPosition, this::setOdometry, this::getChassisSpeeds, this::driveRobotRelative, SwerveConstants.pathPlannerFF, config, () -> setColour(), this);
     
       }
   
       public void getColour(boolean colour){
         isBlue = colour;
+    }
+
+    public boolean setColour(){
+      return isBlue;
+    }
+    
+    public void setOdometry(Pose2d angle){
+      odometry.resetPose(angle);
     }
   
     @Override
@@ -118,6 +129,7 @@ public class Swerve extends SubsystemBase{
 
   @Override
   public void simulationPeriodic() {
+    simHeading = simHeading.plus(new Rotation2d(getChassisSpeeds().omegaRadiansPerSecond * RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds)));
     gyroAngle = simHeading;
 
     modules.frontLeft.simulationPeriodic();
@@ -135,30 +147,25 @@ public class Swerve extends SubsystemBase{
     };
   }
 
- // public Pose2d getOdometryPose(){
-   // return odometry.getEstimatedPosition();
- // }
+  private void driveFeildRelativeScaler(double x, double y, double omega){
 
-  private void driveFiledRelativeScailier(double x, double y, double omega){
+    double linearMagnitude = Math.pow(Math.hypot(x, y), SwerveConstants.LEFT_STICK_SCAILING);
 
-    double liniarMagintued = Math.pow(Math.hypot(x, y), SwerveConstants.LEFT_STICK_SCAILING);
+    Rotation2d direction = new Rotation2d(y, x);
 
-    Rotation2d directions = new Rotation2d(y, x);
-
-    y = liniarMagintued * -directions.getCos() * SwerveConstants.MAX_SPEED.in(MetersPerSecond);
-    x = liniarMagintued * directions.getSin() * SwerveConstants.MAX_SPEED.in(MetersPerSecond);
+    y = linearMagnitude * -direction.getCos() * SwerveConstants.MAX_SPEED.in(MetersPerSecond);
+    x = linearMagnitude * direction.getSin() * SwerveConstants.MAX_SPEED.in(MetersPerSecond);
 
     omega =  Math.pow(omega, SwerveConstants.RIGHT_STICK_SCAILING) * SwerveConstants.MAX_ROTATION.in(RadiansPerSecond);
 
     driveFieldRelative(MetersPerSecond.of(MathUtil.applyDeadband(-x, Constants.SwerveConstants.DEADBAND)), MetersPerSecond.of(MathUtil.applyDeadband(y, Constants.SwerveConstants.DEADBAND)), RadiansPerSecond.of(MathUtil.applyDeadband(-omega, Constants.SwerveConstants.DEADBAND)));
   }
 
-  private void driveFieldRelative(LinearVelocity x, LinearVelocity y, AngularVelocity omega){
-    simHeading = simHeading.plus(new Rotation2d(omega.times(Seconds.of(.02))));
-    estimatedPosition = new Pose2d(estimatedPosition.getX() + x.times(RobotConstants.ROBOT_CLOCK_SPEED).in(Meters), estimatedPosition.getY() + (y.times(RobotConstants.ROBOT_CLOCK_SPEED).in(Meters)), new Rotation2d(estimatedPosition.getRotation().getRadians() + omega.in(RadiansPerSecond)));
-    
-    ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x.in(MetersPerSecond), y.in(MetersPerSecond), omega.in(RadiansPerSecond), gyroAngle);
+  public ChassisSpeeds getChassisSpeeds() {
+    return SwerveConstants.KINEMATICS.toChassisSpeeds(messuredStates);
+  }
 
+  public void driveRobotRelative(ChassisSpeeds speeds, DriveFeedforwards feedforwards){
     setpointStates = SwerveConstants.KINEMATICS.toSwerveModuleStates(speeds);
     
     SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, Constants.SwerveConstants.MAX_SPEED);
@@ -167,6 +174,14 @@ public class Swerve extends SubsystemBase{
     modules.frontRight.setState(setpointStates[1]);
     modules.backLeft.setState(setpointStates[2]);
     modules.backRight.setState(setpointStates[3]);
+  }
+
+  private void driveFieldRelative(LinearVelocity x, LinearVelocity y, AngularVelocity omega){
+    estimatedPosition = new Pose2d(estimatedPosition.getX() + x.times(RobotConstants.ROBOT_CLOCK_SPEED).in(Meters), estimatedPosition.getY() + (y.times(RobotConstants.ROBOT_CLOCK_SPEED).in(Meters)), new Rotation2d(estimatedPosition.getRotation().getRadians() + omega.in(RadiansPerSecond)));
+    
+    ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x.in(MetersPerSecond), y.in(MetersPerSecond), omega.in(RadiansPerSecond), gyroAngle);
+
+    driveRobotRelative(speeds, new DriveFeedforwards(new double[] {0.0}, new double[] {0.0}, new double[] {0.0}, new double[] {0.0}, new double[] {0.0}));
   }
 
   public void zeroing(){
@@ -178,10 +193,8 @@ public class Swerve extends SubsystemBase{
   }
 
    public Command driveFieldRelativeCommand(DoubleSupplier x, DoubleSupplier y, DoubleSupplier omega){
-    return Commands.sequence(
-      Commands.run(
-() -> driveFiledRelativeScailier(x.getAsDouble(), y.getAsDouble(), omega.getAsDouble()), this)
-);
+    return Commands.run(
+() -> driveFeildRelativeScaler(x.getAsDouble(), y.getAsDouble(), omega.getAsDouble()), this);
    }
 
    public Command zeroRobotCommad(boolean colour){

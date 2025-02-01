@@ -5,14 +5,19 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -49,7 +54,6 @@ public class SwerveModule {
   private final SparkFlexConfig driveConfig;
 
   private final SimpleMotorFeedforward turnFeedforward;
-  private final SimpleMotorFeedforward driveFeedforward;
 
   private Angle turnSetpoint;
   private LinearVelocity driveSetpoint;
@@ -68,12 +72,12 @@ public class SwerveModule {
   private final SparkClosedLoopController driveController;
 
   private final TrapezoidProfile turnProfile;
-  private final TrapezoidProfile.State turnGoalState;
-  private final TrapezoidProfile.State turnSetpointState;
+  private TrapezoidProfile.State turnGoalState;
+  private TrapezoidProfile.State turnSetpointState;
 
     public SwerveModule(int driveID, int turnID){
 
-      turnProfile = new TrapezoidProfile(new TrapezoidProfile.Constraints(SwerveConstants.MAX_SPEED.in(MetersPerSecond), SwerveConstants.MAX_ROTATION.in(RadiansPerSecond)));
+      turnProfile = new TrapezoidProfile(new TrapezoidProfile.Constraints(SwerveConstants.MAX_TURN_VECLOCITY.in(RadiansPerSecond), SwerveConstants.MAX_TURN_ACCELERATION.in(RadiansPerSecondPerSecond)));
 
       turnGoalState = new TrapezoidProfile.State(0,0);
       turnSetpointState = new TrapezoidProfile.State(0,0);
@@ -97,7 +101,7 @@ public class SwerveModule {
 
       driveConfig.idleMode(IdleMode.kBrake);
 
-      driveConfig.closedLoop.pid(SwerveConstants.DRIVE_PID.kp, SwerveConstants.DRIVE_PID.ki, SwerveConstants.DRIVE_PID.kd);
+      driveConfig.closedLoop.pidf(SwerveConstants.DRIVE_PID.kp, SwerveConstants.DRIVE_PID.ki, SwerveConstants.DRIVE_PID.kd, SwerveConstants.DRIVE_PID.kf);
 
       driveConfig.smartCurrentLimit((int) SwerveConstants.DRIVE_CURRENT_LIMIT.in(Amps));
   
@@ -112,9 +116,7 @@ public class SwerveModule {
 
     turnFeedforward = new SimpleMotorFeedforward
     (SwerveConstants.TURN_FEEDFORWARD.ks, SwerveConstants.TURN_FEEDFORWARD.kv, SwerveConstants.TURN_FEEDFORWARD.ka);
-    driveFeedforward = new SimpleMotorFeedforward
-    (SwerveConstants.TURN_FEEDFORWARD.ks, SwerveConstants.TURN_FEEDFORWARD.kv, SwerveConstants.TURN_FEEDFORWARD.ka);
-    
+
     turnSetpoint = Radians.of(0);
     driveSetpoint = LinearVelocity.ofBaseUnits(0, Units.MetersPerSecond);
     turnPosition = turnEncoder.getPosition();
@@ -144,6 +146,12 @@ public class SwerveModule {
     turnPosition = turnEncoder.getPosition();
     driveVelocity = driveEncoder.getVelocity();
     turnVelocity = AngularVelocity.ofBaseUnits(turnEncoder.getVelocity(), Units.RadiansPerSecond);
+
+    turnGoalState = new TrapezoidProfile.State(turnSetpoint.in(Radians), 0);
+
+    turnSetpointState = turnProfile.calculate(RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds), turnSetpointState, turnGoalState);
+
+    turnMotor.getClosedLoopController().setReference(turnSetpointState.position, ControlType.kPosition, ClosedLoopSlot.kSlot0, turnFeedforward.calculate(turnSetpointState.velocity));
 
   }
 
