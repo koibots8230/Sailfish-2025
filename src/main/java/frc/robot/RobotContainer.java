@@ -28,7 +28,7 @@ public class RobotContainer {
 
   private final EndEffector endEffector;
 
-  SendableChooser<Command> chooser = new SendableChooser<>();
+  // SendableChooser<Command> chooser = new SendableChooser<>();
 
   @NotLogged private final CommandXboxController xboxController;
   private boolean colour;
@@ -40,7 +40,7 @@ public class RobotContainer {
 
     xboxController = new CommandXboxController(0);
 
-    chooser = AutoBuilder.buildAutoChooser();
+  //  chooser = AutoBuilder.buildAutoChooser();
 
     configureBindings();
     defualtCommands();
@@ -78,7 +78,7 @@ public class RobotContainer {
     swerve.getColour(colour);
   }
 
-  public Command getAutonomousCommand() {
-    return chooser.getSelected();
-  }
+  // public Command getAutonomousCommand() {
+  //   return chooser.getSelected();
+  // }
 }

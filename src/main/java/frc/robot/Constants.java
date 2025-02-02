@@ -2,6 +2,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.units.Units;
@@ -80,12 +81,12 @@ public class Constants {
     public static final AngularVelocity MAX_TURN_VECLOCITY = RadiansPerSecond.of(2 * Math.PI);
     public static final AngularAcceleration MAX_TURN_ACCELERATION = RadiansPerSecondPerSecond.of(4 * Math.PI);
 
-    public static final PIDGains TURN_PID = new PIDGains.Builder().kp(0.04).build();
-    public static final PIDGains DRIVE_PID = new PIDGains.Builder().kp(0.043).build();
+    public static final PIDGains TURN_PID = new PIDGains.Builder().kp(0.0).build();
+    public static final PIDGains DRIVE_PID = new PIDGains.Builder().kp(0.0).build();
     public static final FeedforwardGains TURN_FEEDFORWARD =
-        new FeedforwardGains.Builder().kv(0.35).build();
+        new FeedforwardGains.Builder().kv(0.05).build();
     public static final FeedforwardGains DRIVE_FEEDFORWARD =
-        new FeedforwardGains.Builder().kv(0.221).build();
+        new FeedforwardGains.Builder().kv(0.0).build();
 
     public static final PPHolonomicDriveController pathPlannerFF = new PPHolonomicDriveController(new PIDConstants(0,0,0), new PIDConstants(0,0,0));
 
@@ -98,6 +99,13 @@ public class Constants {
 
     public static final double DRIVE_CONVERSION_FACTOR = 2 * Math.PI;
     public static final double TURN_CONVERSION_FACTOR = 2 * Math.PI;
+
+    public static final Rotation2d[] OFFSETS = {
+      Rotation2d.fromRadians((3 * Math.PI) / 2.0),
+      Rotation2d.fromRadians(Math.PI),
+      Rotation2d.fromRadians(0),
+      Rotation2d.fromRadians(Math.PI / 2.0)
+    };
 
     public static final Current TURN_CURRENT_LIMIT = Current.ofBaseUnits(30, Units.Amps);
     public static final Current DRIVE_CURRENT_LIMIT = Current.ofBaseUnits(80, Units.Amps);

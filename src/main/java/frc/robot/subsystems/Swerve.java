@@ -90,14 +90,14 @@ public class Swerve extends SubsystemBase {
         messuredStates = new SwerveModuleState[4];
 
 
-        try{
-          config = RobotConfig.fromGUISettings();
-        }
-        catch (Exception e){
-          e.printStackTrace();
-        }
+        // try{
+        //   config = RobotConfig.fromGUISettings();
+        // }
+        // catch (Exception e){
+        //   e.printStackTrace();
+        // }
 
-        AutoBuilder.configure(this::getEstimatedPosition, this::setOdometry, this::getChassisSpeeds, this::driveRobotRelative, SwerveConstants.pathPlannerFF, config, () -> setColour(), this);
+       // AutoBuilder.configure(this::getEstimatedPosition, this::setOdometry, this::getChassisSpeeds, this::driveRobotRelative, SwerveConstants.pathPlannerFF, config, () -> setColour(), this);
     
       }
 

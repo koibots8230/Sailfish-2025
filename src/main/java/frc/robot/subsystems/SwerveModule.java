@@ -72,14 +72,29 @@ public class SwerveModule {
     private final TrapezoidProfile turnProfile;
     private TrapezoidProfile.State turnGoalState;
     private TrapezoidProfile.State turnSetpointState;
+
+    private final Rotation2d offset;
   
     public SwerveModule(int driveID, int turnID) {
   
+      if (driveID == SwerveConstants.FRONT_LEFT_DRIVE_ID) {
+        offset = SwerveConstants.OFFSETS[0];
+      }
+      else if (driveID == SwerveConstants.FRONT_RIGHT_DRIVE_ID) {
+        offset = SwerveConstants.OFFSETS[1];
+      }
+      else if (driveID == SwerveConstants.BACK_LEFT_DRIVE_ID) {
+        offset = SwerveConstants.OFFSETS[2];
+      }
+      else {
+        offset = SwerveConstants.OFFSETS[3];
+      }
+
       turnProfile =
           new TrapezoidProfile(
               new TrapezoidProfile.Constraints(
-                  SwerveConstants.MAX_SPEED.in(MetersPerSecond),
-                  SwerveConstants.MAX_ROTATION.in(RadiansPerSecond)));
+                  2 * Math.PI,
+                  3 * Math.PI));
   
       turnGoalState = new TrapezoidProfile.State(0, 0);
       turnSetpointState = new TrapezoidProfile.State(0, 0);
@@ -148,7 +163,7 @@ public class SwerveModule {
 
   public void setState(SwerveModuleState swerveModuleState) {
     turnController.setReference(
-        swerveModuleState.angle.getRadians(), SparkBase.ControlType.kPosition);
+        swerveModuleState.angle.getRadians() + offset.getRadians(), SparkBase.ControlType.kPosition);
     driveController.setReference(
         swerveModuleState.speedMetersPerSecond, SparkBase.ControlType.kVelocity);
 
@@ -164,7 +179,7 @@ public class SwerveModule {
     turnVoltage =
         Voltage.ofBaseUnits(turnMotor.getBusVoltage() * turnMotor.getAppliedOutput(), Volts);
     drivePosition = driveEncoder.getPosition();
-    turnPosition = turnEncoder.getPosition();
+    turnPosition = turnEncoder.getPosition() - offset.getRadians();
     driveVelocity = driveEncoder.getVelocity();
     turnVelocity = AngularVelocity.ofBaseUnits(turnEncoder.getVelocity(), Units.RadiansPerSecond);
 
@@ -173,6 +188,9 @@ public class SwerveModule {
     turnSetpointState = turnProfile.calculate(RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds), turnSetpointState, turnGoalState);
 
     turnMotor.getClosedLoopController().setReference(turnSetpointState.position, ControlType.kPosition, ClosedLoopSlot.kSlot0, turnFeedforward.calculate(turnSetpointState.velocity));
+
+    System.out.println("turn goal state: "  + turnGoalState.position);
+    System.out.println("turn setpoint state: "  + turnSetpointState.position);
 
   }
 
