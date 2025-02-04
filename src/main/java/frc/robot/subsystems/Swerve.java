@@ -154,7 +154,7 @@ public class Swerve extends SubsystemBase {
     };
   }
 
-  private void driveFeildRelativeScaler(double x, double y, double omega){
+  private void driveFieldRelativeScaler(double x, double y, double omega){
 
     double linearMagnitude = Math.pow(Math.hypot(x, y), SwerveConstants.LEFT_STICK_SCAILING);
 
@@ -207,7 +207,7 @@ public class Swerve extends SubsystemBase {
 
    public Command driveFieldRelativeCommand(DoubleSupplier x, DoubleSupplier y, DoubleSupplier omega){
     return Commands.run(
-() -> driveFeildRelativeScaler(x.getAsDouble(), y.getAsDouble(), omega.getAsDouble()), this);
+() -> driveFieldRelativeScaler(x.getAsDouble(), y.getAsDouble(), omega.getAsDouble()), this);
    }
 
   public Command zeroRobotCommad(boolean colour) {

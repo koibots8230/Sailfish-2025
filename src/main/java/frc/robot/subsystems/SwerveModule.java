@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
@@ -93,8 +94,8 @@ public class SwerveModule {
       turnProfile =
           new TrapezoidProfile(
               new TrapezoidProfile.Constraints(
-                  2 * Math.PI,
-                  3 * Math.PI));
+                  10 * Math.PI,
+                  16 * Math.PI));
   
       turnGoalState = new TrapezoidProfile.State(0, 0);
       turnSetpointState = new TrapezoidProfile.State(0, 0);
@@ -109,24 +110,26 @@ public class SwerveModule {
       turnConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-          .pid(SwerveConstants.TURN_PID.kp, SwerveConstants.TURN_PID.ki, SwerveConstants.TURN_PID.kd);
+          .pid(SwerveConstants.TURN_PID.kp, SwerveConstants.TURN_PID.ki, SwerveConstants.TURN_PID.kd)
+          .positionWrappingEnabled(true)
+          .positionWrappingInputRange(-Math.PI, Math.PI);
   
       turnConfig.smartCurrentLimit((int) SwerveConstants.TURN_CURRENT_LIMIT.in(Amps));
   
       turnConfig.absoluteEncoder.positionConversionFactor(SwerveConstants.TURN_CONVERSION_FACTOR);
       turnConfig.absoluteEncoder.velocityConversionFactor(SwerveConstants.TURN_CONVERSION_FACTOR);
-  
+      turnConfig.absoluteEncoder.inverted(true);
       
       driveConfig = new SparkFlexConfig();
 
-      driveConfig.closedLoop.pidf(SwerveConstants.DRIVE_PID.kp, SwerveConstants.DRIVE_PID.ki, SwerveConstants.DRIVE_PID.kd, SwerveConstants.DRIVE_PID.kf);
+      driveConfig.closedLoop.pidf(SwerveConstants.DRIVE_PID.kp, SwerveConstants.DRIVE_PID.ki, SwerveConstants.DRIVE_PID.kd, SwerveConstants.DRIVE_FEEDFORWARD.kv);
 
       driveConfig.idleMode(IdleMode.kBrake);
   
-      driveConfig.closedLoop.pid(
-          SwerveConstants.DRIVE_PID.kp, SwerveConstants.DRIVE_PID.ki, SwerveConstants.DRIVE_PID.kd);
-  
       driveConfig.smartCurrentLimit((int) SwerveConstants.DRIVE_CURRENT_LIMIT.in(Amps));
+
+      driveConfig.encoder.positionConversionFactor(SwerveConstants.DRIVE_CONVERSION_FACTOR);
+      driveConfig.encoder.velocityConversionFactor(SwerveConstants.DRIVE_CONVERSION_FACTOR / 60.0);
   
       turnMotor.configure(turnConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
       driveMotor.configure(
@@ -141,11 +144,7 @@ public class SwerveModule {
       turnFeedforward =
           new SimpleMotorFeedforward(
               SwerveConstants.TURN_FEEDFORWARD.ks,
-              SwerveConstants.TURN_FEEDFORWARD.kv,
-              SwerveConstants.TURN_FEEDFORWARD.ka);
-  
-      turnFeedforward = new SimpleMotorFeedforward
-    (SwerveConstants.TURN_FEEDFORWARD.ks, SwerveConstants.TURN_FEEDFORWARD.kv, SwerveConstants.TURN_FEEDFORWARD.ka);
+              SwerveConstants.TURN_FEEDFORWARD.kv);
 
     turnSetpoint = Radians.of(0);
     driveSetpoint = LinearVelocity.ofBaseUnits(0, Units.MetersPerSecond);
@@ -162,8 +161,6 @@ public class SwerveModule {
   }
 
   public void setState(SwerveModuleState swerveModuleState) {
-    turnController.setReference(
-        swerveModuleState.angle.getRadians() + offset.getRadians(), SparkBase.ControlType.kPosition);
     driveController.setReference(
         swerveModuleState.speedMetersPerSecond, SparkBase.ControlType.kVelocity);
 
@@ -183,15 +180,11 @@ public class SwerveModule {
     driveVelocity = driveEncoder.getVelocity();
     turnVelocity = AngularVelocity.ofBaseUnits(turnEncoder.getVelocity(), Units.RadiansPerSecond);
 
-    turnGoalState = new TrapezoidProfile.State(turnSetpoint.in(Radians), 0);
+    turnGoalState = new TrapezoidProfile.State(turnSetpoint.in(Radians) + offset.getRadians(), 0);
 
     turnSetpointState = turnProfile.calculate(RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds), turnSetpointState, turnGoalState);
 
-    turnMotor.getClosedLoopController().setReference(turnSetpointState.position, ControlType.kPosition, ClosedLoopSlot.kSlot0, turnFeedforward.calculate(turnSetpointState.velocity));
-
-    System.out.println("turn goal state: "  + turnGoalState.position);
-    System.out.println("turn setpoint state: "  + turnSetpointState.position);
-
+    turnController.setReference(turnSetpointState.position, ControlType.kPosition, ClosedLoopSlot.kSlot0, turnFeedforward.calculate(turnSetpointState.velocity));
   }
 
   public void simulationPeriodic() {

@@ -41,7 +41,7 @@ public class Constants {
 
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(60, Units.Amps);
 
-    public static final int MOTOR_ID = 0;
+    public static final int MOTOR_ID = 57;
   }
 
   public static class EndEffectorConstants {
@@ -59,8 +59,8 @@ public class Constants {
 
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(40, Units.Amps);
 
-    public static final int MOTOR_ID = 98;
-    public static final int LASERCAN_ID = 99;
+    public static final int MOTOR_ID = 59;
+    public static final int LASERCAN_ID = 58;
   }
 
   public static class RobotConstants {
@@ -81,12 +81,12 @@ public class Constants {
     public static final AngularVelocity MAX_TURN_VECLOCITY = RadiansPerSecond.of(2 * Math.PI);
     public static final AngularAcceleration MAX_TURN_ACCELERATION = RadiansPerSecondPerSecond.of(4 * Math.PI);
 
-    public static final PIDGains TURN_PID = new PIDGains.Builder().kp(0.0).build();
+    public static final PIDGains TURN_PID = new PIDGains.Builder().kp(1).kd(0.0).build();
     public static final PIDGains DRIVE_PID = new PIDGains.Builder().kp(0.0).build();
     public static final FeedforwardGains TURN_FEEDFORWARD =
-        new FeedforwardGains.Builder().kv(0.05).build();
+        new FeedforwardGains.Builder().kv(0.55).build();
     public static final FeedforwardGains DRIVE_FEEDFORWARD =
-        new FeedforwardGains.Builder().kv(0.0).build();
+        new FeedforwardGains.Builder().kv(0.2).build();
 
     public static final PPHolonomicDriveController pathPlannerFF = new PPHolonomicDriveController(new PIDConstants(0,0,0), new PIDConstants(0,0,0));
 
@@ -97,22 +97,22 @@ public class Constants {
       new Translation2d(RobotConstants.LENGTH.divide(-2), RobotConstants.WIDTH.divide(-2))
       );   
 
-    public static final double DRIVE_CONVERSION_FACTOR = 2 * Math.PI;
+    public static final Wheel SWERVE_WHEEL = new Wheel(Inches.of(1.5));
+
+    public static final double SWERVE_GEARING = 5.08;
+
+    public static final double DRIVE_CONVERSION_FACTOR = (0.038 * 2 * Math.PI) / SWERVE_GEARING;
     public static final double TURN_CONVERSION_FACTOR = 2 * Math.PI;
 
     public static final Rotation2d[] OFFSETS = {
       Rotation2d.fromRadians((3 * Math.PI) / 2.0),
-      Rotation2d.fromRadians(Math.PI),
       Rotation2d.fromRadians(0),
+      Rotation2d.fromRadians(Math.PI),
       Rotation2d.fromRadians(Math.PI / 2.0)
     };
 
     public static final Current TURN_CURRENT_LIMIT = Current.ofBaseUnits(30, Units.Amps);
     public static final Current DRIVE_CURRENT_LIMIT = Current.ofBaseUnits(80, Units.Amps);
-
-    public static final Wheel SWERVE_WHEEL = new Wheel(Inches.of(1.5));
-
-    public static final double SWERVE_GEARING = 5.08;
 
     public static final double DEADBAND = 0.05;
 
