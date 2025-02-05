@@ -32,9 +32,9 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    swerve.setDefaultCommand(
-        swerve.driveFieldRelativeCommand(
-            xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
+    // swerve.setDefaultCommand(
+    //     swerve.driveFieldRelativeCommand(
+    //         xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
 
     Trigger L1 = xboxController.a();
     L1.onTrue(elevator.setPositionCommand(ElevatorConstants.L1_SETPOINT));

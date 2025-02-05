@@ -16,7 +16,7 @@ import frc.lib.util.PIDGains;
 public class Constants {
 
   public static class RobotConstants {
-    public static final Time ROBOT_CLOCK_SPEED = Time.ofBaseUnits(20, Units.Milliseconds);
+    public static final Time ROBOT_CLOCK_SPEED = Time.ofBaseUnits(0.02, Units.Seconds);
   }
 
   public static class SwerveConstants {
@@ -29,22 +29,22 @@ public class Constants {
 
   public static class ElevatorConstants {
     public static final Distance START_SETPOINT = Distance.ofBaseUnits(0.005, Units.Meters);
-    public static final Distance L1_SETPOINT = Distance.ofBaseUnits(0.5, Units.Meters);
+    public static final Distance L1_SETPOINT = Distance.ofBaseUnits(2.65, Units.Meters);
 
-    public static final PIDGains PID = new PIDGains.Builder().kp(0).build();
+    public static final PIDGains PID = new PIDGains.Builder().kp(2.2).build();
     public static final FeedforwardGains FEEDFORWARD =
-        new FeedforwardGains.Builder().kv(0).kg(0).build();
+        new FeedforwardGains.Builder().kv(4.9).kg(0.37).build();
 
     public static final LinearVelocity MAX_VELOCITY =
-        LinearVelocity.ofBaseUnits(0.5, Units.MetersPerSecond);
+        LinearVelocity.ofBaseUnits(24, Units.MetersPerSecond);
     public static final LinearAcceleration MAX_ACCELRATION =
-        LinearAcceleration.ofBaseUnits(0.25, Units.MetersPerSecondPerSecond);
+        LinearAcceleration.ofBaseUnits(12, Units.MetersPerSecondPerSecond);
 
-    public static final Distance CONVERSION_FACTOR = Distance.ofBaseUnits((0.05207 * (Math.PI * Math.PI)) * 2, Meters);
+    public static final Distance CONVERSION_FACTOR = Distance.ofBaseUnits((0.05207 *  Math.PI) * 2, Meters);
 
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(60, Units.Amps);
 
-    public static final int MAIN_MOTOR_ID = 0;
-    public static final int SECONDARY_MOTOR_ID = 1;
+    public static final int MAIN_MOTOR_ID = 31;
+    public static final int SECONDARY_MOTOR_ID = 30;
   }
 }

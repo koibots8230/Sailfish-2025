@@ -77,6 +77,7 @@ public class Elevator extends SubsystemBase {
 
     mainMotorConfig.alternateEncoder.positionConversionFactor(ElevatorConstants.CONVERSION_FACTOR.in(Meters));
     mainMotorConfig.alternateEncoder.velocityConversionFactor(ElevatorConstants.CONVERSION_FACTOR.in(Meters));
+    mainMotorConfig.alternateEncoder.inverted(true);
 
     secondaryMotorConfig = new SparkMaxConfig();
 
