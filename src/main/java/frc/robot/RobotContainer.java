@@ -6,13 +6,10 @@ package frc.robot;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.EndEffectorConstants;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.EndEffector;
@@ -43,17 +40,17 @@ public class RobotContainer {
         swerve.driveFieldRelativeCommand(
             xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
 
-    Trigger testEffector = xboxController.axisGreaterThan(0, 0.05);
+    Trigger testEffector = xboxController.x();
     testEffector.onTrue(endEffector.setVelocityCommand(EndEffectorConstants.INTAKE_SPEED));
-    testEffector.onFalse(endEffector.setVelocityCommand(AngularVelocity.ofBaseUnits(0, Units.RPM)));
+    testEffector.onFalse(endEffector.setVelocityCommand(0));
 
     Trigger intakeEffector = xboxController.a();
     intakeEffector.onTrue(endEffector.intakeCommand());
-    intakeEffector.onFalse(endEffector.setVelocityCommand(AngularVelocity.ofBaseUnits(0, Units.RPM)));
+    intakeEffector.onFalse(endEffector.setVelocityCommand(0));
 
     Trigger outtakeEffector = xboxController.b();
-    outtakeEffector.onTrue(endEffector.intakeCommand());
-    outtakeEffector.onFalse(endEffector.setVelocityCommand(AngularVelocity.ofBaseUnits(0, Units.RPM)));
+    outtakeEffector.onTrue(endEffector.outtakeCommand());
+    outtakeEffector.onFalse(endEffector.setVelocityCommand(0));
   }
 
   public void teleopInit() {}
