@@ -82,11 +82,11 @@ public class Constants {
     public static final AngularAcceleration MAX_TURN_ACCELERATION = RadiansPerSecondPerSecond.of(4 * Math.PI);
 
     public static final PIDGains TURN_PID = new PIDGains.Builder().kp(1).kd(0.0).build();
-    public static final PIDGains DRIVE_PID = new PIDGains.Builder().kp(0.0).build();
+    public static final PIDGains DRIVE_PID = new PIDGains.Builder().kp(0.07).build();
     public static final FeedforwardGains TURN_FEEDFORWARD =
         new FeedforwardGains.Builder().kv(0.55).build();
     public static final FeedforwardGains DRIVE_FEEDFORWARD =
-        new FeedforwardGains.Builder().kv(0.2).build();
+        new FeedforwardGains.Builder().kv(0.21).build();
 
     public static final PPHolonomicDriveController pathPlannerFF = new PPHolonomicDriveController(new PIDConstants(0,0,0), new PIDConstants(0,0,0));
 
