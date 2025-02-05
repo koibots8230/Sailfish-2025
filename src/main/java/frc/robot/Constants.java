@@ -49,10 +49,12 @@ public class Constants {
 
   public static class EndEffectorConstants {
     public static final double INTAKE_SPEED = 250;
-    public static final double OUTTAKE_SPEED = 1000; //TODO: Turn back into units once not bugged anymore :(
+    public static final double OUTTAKE_SPEED =
+        1000; // TODO: Turn back into units once not bugged anymore :(
 
     public static final PIDGains PID_GAINS = new PIDGains.Builder().kp(0.0001).build();
-    public static final FeedforwardGains FEEDFORWARD_GAINS = new FeedforwardGains.Builder().kv(0.0002).build();
+    public static final FeedforwardGains FEEDFORWARD_GAINS =
+        new FeedforwardGains.Builder().kv(0.0002).build();
 
     public static final Distance TRIGGER_DISTANCE = Distance.ofBaseUnits(0.085, Units.Meters);
 

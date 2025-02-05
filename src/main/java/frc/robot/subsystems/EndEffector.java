@@ -1,19 +1,17 @@
 package frc.robot.subsystems;
 
+import au.grapplerobotics.LaserCan;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
-import au.grapplerobotics.LaserCan;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
@@ -24,95 +22,97 @@ import frc.robot.Constants.EndEffectorConstants;
 
 @Logged
 public class EndEffector extends SubsystemBase {
-    
-    private final SparkMax motor;
-    private final SparkMaxConfig config;
-    private final RelativeEncoder encoder;
 
-    private final SparkClosedLoopController pid;
+  private final SparkMax motor;
+  private final SparkMaxConfig config;
+  private final RelativeEncoder encoder;
 
-    private final LaserCan laserCAN;
+  private final SparkClosedLoopController pid;
 
-    double setpoint;
-    double velocity;
-    Current current;
-    Voltage voltage;
+  private final LaserCan laserCAN;
 
-    Distance sensorDistance;
+  double setpoint;
+  double velocity;
+  Current current;
+  Voltage voltage;
 
-    public EndEffector() {
-        motor = new SparkMax(EndEffectorConstants.MOTOR_ID, MotorType.kBrushless);
+  Distance sensorDistance;
 
-        laserCAN = new LaserCan(EndEffectorConstants.LASERCAN_ID);
+  public EndEffector() {
+    motor = new SparkMax(EndEffectorConstants.MOTOR_ID, MotorType.kBrushless);
 
-        config = new SparkMaxConfig();
+    laserCAN = new LaserCan(EndEffectorConstants.LASERCAN_ID);
 
-        config.inverted(true);
+    config = new SparkMaxConfig();
 
-        config.smartCurrentLimit((int) EndEffectorConstants.CURRENT_LIMIT.in(Units.Amps));
+    config.inverted(true);
 
-        config.encoder.uvwAverageDepth(3);
-        config.encoder.uvwMeasurementPeriod(10);
+    config.smartCurrentLimit((int) EndEffectorConstants.CURRENT_LIMIT.in(Units.Amps));
 
-        config.voltageCompensation(12);
+    config.encoder.uvwAverageDepth(3);
+    config.encoder.uvwMeasurementPeriod(10);
 
-        config.idleMode(IdleMode.kBrake);
+    config.voltageCompensation(12);
 
-        config.closedLoop.p(EndEffectorConstants.PID_GAINS.kp);
-        config.closedLoop.velocityFF(EndEffectorConstants.FEEDFORWARD_GAINS.kv);
+    config.idleMode(IdleMode.kBrake);
 
-        motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    config.closedLoop.p(EndEffectorConstants.PID_GAINS.kp);
+    config.closedLoop.velocityFF(EndEffectorConstants.FEEDFORWARD_GAINS.kv);
 
-        encoder = motor.getEncoder();
+    motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        pid = motor.getClosedLoopController();
+    encoder = motor.getEncoder();
 
-        setpoint = 0;
-    }
+    pid = motor.getClosedLoopController();
 
-    @Override
-    public void periodic() {
-        velocity = encoder.getVelocity();
-        current = Current.ofBaseUnits(motor.getOutputCurrent(), Units.Amps);
-        voltage = Voltage.ofBaseUnits(motor.getAppliedOutput() * motor.getBusVoltage(), Units.Volts);
+    setpoint = 0;
+  }
 
-        sensorDistance = Distance.ofBaseUnits(laserCAN.getMeasurement().distance_mm, Units.Millimeters);
-    }
+  @Override
+  public void periodic() {
+    velocity = encoder.getVelocity();
+    current = Current.ofBaseUnits(motor.getOutputCurrent(), Units.Amps);
+    voltage = Voltage.ofBaseUnits(motor.getAppliedOutput() * motor.getBusVoltage(), Units.Volts);
 
-    @Override
-    public void simulationPeriodic() {
-        velocity = setpoint;
-    }
+    sensorDistance = Distance.ofBaseUnits(laserCAN.getMeasurement().distance_mm, Units.Millimeters);
+  }
 
-    private void setVelocity(double velocity) {
-        pid.setReference(velocity, ControlType.kVelocity);
+  @Override
+  public void simulationPeriodic() {
+    velocity = setpoint;
+  }
 
-        setpoint = velocity;
-        System.out.println(setpoint);
-    }
+  private void setVelocity(double velocity) {
+    pid.setReference(velocity, ControlType.kVelocity);
 
-    public Command intakeCommand() {
-        return Commands.sequence(
-            Commands.race(
-                Commands.run(() -> this.setVelocity(EndEffectorConstants.INTAKE_SPEED), this),
-                Commands.waitUntil(() -> laserCAN.getMeasurement().distance_mm <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters))
-            ),
-            Commands.runOnce(() -> this.setVelocity(0), this)
-        );
-    }
-    
-    public Command outtakeCommand() {
-        return Commands.sequence(
-            Commands.race(
-                Commands.run(() -> this.setVelocity(EndEffectorConstants.OUTTAKE_SPEED), this),
-                Commands.waitUntil(() -> !(laserCAN.getMeasurement().distance_mm <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters)))
-            ),
-            Commands.waitSeconds(0.5),
-            Commands.runOnce(() -> this.setVelocity(0), this)
-        );
-    }
+    setpoint = velocity;
+    System.out.println(setpoint);
+  }
 
-    public Command setVelocityCommand(double velocity) {
-        return Commands.runOnce(() -> this.setVelocity(velocity), this);
-    }
+  public Command intakeCommand() {
+    return Commands.sequence(
+        Commands.race(
+            Commands.run(() -> this.setVelocity(EndEffectorConstants.INTAKE_SPEED), this),
+            Commands.waitUntil(
+                () ->
+                    laserCAN.getMeasurement().distance_mm
+                        <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters))),
+        Commands.runOnce(() -> this.setVelocity(0), this));
+  }
+
+  public Command outtakeCommand() {
+    return Commands.sequence(
+        Commands.race(
+            Commands.run(() -> this.setVelocity(EndEffectorConstants.OUTTAKE_SPEED), this),
+            Commands.waitUntil(
+                () ->
+                    !(laserCAN.getMeasurement().distance_mm
+                        <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters)))),
+        Commands.waitSeconds(0.5),
+        Commands.runOnce(() -> this.setVelocity(0), this));
+  }
+
+  public Command setVelocityCommand(double velocity) {
+    return Commands.runOnce(() -> this.setVelocity(velocity), this);
+  }
 }
