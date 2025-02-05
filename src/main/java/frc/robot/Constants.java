@@ -40,7 +40,7 @@ public class Constants {
     public static final LinearAcceleration MAX_ACCELRATION =
         LinearAcceleration.ofBaseUnits(0.25, Units.MetersPerSecondPerSecond);
 
-    public static final Distance CONVERSION_FACTOR = Distance.ofBaseUnits(0.05207 * (Math.PI * Math.PI), Meters);
+    public static final Distance CONVERSION_FACTOR = Distance.ofBaseUnits((0.05207 * (Math.PI * Math.PI)) * 2, Meters);
 
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(60, Units.Amps);
 
