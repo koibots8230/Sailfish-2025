@@ -12,8 +12,8 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -31,10 +31,12 @@ public class EndEffector extends SubsystemBase {
 
   private final LaserCan laserCAN;
 
-  AngularVelocity setpoint;
-  AngularVelocity velocity;
+  double setpoint;
+  double velocity;
   Current current;
   Voltage voltage;
+
+  Distance sensorDistance;
 
   public EndEffector() {
     motor = new SparkMax(EndEffectorConstants.MOTOR_ID, MotorType.kBrushless);
@@ -43,12 +45,12 @@ public class EndEffector extends SubsystemBase {
 
     config = new SparkMaxConfig();
 
+    config.inverted(true);
+
     config.smartCurrentLimit((int) EndEffectorConstants.CURRENT_LIMIT.in(Units.Amps));
 
-    config.encoder.positionConversionFactor(EndEffectorConstants.CONVERSION_FACTOR);
-
-    config.encoder.uvwAverageDepth(2);
-    config.encoder.uvwMeasurementPeriod(20);
+    config.encoder.uvwAverageDepth(3);
+    config.encoder.uvwMeasurementPeriod(10);
 
     config.voltageCompensation(12);
 
@@ -63,14 +65,16 @@ public class EndEffector extends SubsystemBase {
 
     pid = motor.getClosedLoopController();
 
-    setpoint = AngularVelocity.ofBaseUnits(0, Units.RPM);
+    setpoint = 0;
   }
 
   @Override
   public void periodic() {
-    velocity = AngularVelocity.ofBaseUnits(encoder.getVelocity(), Units.RPM);
+    velocity = encoder.getVelocity();
     current = Current.ofBaseUnits(motor.getOutputCurrent(), Units.Amps);
     voltage = Voltage.ofBaseUnits(motor.getAppliedOutput() * motor.getBusVoltage(), Units.Volts);
+
+    sensorDistance = Distance.ofBaseUnits(laserCAN.getMeasurement().distance_mm, Units.Millimeters);
   }
 
   @Override
@@ -78,36 +82,37 @@ public class EndEffector extends SubsystemBase {
     velocity = setpoint;
   }
 
-  private void setVelocity(AngularVelocity velocity) {
-    pid.setReference(velocity.in(Units.RPM), ControlType.kVelocity);
+  private void setVelocity(double velocity) {
+    pid.setReference(velocity, ControlType.kVelocity);
 
     setpoint = velocity;
+    System.out.println(setpoint);
   }
 
   public Command intakeCommand() {
     return Commands.sequence(
         Commands.race(
-            Commands.runOnce(() -> this.setVelocity(EndEffectorConstants.INTAKE_SPEED), this),
+            Commands.run(() -> this.setVelocity(EndEffectorConstants.INTAKE_SPEED), this),
             Commands.waitUntil(
                 () ->
                     laserCAN.getMeasurement().distance_mm
-                        <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeter))),
-        Commands.runOnce(() -> this.setVelocity(AngularVelocity.ofBaseUnits(0, Units.RPM)), this));
+                        <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters))),
+        Commands.runOnce(() -> this.setVelocity(0), this));
   }
 
   public Command outtakeCommand() {
     return Commands.sequence(
         Commands.race(
-            Commands.runOnce(() -> this.setVelocity(EndEffectorConstants.OUTTAKE_SPEED), this),
+            Commands.run(() -> this.setVelocity(EndEffectorConstants.OUTTAKE_SPEED), this),
             Commands.waitUntil(
                 () ->
                     !(laserCAN.getMeasurement().distance_mm
-                        <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeter)))),
+                        <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters)))),
         Commands.waitSeconds(0.5),
-        Commands.runOnce(() -> this.setVelocity(AngularVelocity.ofBaseUnits(0, Units.RPM)), this));
+        Commands.runOnce(() -> this.setVelocity(0), this));
   }
 
-  public Command setVelocityCommand(AngularVelocity velocity) {
+  public Command setVelocityCommand(double velocity) {
     return Commands.runOnce(() -> this.setVelocity(velocity), this);
   }
 }
