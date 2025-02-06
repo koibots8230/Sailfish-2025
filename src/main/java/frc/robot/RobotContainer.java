@@ -4,15 +4,9 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.EndEffectorConstants;
@@ -40,7 +34,7 @@ public class RobotContainer {
 
     xboxController = new CommandXboxController(0);
 
-  //  chooser = AutoBuilder.buildAutoChooser();
+    //  chooser = AutoBuilder.buildAutoChooser();
 
     configureBindings();
     defualtCommands();
@@ -58,8 +52,7 @@ public class RobotContainer {
 
     Trigger outtakeEffector = xboxController.b();
     outtakeEffector.onTrue(endEffector.intakeCommand());
-    outtakeEffector.onFalse(
-        endEffector.setVelocityCommand(AngularVelocity.ofBaseUnits(0, Units.RPM)));
+    outtakeEffector.onFalse(endEffector.setVelocityCommand(0));
 
     Trigger zero = xboxController.y();
 

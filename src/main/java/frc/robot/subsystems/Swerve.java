@@ -5,13 +5,9 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
-import java.util.function.DoubleSupplier;
-
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.util.DriveFeedforwards;
-
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -29,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.RobotConstants;
 import frc.robot.Constants.SwerveConstants;
+import java.util.function.DoubleSupplier;
 
 @Logged
 public class Swerve extends SubsystemBase {
@@ -67,47 +64,50 @@ public class Swerve extends SubsystemBase {
   private boolean isBlue;
 
   RobotConfig config;
-    
-    
-      
-      public Swerve() {
-    
-        this.isBlue = true;
-        
-        modules = new Modules();
-    
-        estimatedPosition = new Pose2d();
-  
-        gyro = new Pigeon2(SwerveConstants.GYRO_ID);
-  
-        gyroAngle = new Rotation2d();
-  
-        odometry = new SwerveDrivePoseEstimator(Constants.SwerveConstants.KINEMATICS, gyroAngle, this.getModulePostition(), estimatedPosition);
-    
-        simHeading = new Rotation2d(0.0);
-    
-        setpointStates = new SwerveModuleState[4];
-        messuredStates = new SwerveModuleState[4];
 
+  public Swerve() {
 
-        // try{
-        //   config = RobotConfig.fromGUISettings();
-        // }
-        // catch (Exception e){
-        //   e.printStackTrace();
-        // }
+    this.isBlue = true;
 
-       // AutoBuilder.configure(this::getEstimatedPosition, this::setOdometry, this::getChassisSpeeds, this::driveRobotRelative, SwerveConstants.pathPlannerFF, config, () -> setColour(), this);
-    
-      }
+    modules = new Modules();
 
-    public boolean setColour(){
-      return isBlue;
-    }
-    
-    public void setOdometry(Pose2d angle){
-      odometry.resetPose(angle);
-    }
+    estimatedPosition = new Pose2d();
+
+    gyro = new Pigeon2(SwerveConstants.GYRO_ID);
+
+    gyroAngle = new Rotation2d();
+
+    odometry =
+        new SwerveDrivePoseEstimator(
+            Constants.SwerveConstants.KINEMATICS,
+            gyroAngle,
+            this.getModulePostition(),
+            estimatedPosition);
+
+    simHeading = new Rotation2d(0.0);
+
+    setpointStates = new SwerveModuleState[4];
+    messuredStates = new SwerveModuleState[4];
+
+    // try{
+    //   config = RobotConfig.fromGUISettings();
+    // }
+    // catch (Exception e){
+    //   e.printStackTrace();
+    // }
+
+    // AutoBuilder.configure(this::getEstimatedPosition, this::setOdometry, this::getChassisSpeeds,
+    // this::driveRobotRelative, SwerveConstants.pathPlannerFF, config, () -> setColour(), this);
+
+  }
+
+  public boolean setColour() {
+    return isBlue;
+  }
+
+  public void setOdometry(Pose2d angle) {
+    odometry.resetPose(angle);
+  }
 
   public void getColour(boolean colour) {
     isBlue = colour;
@@ -136,7 +136,11 @@ public class Swerve extends SubsystemBase {
 
   @Override
   public void simulationPeriodic() {
-    simHeading = simHeading.plus(new Rotation2d(getChassisSpeeds().omegaRadiansPerSecond * RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds)));
+    simHeading =
+        simHeading.plus(
+            new Rotation2d(
+                getChassisSpeeds().omegaRadiansPerSecond
+                    * RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds)));
     gyroAngle = simHeading;
 
     modules.frontLeft.simulationPeriodic();
@@ -154,7 +158,7 @@ public class Swerve extends SubsystemBase {
     };
   }
 
-  private void driveFieldRelativeScaler(double x, double y, double omega){
+  private void driveFieldRelativeScaler(double x, double y, double omega) {
 
     double linearMagnitude = Math.pow(Math.hypot(x, y), SwerveConstants.LEFT_STICK_SCAILING);
 
@@ -177,7 +181,7 @@ public class Swerve extends SubsystemBase {
     return SwerveConstants.KINEMATICS.toChassisSpeeds(messuredStates);
   }
 
-  public void driveRobotRelative(ChassisSpeeds speeds, DriveFeedforwards feedforwards){
+  public void driveRobotRelative(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
     setpointStates = SwerveConstants.KINEMATICS.toSwerveModuleStates(speeds);
 
     SwerveDriveKinematics.desaturateWheelSpeeds(
@@ -189,15 +193,29 @@ public class Swerve extends SubsystemBase {
     modules.backRight.setState(setpointStates[3]);
   }
 
-  private void driveFieldRelative(LinearVelocity x, LinearVelocity y, AngularVelocity omega){
-    estimatedPosition = new Pose2d(estimatedPosition.getX() + x.times(RobotConstants.ROBOT_CLOCK_SPEED).in(Meters), estimatedPosition.getY() + (y.times(RobotConstants.ROBOT_CLOCK_SPEED).in(Meters)), new Rotation2d(estimatedPosition.getRotation().getRadians() + omega.in(RadiansPerSecond)));
-    
-    ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(x.in(MetersPerSecond), y.in(MetersPerSecond), omega.in(RadiansPerSecond), gyroAngle);
+  private void driveFieldRelative(LinearVelocity x, LinearVelocity y, AngularVelocity omega) {
+    estimatedPosition =
+        new Pose2d(
+            estimatedPosition.getX() + x.times(RobotConstants.ROBOT_CLOCK_SPEED).in(Meters),
+            estimatedPosition.getY() + (y.times(RobotConstants.ROBOT_CLOCK_SPEED).in(Meters)),
+            new Rotation2d(
+                estimatedPosition.getRotation().getRadians() + omega.in(RadiansPerSecond)));
 
-    driveRobotRelative(speeds, new DriveFeedforwards(new double[] {0.0}, new double[] {0.0}, new double[] {0.0}, new double[] {0.0}, new double[] {0.0}));
+    ChassisSpeeds speeds =
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            x.in(MetersPerSecond), y.in(MetersPerSecond), omega.in(RadiansPerSecond), gyroAngle);
+
+    driveRobotRelative(
+        speeds,
+        new DriveFeedforwards(
+            new double[] {0.0},
+            new double[] {0.0},
+            new double[] {0.0},
+            new double[] {0.0},
+            new double[] {0.0}));
   }
 
-  public void zeroing(){
+  public void zeroing() {
     gyro.setYaw(0);
   }
 
@@ -205,10 +223,12 @@ public class Swerve extends SubsystemBase {
     return estimatedPosition;
   }
 
-   public Command driveFieldRelativeCommand(DoubleSupplier x, DoubleSupplier y, DoubleSupplier omega){
+  public Command driveFieldRelativeCommand(
+      DoubleSupplier x, DoubleSupplier y, DoubleSupplier omega) {
     return Commands.run(
-() -> driveFieldRelativeScaler(x.getAsDouble(), y.getAsDouble(), omega.getAsDouble()), this);
-   }
+        () -> driveFieldRelativeScaler(x.getAsDouble(), y.getAsDouble(), omega.getAsDouble()),
+        this);
+  }
 
   public Command zeroRobotCommad(boolean colour) {
     return Commands.runOnce(() -> zeroing(), this);

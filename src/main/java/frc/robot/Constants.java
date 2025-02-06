@@ -2,6 +2,8 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -15,9 +17,6 @@ import edu.wpi.first.units.measure.Time;
 import frc.lib.util.FeedforwardGains;
 import frc.lib.util.PIDGains;
 import frc.lib.util.Wheel;
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-
 
 public class Constants {
 
@@ -59,8 +58,6 @@ public class Constants {
 
     public static final int MOTOR_ID = 10;
     public static final int LASERCAN_ID = 34;
-    public static final int MOTOR_ID = 59;
-    public static final int LASERCAN_ID = 58;
   }
 
   public static class RobotConstants {
@@ -79,7 +76,8 @@ public class Constants {
     public static final AngularVelocity MAX_ROTATION = RadiansPerSecond.of(2 * Math.PI);
 
     public static final AngularVelocity MAX_TURN_VECLOCITY = RadiansPerSecond.of(2 * Math.PI);
-    public static final AngularAcceleration MAX_TURN_ACCELERATION = RadiansPerSecondPerSecond.of(4 * Math.PI);
+    public static final AngularAcceleration MAX_TURN_ACCELERATION =
+        RadiansPerSecondPerSecond.of(4 * Math.PI);
 
     public static final PIDGains TURN_PID = new PIDGains.Builder().kp(1).kd(0.0).build();
     public static final PIDGains DRIVE_PID = new PIDGains.Builder().kp(0.07).build();
@@ -88,14 +86,15 @@ public class Constants {
     public static final FeedforwardGains DRIVE_FEEDFORWARD =
         new FeedforwardGains.Builder().kv(0.21).build();
 
-    public static final PPHolonomicDriveController pathPlannerFF = new PPHolonomicDriveController(new PIDConstants(0,0,0), new PIDConstants(0,0,0));
+    public static final PPHolonomicDriveController pathPlannerFF =
+        new PPHolonomicDriveController(new PIDConstants(0, 0, 0), new PIDConstants(0, 0, 0));
 
-    public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(
-      new Translation2d(RobotConstants.LENGTH.divide(2), RobotConstants.WIDTH.divide(2)),
-      new Translation2d(RobotConstants.LENGTH.divide(2), RobotConstants.WIDTH.divide(-2)),
-      new Translation2d(RobotConstants.LENGTH.divide(-2), RobotConstants.WIDTH.divide(2)),
-      new Translation2d(RobotConstants.LENGTH.divide(-2), RobotConstants.WIDTH.divide(-2))
-      );   
+    public static final SwerveDriveKinematics KINEMATICS =
+        new SwerveDriveKinematics(
+            new Translation2d(RobotConstants.LENGTH.divide(2), RobotConstants.WIDTH.divide(2)),
+            new Translation2d(RobotConstants.LENGTH.divide(2), RobotConstants.WIDTH.divide(-2)),
+            new Translation2d(RobotConstants.LENGTH.divide(-2), RobotConstants.WIDTH.divide(2)),
+            new Translation2d(RobotConstants.LENGTH.divide(-2), RobotConstants.WIDTH.divide(-2)));
 
     public static final Wheel SWERVE_WHEEL = new Wheel(Inches.of(1.5));
 
