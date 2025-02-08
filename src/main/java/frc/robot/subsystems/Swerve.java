@@ -101,7 +101,7 @@ public class Swerve extends SubsystemBase {
 
   }
 
-  public boolean setColour() {
+  public boolean getIsBlue() {
     return isBlue;
   }
 
@@ -109,7 +109,7 @@ public class Swerve extends SubsystemBase {
     odometry.resetPose(angle);
   }
 
-  public void getColour(boolean colour) {
+  public void setIsBlue(boolean colour) {
     isBlue = colour;
   }
 
@@ -170,6 +170,7 @@ public class Swerve extends SubsystemBase {
     omega =
         Math.pow(omega, SwerveConstants.RIGHT_STICK_SCAILING)
             * SwerveConstants.MAX_ROTATION.in(RadiansPerSecond);
+    
 
     driveFieldRelative(
         MetersPerSecond.of(MathUtil.applyDeadband(-x, Constants.SwerveConstants.DEADBAND)),
@@ -205,6 +206,8 @@ public class Swerve extends SubsystemBase {
         ChassisSpeeds.fromFieldRelativeSpeeds(
             x.in(MetersPerSecond), y.in(MetersPerSecond), omega.in(RadiansPerSecond), gyroAngle);
 
+    
+
     driveRobotRelative(
         speeds,
         new DriveFeedforwards(
@@ -215,7 +218,7 @@ public class Swerve extends SubsystemBase {
             new double[] {0.0}));
   }
 
-  public void zeroing() {
+  public void zeroGyro() {
     gyro.setYaw(0);
   }
 
@@ -230,8 +233,8 @@ public class Swerve extends SubsystemBase {
         this);
   }
 
-  public Command zeroRobotCommad(boolean colour) {
-    return Commands.runOnce(() -> zeroing(), this);
+  public Command zeroGyroCommand(boolean colour) {
+    return Commands.runOnce(() -> zeroGyro(), this);
   }
 
   /**

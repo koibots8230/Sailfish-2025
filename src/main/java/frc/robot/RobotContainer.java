@@ -56,7 +56,7 @@ public class RobotContainer {
 
     Trigger zero = xboxController.y();
 
-    zero.onTrue(swerve.zeroRobotCommad(colour));
+    zero.onTrue(swerve.zeroGyroCommand(colour));
   }
 
   private void defualtCommands() {
@@ -67,7 +67,7 @@ public class RobotContainer {
 
   public void teleopInit() {
     colour = (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
-    swerve.getColour(colour);
+    swerve.setIsBlue(colour);
   }
 
   // public Command getAutonomousCommand() {

@@ -72,6 +72,8 @@ public class SwerveModule {
 
   private final Rotation2d offset;
 
+  private final Rotation2d currentAngle;
+
   public SwerveModule(int driveID, int turnID) {
 
     if (driveID == SwerveConstants.FRONT_LEFT_DRIVE_ID) {
@@ -83,6 +85,8 @@ public class SwerveModule {
     } else {
       offset = SwerveConstants.OFFSETS[3];
     }
+
+    currentAngle = new Rotation2d();
 
     turnProfile =
         new TrapezoidProfile(new TrapezoidProfile.Constraints(10 * Math.PI, 16 * Math.PI));
@@ -154,6 +158,9 @@ public class SwerveModule {
   }
 
   public void setState(SwerveModuleState swerveModuleState) {
+    swerveModuleState.optimize(currentAngle);
+    swerveModuleState.angle.times(swerveModuleState.angle.minus(currentAngle).getCos());
+
     driveController.setReference(
         swerveModuleState.speedMetersPerSecond, SparkBase.ControlType.kVelocity);
 
