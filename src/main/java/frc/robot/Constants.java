@@ -87,7 +87,7 @@ public class Constants {
         new FeedforwardGains.Builder().kv(0.21).build();
 
     public static final double MAX_VELOCITY = 10 * Math.PI;
-    public static final double MAX_ACCELRATION =  16 * Math.PI;
+    public static final double MAX_ACCELRATION = 16 * Math.PI;
 
     public static final PPHolonomicDriveController pathPlannerFF =
         new PPHolonomicDriveController(new PIDConstants(0, 0, 0), new PIDConstants(0, 0, 0));

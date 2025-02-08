@@ -105,8 +105,8 @@ public class Swerve extends SubsystemBase {
     return isBlue;
   }
 
-  public void setOdometry(Pose2d angle) {
-    odometry.resetPose(angle);
+  public void setOdometry(Pose2d pose) {
+    odometry.resetPose(pose);
   }
 
   public void setIsBlue(boolean colour) {
@@ -170,8 +170,6 @@ public class Swerve extends SubsystemBase {
     omega =
         Math.pow(omega, SwerveConstants.RIGHT_STICK_SCAILING)
             * SwerveConstants.MAX_ROTATION.in(RadiansPerSecond);
-    
-
 
     driveFieldRelative(
         MetersPerSecond.of(MathUtil.applyDeadband(-x, Constants.SwerveConstants.DEADBAND)),
@@ -206,8 +204,6 @@ public class Swerve extends SubsystemBase {
     ChassisSpeeds speeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(
             x.in(MetersPerSecond), y.in(MetersPerSecond), omega.in(RadiansPerSecond), gyroAngle);
-
-    
 
     driveRobotRelative(
         speeds,
