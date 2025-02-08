@@ -46,5 +46,6 @@ public class Constants {
 
     public static final int MAIN_MOTOR_ID = 31;
     public static final int SECONDARY_MOTOR_ID = 30;
+    public static final int HALL_EFFECTS_SENSOR = 0;
   }
 }
