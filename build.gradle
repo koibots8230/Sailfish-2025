@@ -119,6 +119,7 @@ spotless {
         removeUnusedImports()
         trimTrailingWhitespace()
         endWithNewline()
+        indentWithSpaces(4)
     }
     groovyGradle {
         target fileTree('.') {
@@ -137,7 +138,7 @@ spotless {
         }
         eclipseWtp('xml')
         trimTrailingWhitespace()
-        indentWithSpaces(4)
+        indentWithSpaces(2)
         endWithNewline()
     }
     format 'misc', {
@@ -146,7 +147,7 @@ spotless {
             exclude '**/build/**', '**/build-*/**'
         }
         trimTrailingWhitespace()
-        indentWithSpaces(4)
+        indentWithSpaces(2)
         endWithNewline()
     }
 }

@@ -6,8 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.EndEffectorConstants;
@@ -23,7 +22,10 @@ public class RobotContainer {
 
   private final EndEffector endEffector;
 
+  // SendableChooser<Command> chooser = new SendableChooser<>();
+
   @NotLogged private final CommandXboxController xboxController;
+  private boolean isBlue;
 
   public RobotContainer() {
     swerve = new Swerve();
@@ -32,13 +34,13 @@ public class RobotContainer {
 
     xboxController = new CommandXboxController(0);
 
+    //  chooser = AutoBuilder.buildAutoChooser();
+
     configureBindings();
+    defualtCommands();
   }
 
   private void configureBindings() {
-    swerve.setDefaultCommand(
-        swerve.driveFieldRelativeCommand(
-            xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
 
     Trigger testEffector = xboxController.x();
     testEffector.onTrue(endEffector.setVelocityCommand(EndEffectorConstants.INTAKE_SPEED));
@@ -51,11 +53,24 @@ public class RobotContainer {
     Trigger outtakeEffector = xboxController.b();
     outtakeEffector.onTrue(endEffector.outtakeCommand());
     outtakeEffector.onFalse(endEffector.setVelocityCommand(0));
+
+    Trigger zero = xboxController.y();
+
+    zero.onTrue(swerve.zeroGyroCommand(isBlue));
   }
 
-  public void teleopInit() {}
-
-  public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+  private void defualtCommands() {
+    swerve.setDefaultCommand(
+        swerve.driveFieldRelativeCommand(
+            xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
   }
+
+  public void teleopInit() {
+    isBlue = (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
+    swerve.setIsBlue(isBlue);
+  }
+
+  // public Command getAutonomousCommand() {
+  //   return chooser.getSelected();
+  // }
 }
