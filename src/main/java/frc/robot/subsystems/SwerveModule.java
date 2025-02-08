@@ -89,7 +89,7 @@ public class SwerveModule {
     currentAngle = new Rotation2d();
 
     turnProfile =
-        new TrapezoidProfile(new TrapezoidProfile.Constraints(10 * Math.PI, 16 * Math.PI));
+        new TrapezoidProfile(new TrapezoidProfile.Constraints(SwerveConstants.MAX_VELOCITY,SwerveConstants.MAX_ACCELRATION));
 
     turnGoalState = new TrapezoidProfile.State(0, 0);
     turnSetpointState = new TrapezoidProfile.State(0, 0);

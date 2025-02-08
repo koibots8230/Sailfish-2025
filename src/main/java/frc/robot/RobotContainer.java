@@ -25,7 +25,7 @@ public class RobotContainer {
   // SendableChooser<Command> chooser = new SendableChooser<>();
 
   @NotLogged private final CommandXboxController xboxController;
-  private boolean colour;
+  private boolean isBlue;
 
   public RobotContainer() {
     swerve = new Swerve();
@@ -51,12 +51,12 @@ public class RobotContainer {
     intakeEffector.onFalse(endEffector.setVelocityCommand(0));
 
     Trigger outtakeEffector = xboxController.b();
-    outtakeEffector.onTrue(endEffector.intakeCommand());
+    outtakeEffector.onTrue(endEffector.outtakeCommand());
     outtakeEffector.onFalse(endEffector.setVelocityCommand(0));
 
     Trigger zero = xboxController.y();
 
-    zero.onTrue(swerve.zeroGyroCommand(colour));
+    zero.onTrue(swerve.zeroGyroCommand(isBlue));
   }
 
   private void defualtCommands() {
@@ -66,8 +66,8 @@ public class RobotContainer {
   }
 
   public void teleopInit() {
-    colour = (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
-    swerve.setIsBlue(colour);
+    isBlue = (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
+    swerve.setIsBlue(isBlue);
   }
 
   // public Command getAutonomousCommand() {
