@@ -11,7 +11,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.EndEffectorConstants;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.EndEffector;
 import frc.robot.subsystems.Swerve;
 
 @Logged
@@ -20,11 +22,14 @@ public class RobotContainer {
   private final Swerve swerve;
   private final Elevator elevator;
 
+  private final EndEffector endEffector;
+
   @NotLogged private final CommandXboxController xboxController;
 
   public RobotContainer() {
     swerve = new Swerve();
     elevator = new Elevator();
+    endEffector = new EndEffector();
 
     xboxController = new CommandXboxController(0);
 
@@ -36,9 +41,22 @@ public class RobotContainer {
     //     swerve.driveFieldRelativeCommand(
     //         xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
 
-    Trigger L1 = xboxController.a();
+    Trigger testEffector = xboxController.x();
+    testEffector.onTrue(endEffector.setVelocityCommand(EndEffectorConstants.INTAKE_SPEED));
+    testEffector.onFalse(endEffector.setVelocityCommand(0));
+
+    Trigger intakeEffector = xboxController.a();
+    intakeEffector.onTrue(endEffector.intakeCommand());
+    intakeEffector.onFalse(endEffector.setVelocityCommand(0));
+
+    Trigger outtakeEffector = xboxController.b();
+    outtakeEffector.onTrue(endEffector.outtakeCommand());
+    outtakeEffector.onFalse(endEffector.setVelocityCommand(0));
+    
+    Trigger L1 = xboxController.a(); // TODO CHANGE VALUE TO SOMTHING ELSE SHOULD NOT HAVE TWO A
     L1.onTrue(elevator.setPositionCommand(ElevatorConstants.L1_SETPOINT));
-    Trigger ElevatorDown = xboxController.b();
+
+    Trigger ElevatorDown = xboxController.y();
     ElevatorDown.onTrue(elevator.setPositionCommand(ElevatorConstants.START_SETPOINT));
   }
 

@@ -48,4 +48,21 @@ public class Constants {
     public static final int SECONDARY_MOTOR_ID = 30;
     public static final int HALL_EFFECTS_SENSOR = 0;
   }
+
+  public static class EndEffectorConstants {
+    public static final double INTAKE_SPEED = 250;
+    public static final double OUTTAKE_SPEED =
+        1000; // TODO: Turn back into units once not bugged anymore :(
+
+    public static final PIDGains PID_GAINS = new PIDGains.Builder().kp(0.0001).build();
+    public static final FeedforwardGains FEEDFORWARD_GAINS =
+        new FeedforwardGains.Builder().kv(0.0002).build();
+
+    public static final Distance TRIGGER_DISTANCE = Distance.ofBaseUnits(0.085, Units.Meters);
+
+    public static final Current CURRENT_LIMIT = Current.ofBaseUnits(40, Units.Amps);
+
+    public static final int MOTOR_ID = 10;
+    public static final int LASERCAN_ID = 34;
+  }
 }

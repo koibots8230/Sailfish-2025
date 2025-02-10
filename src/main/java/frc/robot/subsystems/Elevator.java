@@ -43,7 +43,7 @@ public class Elevator extends SubsystemBase {
   private final TrapezoidProfile profile;
   private final RelativeEncoder encoder;
   private final ElevatorFeedforward feedforward;
-  private final DigitalInput HallEffectsSensor;
+  private final DigitalInput hallEffectsSensor;
   private TrapezoidProfile.State goal;
   private TrapezoidProfile.State motorSetpoint;
   private Distance setpoint;
@@ -75,7 +75,7 @@ public class Elevator extends SubsystemBase {
 
     mainMotorConfig.smartCurrentLimit((int) ElevatorConstants.CURRENT_LIMIT.in(Amps));
 
-    mainMotorConfig.alternateEncoder.positionConversionFactor(ElevatorConstants.CONVERSION_FACTOR.in(Meters) / 60);
+    mainMotorConfig.alternateEncoder.positionConversionFactor(ElevatorConstants.CONVERSION_FACTOR.in(Meters));
     mainMotorConfig.alternateEncoder.velocityConversionFactor(ElevatorConstants.CONVERSION_FACTOR.in(Meters) / 60);
     mainMotorConfig.alternateEncoder.inverted(true);
 
@@ -99,7 +99,7 @@ public class Elevator extends SubsystemBase {
             ElevatorConstants.FEEDFORWARD.kv,
             ElevatorConstants.FEEDFORWARD.ka);
 
-    HallEffectsSensor = new DigitalInput(ElevatorConstants.HALL_EFFECTS_SENSOR);
+    hallEffectsSensor = new DigitalInput(ElevatorConstants.HALL_EFFECTS_SENSOR);
 
     goal = new TrapezoidProfile.State();
     setpoint = ElevatorConstants.START_SETPOINT;
@@ -154,7 +154,7 @@ public class Elevator extends SubsystemBase {
     return Commands.sequence(
       Commands.race(
         Commands.run(() -> setPosition(Distance.ofBaseUnits(setpoint.in(Millimeters) - 0.05, Millimeters)), this),
-        Commands.waitUntil(() -> HallEffectsSensor.get() == true)
+        Commands.waitUntil(() -> hallEffectsSensor.get() == true)
       ),
       Commands.runOnce(() -> encoder.setPosition(0), this)
     );
