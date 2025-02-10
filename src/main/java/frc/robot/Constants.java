@@ -145,7 +145,7 @@ public class Constants {
         AngularAcceleration.ofBaseUnits(0, Units.RotationsPerSecondPerSecond);
 
     public static final double POSITION_CONVERSION_FACTOR = 2.0 * Math.PI;
-    public static final double VELCOITY_CONVERSION_FACTOR = 2.0 * Math.PI;
+    public static final double VELCOITY_CONVERSION_FACTOR = (2.0 * Math.PI) / 60.0;
 
     public static final PIDGains PID = new PIDGains.Builder().kp(0).build();
     public static final FeedforwardGains FEEDFORWARD =

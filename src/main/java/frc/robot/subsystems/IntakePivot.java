@@ -50,7 +50,6 @@ public class IntakePivot extends SubsystemBase {
 
   public IntakePivot() {
     motor = new SparkMax(IntakePivotConstants.INTAKE_PIVOT_MOTOR_ID, MotorType.kBrushless);
-    encoder = motor.getAbsoluteEncoder();
 
     config = new SparkMaxConfig();
     config.closedLoop.p(IntakePivotConstants.PID.kp);
@@ -62,6 +61,8 @@ public class IntakePivot extends SubsystemBase {
         IntakePivotConstants.VELCOITY_CONVERSION_FACTOR);
 
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    encoder = motor.getAbsoluteEncoder();
 
     profile =
         new TrapezoidProfile(
