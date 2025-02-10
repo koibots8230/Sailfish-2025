@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
@@ -75,8 +74,10 @@ public class Elevator extends SubsystemBase {
 
     mainMotorConfig.smartCurrentLimit((int) ElevatorConstants.CURRENT_LIMIT.in(Amps));
 
-    mainMotorConfig.alternateEncoder.positionConversionFactor(ElevatorConstants.CONVERSION_FACTOR.in(Meters));
-    mainMotorConfig.alternateEncoder.velocityConversionFactor(ElevatorConstants.CONVERSION_FACTOR.in(Meters) / 60);
+    mainMotorConfig.alternateEncoder.positionConversionFactor(
+        ElevatorConstants.CONVERSION_FACTOR.in(Meters));
+    mainMotorConfig.alternateEncoder.velocityConversionFactor(
+        ElevatorConstants.CONVERSION_FACTOR.in(Meters) / 60);
     mainMotorConfig.alternateEncoder.inverted(true);
 
     secondaryMotorConfig = new SparkMaxConfig();
@@ -86,9 +87,11 @@ public class Elevator extends SubsystemBase {
     secondaryMotorConfig.follow(ElevatorConstants.MAIN_MOTOR_ID);
 
     secondaryMotorConfig.smartCurrentLimit((int) ElevatorConstants.CURRENT_LIMIT.in(Amps));
-    
-    mainMotor.configure(mainMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    secondaryMotor.configure(secondaryMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    mainMotor.configure(
+        mainMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    secondaryMotor.configure(
+        secondaryMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     encoder = mainMotor.getAlternateEncoder();
 
@@ -107,19 +110,21 @@ public class Elevator extends SubsystemBase {
 
     position = Distance.ofBaseUnits(0, Meters);
     velocity = LinearVelocity.ofBaseUnits(encoder.getVelocity(), MetersPerSecond);
-    mainVoltage = Voltage.ofBaseUnits(mainMotor.getBusVoltage() * mainMotor.getAppliedOutput(), Volts);
-    secondaryVoltage = Voltage.ofBaseUnits(secondaryMotor.getBusVoltage() * secondaryMotor.getAppliedOutput(), Volts);
+    mainVoltage =
+        Voltage.ofBaseUnits(mainMotor.getBusVoltage() * mainMotor.getAppliedOutput(), Volts);
+    secondaryVoltage =
+        Voltage.ofBaseUnits(
+            secondaryMotor.getBusVoltage() * secondaryMotor.getAppliedOutput(), Volts);
     mainCurrent = Current.ofBaseUnits(mainMotor.getOutputCurrent(), Amps);
     secondaryCurrent = Current.ofBaseUnits(secondaryMotor.getOutputCurrent(), Amps);
   }
 
   @Override
   public void periodic() {
-    goal =
-        new TrapezoidProfile.State(
-            setpoint.in(Meters), 0);
+    goal = new TrapezoidProfile.State(setpoint.in(Meters), 0);
 
-    motorSetpoint = profile.calculate(RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds), motorSetpoint, goal);
+    motorSetpoint =
+        profile.calculate(RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds), motorSetpoint, goal);
 
     mainMotor
         .getClosedLoopController()
@@ -131,8 +136,11 @@ public class Elevator extends SubsystemBase {
 
     position = Distance.ofBaseUnits(encoder.getPosition(), Meters);
     velocity = LinearVelocity.ofBaseUnits(encoder.getVelocity(), MetersPerSecond);
-    mainVoltage = Voltage.ofBaseUnits(mainMotor.getBusVoltage() * mainMotor.getAppliedOutput(), Volts);
-    secondaryVoltage = Voltage.ofBaseUnits(secondaryMotor.getBusVoltage() * secondaryMotor.getAppliedOutput(), Volts);
+    mainVoltage =
+        Voltage.ofBaseUnits(mainMotor.getBusVoltage() * mainMotor.getAppliedOutput(), Volts);
+    secondaryVoltage =
+        Voltage.ofBaseUnits(
+            secondaryMotor.getBusVoltage() * secondaryMotor.getAppliedOutput(), Volts);
     mainCurrent = Current.ofBaseUnits(mainMotor.getOutputCurrent(), Amps);
     secondaryCurrent = Current.ofBaseUnits(secondaryMotor.getOutputCurrent(), Amps);
   }
@@ -152,11 +160,12 @@ public class Elevator extends SubsystemBase {
 
   public Command setZeroPositionCommand() { // TODO: Untested
     return Commands.sequence(
-      Commands.race(
-        Commands.run(() -> setPosition(Distance.ofBaseUnits(setpoint.in(Millimeters) - 0.05, Millimeters)), this),
-        Commands.waitUntil(() -> hallEffectsSensor.get() == true)
-      ),
-      Commands.runOnce(() -> encoder.setPosition(0), this)
-    );
+        Commands.race(
+            Commands.run(
+                () ->
+                    setPosition(Distance.ofBaseUnits(setpoint.in(Millimeters) - 0.05, Millimeters)),
+                this),
+            Commands.waitUntil(() -> hallEffectsSensor.get() == true)),
+        Commands.runOnce(() -> encoder.setPosition(0), this));
   }
 }

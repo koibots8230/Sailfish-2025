@@ -1,8 +1,7 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Meters;
-
 import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Meters;
 
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
@@ -23,18 +22,6 @@ import frc.lib.util.Wheel;
 
 public class Constants {
 
-  public static class RobotConstants {
-    public static final Time ROBOT_CLOCK_SPEED = Time.ofBaseUnits(0.02, Units.Seconds);
-  }
-
-  public static class SwerveConstants {
-    public static final LinearVelocity MAX_SPEED =
-        LinearVelocity.ofBaseUnits(4.25, Units.MetersPerSecond);
-    public static final AngularVelocity MAX_ANGULAR_VELOCITY =
-        AngularVelocity.ofBaseUnits(0.75, Units.RotationsPerSecond);
-    public static final Time SWERVE_UPDATE_PERIOD = Time.ofBaseUnits(20, Units.Millisecond);
-  }
-
   public static class ElevatorConstants {
     public static final Distance START_SETPOINT = Distance.ofBaseUnits(0.005, Units.Meters);
     public static final Distance L1_SETPOINT = Distance.ofBaseUnits(2.65, Units.Meters);
@@ -48,7 +35,8 @@ public class Constants {
     public static final LinearAcceleration MAX_ACCELRATION =
         LinearAcceleration.ofBaseUnits(12, Units.MetersPerSecondPerSecond);
 
-    public static final Distance CONVERSION_FACTOR = Distance.ofBaseUnits((0.05207 *  Math.PI) * 2, Meters);
+    public static final Distance CONVERSION_FACTOR =
+        Distance.ofBaseUnits((0.05207 * Math.PI) * 2, Meters);
 
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(60, Units.Amps);
 

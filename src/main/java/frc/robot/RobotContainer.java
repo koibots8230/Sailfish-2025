@@ -54,7 +54,7 @@ public class RobotContainer {
     Trigger outtakeEffector = xboxController.b();
     outtakeEffector.onTrue(endEffector.outtakeCommand());
     outtakeEffector.onFalse(endEffector.setVelocityCommand(0));
-    
+
     Trigger L1 = xboxController.a(); // TODO CHANGE VALUE TO SOMTHING ELSE SHOULD NOT HAVE TWO A
     L1.onTrue(elevator.setPositionCommand(ElevatorConstants.L1_SETPOINT));
 
