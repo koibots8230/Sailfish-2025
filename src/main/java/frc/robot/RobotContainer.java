@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.EndEffectorConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.IntakePivotConstants;
@@ -65,6 +66,12 @@ public class RobotContainer {
     Trigger outtakeEffector = xboxController.b();
     outtakeEffector.onTrue(endEffector.outtakeCommand());
     outtakeEffector.onFalse(endEffector.setVelocityCommand(0));
+
+    Trigger L1 = xboxController.a(); // TODO CHANGE VALUE TO SOMTHING ELSE SHOULD NOT HAVE TWO A
+    L1.onTrue(elevator.setPositionCommand(ElevatorConstants.L1_SETPOINT));
+
+    Trigger ElevatorDown = xboxController.y();
+    ElevatorDown.onTrue(elevator.setPositionCommand(ElevatorConstants.START_SETPOINT));
 
     Trigger zero = xboxController.y();
 
