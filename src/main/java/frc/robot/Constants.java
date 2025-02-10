@@ -1,5 +1,12 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.*;
+
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
@@ -18,20 +25,9 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Velocity;
 import frc.lib.util.FeedforwardGains;
 import frc.lib.util.PIDGains;
+import frc.lib.util.Wheel;
 
 public class Constants {
-
-  public static class RobotConstants {
-    public static final Time ROBOT_CLOCK_SPEED = Time.ofBaseUnits(20, Units.Milliseconds);
-  }
-
-  public static class SwerveConstants {
-    public static final LinearVelocity MAX_SPEED =
-        LinearVelocity.ofBaseUnits(4.25, Units.MetersPerSecond);
-    public static final AngularVelocity MAX_ANGULAR_VELOCITY =
-        AngularVelocity.ofBaseUnits(0.75, Units.RotationsPerSecond);
-    public static final Time SWERVE_UPDATE_PERIOD = Time.ofBaseUnits(20, Units.Millisecond);
-  }
 
   public static class ElevatorConstants {
     public static final Distance START_SETPOINT = Distance.ofBaseUnits(0, Units.Meters);
