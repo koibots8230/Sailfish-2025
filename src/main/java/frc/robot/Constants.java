@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -134,5 +135,36 @@ public class Constants {
     public static final int BACK_RIGHT_TURN_ID = 8;
 
     public static final int GYRO_ID = 18;
+  }
+
+  public static class IntakePivotConstants {
+    public static final Angle OUT_POSITION = Angle.ofBaseUnits(10, Radians);
+    public static final Angle START_POSITION = Angle.ofBaseUnits(0, Radians);
+    public static final AngularVelocity MAX_VELOCITY =
+        AngularVelocity.ofBaseUnits(0, Units.RotationsPerSecond);
+    public static final AngularAcceleration MAX_ACCELRATION =
+        AngularAcceleration.ofBaseUnits(0, Units.RotationsPerSecondPerSecond);
+
+    public static final double POSITION_CONVERSION_FACTOR = 2.0 * Math.PI;
+    public static final double VELCOITY_CONVERSION_FACTOR = (2.0 * Math.PI) / 60.0;
+
+    public static final PIDGains PID = new PIDGains.Builder().kp(0).build();
+    public static final FeedforwardGains FEEDFORWARD =
+        new FeedforwardGains.Builder().kv(0).kg(0).build();
+
+    public static final int INTAKE_PIVOT_MOTOR_ID = 12;
+  }
+
+  public static class IntakeConstants {
+    public static final AngularVelocity INTAKE_VELOCITY = AngularVelocity.ofBaseUnits(10, RPM);
+    public static final AngularVelocity REVERSE_INTAKE_VELOCITY =
+        AngularVelocity.ofBaseUnits(10, RPM);
+
+    public static final PIDGains PID = new PIDGains.Builder().kp(0).build();
+    public static final FeedforwardGains FEEDFORWARD =
+        new FeedforwardGains.Builder().kv(0).kg(0).build();
+
+    public static final int INTAKE_LEFT_MOTOR_ID = 10;
+    public static final int INTAKE_RIGHT_MOTOR_ID = 11;
   }
 }
