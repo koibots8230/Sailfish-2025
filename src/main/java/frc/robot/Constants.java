@@ -1,31 +1,17 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
-
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
 
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.units.measure.Velocity;
 import frc.lib.util.FeedforwardGains;
 import frc.lib.util.PIDGains;
-import frc.lib.util.Wheel;
 
 public class Constants {
 
@@ -52,14 +38,14 @@ public class Constants {
     public static final int MOTOR_ID = 0;
   }
 
-  public static class IntakePivotConstants {     
+  public static class IntakePivotConstants {
     public static final Angle OUT_POSITION = Angle.ofBaseUnits(10, Radians);
     public static final Angle START_POSITION = Angle.ofBaseUnits(0, Radians);
     public static final AngularVelocity MAX_VELOCITY =
         AngularVelocity.ofBaseUnits(0, Units.RotationsPerSecond);
     public static final AngularAcceleration MAX_ACCELRATION =
         AngularAcceleration.ofBaseUnits(0, Units.RotationsPerSecondPerSecond);
-      
+
     public static final double POSITION_CONVERSION_FACTOR = 2.0 * Math.PI;
     public static final double VELCOITY_CONVERSION_FACTOR = 2.0 * Math.PI;
 
@@ -72,8 +58,9 @@ public class Constants {
 
   public static class IntakeConstants {
     public static final AngularVelocity INTAKE_VELOCITY = AngularVelocity.ofBaseUnits(10, RPM);
-    public static final AngularVelocity REVERSE_INTAKE_VELOCITY = AngularVelocity.ofBaseUnits(10, RPM);
-    
+    public static final AngularVelocity REVERSE_INTAKE_VELOCITY =
+        AngularVelocity.ofBaseUnits(10, RPM);
+
     public static final PIDGains PID = new PIDGains.Builder().kp(0).build();
     public static final FeedforwardGains FEEDFORWARD =
         new FeedforwardGains.Builder().kv(0).kg(0).build();
