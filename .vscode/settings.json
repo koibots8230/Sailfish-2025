@@ -56,5 +56,10 @@
     "edu.wpi.first.math.proto.*",
     "edu.wpi.first.math.**.proto.*",
     "edu.wpi.first.math.**.struct.*",
-  ]
+  ],
+  "files.autoSave": "afterDelay",
+  "editor.fontSize": 13,
+  "editor.multiCursorModifier": "ctrlCmd",
+  "editor.autoIndent": "keep",
+  "java.debug.settings.onBuildFailureProceed": true
 }
