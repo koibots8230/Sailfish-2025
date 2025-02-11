@@ -63,6 +63,23 @@ public class Constants {
     public static final int LASERCAN_ID = 34;
   }
 
+  public static class EffectorPivotConsants {
+
+    public static final AngularVelocity MAX_VELOCITY = RadiansPerSecond.of(4 * Math.PI);
+    public static final AngularAcceleration MAX_ACCELERATION =
+        RadiansPerSecondPerSecond.of(3 * Math.PI);
+
+    public static final PIDGains PID_GAINS = new PIDGains.Builder().kp(0).build();
+    public static final FeedforwardGains FEEDFORWARD_GAINS =
+        new FeedforwardGains.Builder().kv(0).kg(0).build();
+
+    public static final double CONVERSION_FACTOR = 2 * Math.PI;
+
+    public static final Current CURRENT_LIMIT = Amps.of(50);
+
+    public static final int MOTOR_ID = 30;
+  }
+
   public static class RobotConstants {
 
     public static final Distance WIDTH = Inches.of(23.5);
