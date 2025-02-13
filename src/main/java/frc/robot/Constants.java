@@ -169,6 +169,7 @@ public class Constants {
   }
 
   public static class IndexerConstants{
+    public static final AngularVelocity INDEX_VELOCITY = AngularVelocity.ofBaseUnits(10, RPM);
 
     public static final PIDGains PID = new PIDGains.Builder().kp(0).build();
     public static final FeedforwardGains FEEDFORWARD = new FeedforwardGains.Builder().kv(0).kg(0).build();
