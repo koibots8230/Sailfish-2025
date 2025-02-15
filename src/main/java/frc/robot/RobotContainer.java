@@ -96,7 +96,7 @@ public class RobotContainer {
     spinIntake.onFalse(
         Commands.parallel(
             intake.IntakeCommand(AngularVelocity.ofBaseUnits(0, RPM)),
-            intakePivot.moveIntakePivotCommand(IntakePivotConstants.START_POSITION)));
+            intakePivot.moveIntakePivotCommand(IntakePivotConstants.IN_POSITION)));
 
     // reverseIntake.onTrue(intake.IntakeCommand(IntakeConstants.REVERSE_INTAKE_VELOCITY));
     // reverseIntake.onFalse(intake.IntakeCommand(AngularVelocity.ofBaseUnits(0, RPM)));
@@ -107,7 +107,7 @@ public class RobotContainer {
     reverseIntake.onFalse(
         Commands.parallel(
             intake.IntakeCommand(AngularVelocity.ofBaseUnits(0, RPM)),
-            intakePivot.moveIntakePivotCommand(IntakePivotConstants.START_POSITION)));
+            intakePivot.moveIntakePivotCommand(IntakePivotConstants.IN_POSITION)));
 
     // Trigger intakePivotOut = new Trigger(xboxController.b());
     // intakePivotOut.onTrue(intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION));
