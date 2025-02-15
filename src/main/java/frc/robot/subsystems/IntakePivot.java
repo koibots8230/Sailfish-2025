@@ -19,6 +19,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.units.measure.Angle;
@@ -37,7 +38,7 @@ public class IntakePivot extends SubsystemBase {
 
   private final SparkMax motor;
   private final TrapezoidProfile profile;
-  private final ArmFeedforward feedforward;
+  private final SimpleMotorFeedforward feedforward;
   private final RelativeEncoder encoder;
   private DigitalInput limitSwitch;
   private TrapezoidProfile.State goal;
@@ -72,9 +73,8 @@ public class IntakePivot extends SubsystemBase {
                 IntakePivotConstants.MAX_ACCELRATION.in(RotationsPerSecondPerSecond)));
 
     feedforward =
-        new ArmFeedforward(
+        new SimpleMotorFeedforward(
             IntakePivotConstants.FEEDFORWARD.ks,
-            IntakePivotConstants.FEEDFORWARD.kg,
             IntakePivotConstants.FEEDFORWARD.kv);
 
     goal = new TrapezoidProfile.State();
@@ -95,7 +95,7 @@ public class IntakePivot extends SubsystemBase {
             motorSetpoint.position,
             ControlType.kPosition,
             ClosedLoopSlot.kSlot0,
-            feedforward.calculate(motorSetpoint.position, motorSetpoint.velocity));
+            feedforward.calculate(motorSetpoint.velocity));
 
     position = Angle.ofBaseUnits(encoder.getPosition(), Degrees);
     velocity = AngularVelocity.ofBaseUnits(encoder.getVelocity(), DegreesPerSecond);
