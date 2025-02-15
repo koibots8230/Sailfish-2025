@@ -63,16 +63,16 @@ public class RobotContainer {
     testEffector.onTrue(endEffector.setVelocityCommand(EndEffectorConstants.INTAKE_SPEED));
     testEffector.onFalse(endEffector.setVelocityCommand(0));
 
-    //Trigger intakeEffector = xboxController.a();
-    //intakeEffector.onTrue(endEffector.intakeCommand());
-    //intakeEffector.onFalse(endEffector.setVelocityCommand(0));
+    // Trigger intakeEffector = xboxController.a();
+    // intakeEffector.onTrue(endEffector.intakeCommand());
+    // intakeEffector.onFalse(endEffector.setVelocityCommand(0));
 
     Trigger outtakeEffector = xboxController.b();
     outtakeEffector.onTrue(endEffector.outtakeCommand());
     outtakeEffector.onFalse(endEffector.setVelocityCommand(0));
 
-    //Trigger L1 = xboxController.a(); // TODO CHANGE VALUE TO SOMTHING ELSE SHOULD NOT HAVE TWO A
-    //L1.onTrue(elevator.setPositionCommand(ElevatorConstants.L1_SETPOINT));
+    // Trigger L1 = xboxController.a(); // TODO CHANGE VALUE TO SOMTHING ELSE SHOULD NOT HAVE TWO A
+    // L1.onTrue(elevator.setPositionCommand(ElevatorConstants.L1_SETPOINT));
 
     Trigger ElevatorDown = xboxController.y();
     ElevatorDown.onTrue(elevator.setPositionCommand(ElevatorConstants.START_SETPOINT));
@@ -84,8 +84,9 @@ public class RobotContainer {
     Trigger spinIntake = new Trigger(xboxController.rightTrigger());
     Trigger reverseIntake = new Trigger(xboxController.leftTrigger());
 
-    //TODO change this whole thing so it does the intake, intakePivot, and idexer all in one command.
-    
+    // TODO change this whole thing so it does the intake, intakePivot, and idexer all in one
+    // command.
+
     // spinIntake.onTrue(intake.IntakeCommand(IntakeConstants.INTAKE_VELOCITY));
     // spinIntake.onFalse(intake.IntakeCommand(AngularVelocity.ofBaseUnits(0, RPM)));
     spinIntake.onTrue(
@@ -114,7 +115,6 @@ public class RobotContainer {
     Trigger spinIndexer = new Trigger(xboxController.a());
     spinIndexer.onTrue(indexer.indexerCommand(IndexerConstants.INDEX_VELOCITY));
     spinIndexer.onFalse(indexer.indexerCommand(AngularVelocity.ofBaseUnits(0, RPM)));
-
   }
 
   private void defualtCommands() {
