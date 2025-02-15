@@ -18,7 +18,6 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
@@ -74,8 +73,7 @@ public class IntakePivot extends SubsystemBase {
 
     feedforward =
         new SimpleMotorFeedforward(
-            IntakePivotConstants.FEEDFORWARD.ks,
-            IntakePivotConstants.FEEDFORWARD.kv);
+            IntakePivotConstants.FEEDFORWARD.ks, IntakePivotConstants.FEEDFORWARD.kv);
 
     goal = new TrapezoidProfile.State();
     setpoint = IntakePivotConstants.IN_POSITION;
