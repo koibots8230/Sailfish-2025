@@ -103,6 +103,8 @@ public class RobotContainer {
     swerve.setDefaultCommand(
         swerve.driveFieldRelativeCommand(
             xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
+
+    elevator.setDefaultCommand(elevator.setPositionCommand(ElevatorConstants.INTAKE_SETPOINT));
   }
 
   public void teleopInit() {

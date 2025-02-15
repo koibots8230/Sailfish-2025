@@ -107,9 +107,9 @@ public class IntakePivot extends SubsystemBase {
   }
 
   public boolean atPosition() {
-    return (position.gte(IntakePivotConstants.IN_POSITION.minus(Angle.ofBaseUnits(0.025, Radians)))
+    return (position.gte(IntakePivotConstants.OUT_POSITION.minus(Angle.ofBaseUnits(0.025, Radians)))
         && position.lt(
-            IntakePivotConstants.IN_POSITION.plus(
+            IntakePivotConstants.OUT_POSITION.plus(
                 Angle.ofBaseUnits(
                     0.025,
                     Radians)))); // TODO CHANGE THE PLUS AND MINUS VALUES HERE TO SOMTHING RELEVENT
