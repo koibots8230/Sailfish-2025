@@ -25,8 +25,10 @@ public class Constants {
 
   public static class ElevatorConstants {
     public static final Distance INTAKE_SETPOINT = Distance.ofBaseUnits(0.005, Units.Meters);
-    public static final Distance L2_SETPOINT = Distance.ofBaseUnits(2.65, Units.Meters); // untested value
-    public static final Distance L3_SETPOINT = Distance.ofBaseUnits(2.65, Units.Meters); //  untested value
+    public static final Distance L2_SETPOINT =
+        Distance.ofBaseUnits(2.65, Units.Meters); // untested value
+    public static final Distance L3_SETPOINT =
+        Distance.ofBaseUnits(2.65, Units.Meters); //  untested value
 
     public static final PIDGains PID = new PIDGains.Builder().kp(2.2).build();
     public static final FeedforwardGains FEEDFORWARD =
@@ -171,7 +173,7 @@ public class Constants {
   }
 
   public static class IndexerConstants {
-    public static final AngularVelocity INDEX_VELOCITY = AngularVelocity.ofBaseUnits(1000, RPM); 
+    public static final AngularVelocity INDEX_VELOCITY = AngularVelocity.ofBaseUnits(1000, RPM);
     public static final AngularVelocity REVERSE_VELOCITY = AngularVelocity.ofBaseUnits(-1000, RPM);
 
     public static final PIDGains PID = new PIDGains.Builder().kp(0).build();

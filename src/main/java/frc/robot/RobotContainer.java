@@ -10,14 +10,11 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.EndEffectorConstants;
 import frc.robot.Constants.IndexerConstants;
-import frc.robot.Constants.IntakeConstants;
-import frc.robot.Constants.IntakePivotConstants;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.ScoreCommand;
 import frc.robot.subsystems.Elevator;
@@ -69,7 +66,6 @@ public class RobotContainer {
     outtakeEffector.onTrue(endEffector.outtakeCommand());
     outtakeEffector.onFalse(endEffector.setVelocityCommand(0));
 
-
     Trigger ElevatorDown = xboxController.y();
     ElevatorDown.onTrue(elevator.setPositionCommand(ElevatorConstants.INTAKE_SETPOINT));
 
@@ -78,11 +74,13 @@ public class RobotContainer {
     zero.onTrue(swerve.zeroGyroCommand(isBlue));
 
     Trigger spinIntake = new Trigger(xboxController.rightTrigger());
-    spinIntake.onTrue(IntakeCommand.intakeCommand(intake, intakePivot, indexer, elevator, endEffector));
+    spinIntake.onTrue(
+        IntakeCommand.intakeCommand(intake, intakePivot, indexer, elevator, endEffector));
     spinIntake.onFalse(IntakeCommand.intakeStop(intake, indexer, intakePivot));
 
     Trigger reverseIntake = new Trigger(xboxController.leftTrigger());
-    reverseIntake.onTrue(IntakeCommand.reveseCommand(intake, intakePivot, indexer, elevator, endEffector));
+    reverseIntake.onTrue(
+        IntakeCommand.reveseCommand(intake, intakePivot, indexer, elevator, endEffector));
     reverseIntake.onFalse(IntakeCommand.intakeStop(intake, indexer, intakePivot));
 
     Trigger gotoLevelThree = new Trigger(xboxController.y());

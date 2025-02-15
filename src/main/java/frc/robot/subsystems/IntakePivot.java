@@ -29,7 +29,6 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.IntakePivotConstants;
 import frc.robot.Constants.RobotConstants;
 
@@ -107,8 +106,13 @@ public class IntakePivot extends SubsystemBase {
     }
   }
 
-  public boolean atPosition(){
-  return (position.gte(IntakePivotConstants.IN_POSITION.minus(Angle.ofBaseUnits(0.025, Radians))) && position.lt(IntakePivotConstants.IN_POSITION.plus(Angle.ofBaseUnits(0.025, Radians)))); // TODO CHANGE THE PLUS AND MINUS VALUES HERE TO SOMTHING RELEVENT
+  public boolean atPosition() {
+    return (position.gte(IntakePivotConstants.IN_POSITION.minus(Angle.ofBaseUnits(0.025, Radians)))
+        && position.lt(
+            IntakePivotConstants.IN_POSITION.plus(
+                Angle.ofBaseUnits(
+                    0.025,
+                    Radians)))); // TODO CHANGE THE PLUS AND MINUS VALUES HERE TO SOMTHING RELEVENT
   }
 
   @Override

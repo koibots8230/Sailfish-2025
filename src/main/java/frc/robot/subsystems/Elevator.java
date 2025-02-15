@@ -8,8 +8,6 @@ import static edu.wpi.first.units.Units.Millimeters;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.util.function.BooleanSupplier;
-
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -148,7 +146,8 @@ public class Elevator extends SubsystemBase {
   }
 
   public boolean getPosition(Distance desieredPostion) {
-  return (position.gte(desieredPostion.minus(Meters.of(.025))) && position.lt(desieredPostion.plus(Meters.of(.025))));
+    return (position.gte(desieredPostion.minus(Meters.of(.025)))
+        && position.lt(desieredPostion.plus(Meters.of(.025))));
   }
 
   @Override
