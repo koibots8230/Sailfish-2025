@@ -13,13 +13,16 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.EndEffectorConstants;
+import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.IntakePivotConstants;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.ScoreCommand;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.EndEffector;
+import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakePivot;
 import frc.robot.subsystems.Swerve;
@@ -29,12 +32,13 @@ public class RobotContainer {
 
   private final Swerve swerve;
   private final Elevator elevator;
-
   private final EndEffector endEffector;
 
   // SendableChooser<Command> chooser = new SendableChooser<>();
   private final Intake intake;
   private final IntakePivot intakePivot;
+
+  private final Indexer indexer;
 
   @NotLogged private final CommandXboxController xboxController;
   private boolean isBlue;
@@ -45,6 +49,7 @@ public class RobotContainer {
     endEffector = new EndEffector();
     intake = new Intake();
     intakePivot = new IntakePivot();
+    indexer = new Indexer();
 
     xboxController = new CommandXboxController(0);
 
@@ -60,25 +65,25 @@ public class RobotContainer {
     testEffector.onTrue(endEffector.setVelocityCommand(EndEffectorConstants.INTAKE_SPEED));
     testEffector.onFalse(endEffector.setVelocityCommand(0));
 
-    Trigger intakeEffector = xboxController.a();
-    intakeEffector.onTrue(endEffector.intakeCommand());
-    intakeEffector.onFalse(endEffector.setVelocityCommand(0));
-
     Trigger outtakeEffector = xboxController.b();
     outtakeEffector.onTrue(endEffector.outtakeCommand());
     outtakeEffector.onFalse(endEffector.setVelocityCommand(0));
+
+
+    Trigger ElevatorDown = xboxController.y();
+    ElevatorDown.onTrue(elevator.setPositionCommand(ElevatorConstants.INTAKE_SETPOINT));
 
     Trigger zero = xboxController.y();
 
     zero.onTrue(swerve.zeroGyroCommand(isBlue));
 
     Trigger spinIntake = new Trigger(xboxController.rightTrigger());
-    spinIntake.onTrue(IntakeCommand.intakeCommand(intake, intakePivot));
-    spinIntake.onFalse(IntakeCommand.intakeStop(intake, intakePivot));
+    spinIntake.onTrue(IntakeCommand.intakeCommand(intake, intakePivot, indexer, elevator, endEffector));
+    spinIntake.onFalse(IntakeCommand.intakeStop(intake, indexer, intakePivot));
 
     Trigger reverseIntake = new Trigger(xboxController.leftTrigger());
-    reverseIntake.onTrue(IntakeCommand.reveseCommand(intake, intakePivot));
-    reverseIntake.onFalse(IntakeCommand.intakeStop(intake, intakePivot));
+    reverseIntake.onTrue(IntakeCommand.reveseCommand(intake, intakePivot, indexer, elevator, endEffector));
+    reverseIntake.onFalse(IntakeCommand.intakeStop(intake, indexer, intakePivot));
 
     Trigger gotoLevelThree = new Trigger(xboxController.y());
     gotoLevelThree.onTrue(ScoreCommand.levelThreeScore(elevator, endEffector));
@@ -88,10 +93,12 @@ public class RobotContainer {
     gotoLevelTwo.onTrue(ScoreCommand.levelTwoScore(elevator, endEffector));
     gotoLevelTwo.onFalse(ScoreCommand.basePosition(elevator));
 
-   
-
     // Trigger intakePivotOut = new Trigger(xboxController.b());
     // intakePivotOut.onTrue(intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION));
+
+    Trigger spinIndexer = new Trigger(xboxController.a());
+    spinIndexer.onTrue(indexer.setVelocityCommand(IndexerConstants.INDEX_VELOCITY));
+    spinIndexer.onFalse(indexer.setVelocityCommand(AngularVelocity.ofBaseUnits(0, RPM)));
   }
 
   private void defualtCommands() {

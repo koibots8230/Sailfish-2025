@@ -27,7 +27,7 @@ public class ScoreCommand {
 
     public static Command basePosition(Elevator elevator) {
     return Commands.sequence(
-    elevator.setPositionCommand(ElevatorConstants.START_SETPOINT)
+    elevator.setPositionCommand(ElevatorConstants.INTAKE_SETPOINT)
     );
     }
 
