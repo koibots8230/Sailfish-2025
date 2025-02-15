@@ -8,6 +8,8 @@ import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.function.BooleanSupplier;
+
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -104,6 +106,10 @@ public class Elevator extends SubsystemBase {
     current = Current.ofBaseUnits(motor.getOutputCurrent(), Amps);
     position = Distance.ofBaseUnits(motorEncoder.getPosition(), Meters);
     velocity = LinearVelocity.ofBaseUnits(motorEncoder.getVelocity(), MetersPerSecond);
+  }
+
+  public boolean getPosition(Distance desieredPostion) {
+  return (position.gte(desieredPostion.minus(Meters.of(.025))) && position.lt(desieredPostion.plus(Meters.of(.025))));
   }
 
   @Override
