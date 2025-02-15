@@ -139,7 +139,7 @@ public class Constants {
 
   public static class IntakePivotConstants {
     public static final Angle OUT_POSITION = Angle.ofBaseUnits(10, Radians);
-    public static final Angle START_POSITION = Angle.ofBaseUnits(0, Radians);
+    public static final Angle IN_POSITION = Angle.ofBaseUnits(0, Radians);
     public static final AngularVelocity MAX_VELOCITY =
         AngularVelocity.ofBaseUnits(0, Units.RotationsPerSecond);
     public static final AngularAcceleration MAX_ACCELRATION =
@@ -153,6 +153,7 @@ public class Constants {
         new FeedforwardGains.Builder().kv(0).kg(0).build();
 
     public static final int INTAKE_PIVOT_MOTOR_ID = 12;
+    public static final int INTAKE_PIVOT_SWITCH_CHANEL = 1;
   }
 
   public static class IntakeConstants {
