@@ -111,7 +111,7 @@ public class RobotContainer {
     // Trigger intakePivotOut = new Trigger(xboxController.b());
     // intakePivotOut.onTrue(intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION));
 
-    Trigger spinIndexer = new Trigger(xboxController.a()); //This is another "a" but its fine cuz we are gonna change the whole intake/indexer thing anyway
+    Trigger spinIndexer = new Trigger(xboxController.a());
     spinIndexer.onTrue(indexer.indexerCommand(IndexerConstants.INDEX_VELOCITY));
     spinIndexer.onFalse(indexer.indexerCommand(AngularVelocity.ofBaseUnits(0, RPM)));
 

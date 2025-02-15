@@ -74,7 +74,9 @@ public class EndEffector extends SubsystemBase {
     current = Current.ofBaseUnits(motor.getOutputCurrent(), Units.Amps);
     voltage = Voltage.ofBaseUnits(motor.getAppliedOutput() * motor.getBusVoltage(), Units.Volts);
 
-    sensorDistance = Distance.ofBaseUnits(laserCAN.getMeasurement().distance_mm, Units.Millimeters);
+    if (laserCAN.getMeasurement() != null) {
+      sensorDistance = Distance.ofBaseUnits(laserCAN.getMeasurement().distance_mm, Units.Millimeters);
+    }
   }
 
   @Override

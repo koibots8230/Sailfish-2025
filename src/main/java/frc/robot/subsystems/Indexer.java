@@ -11,6 +11,7 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
@@ -24,6 +25,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.IntakeConstants;
 
+@Logged
 public class Indexer extends SubsystemBase {
 
     private final SparkMax motor;
@@ -43,8 +45,6 @@ public class Indexer extends SubsystemBase {
         config.closedLoop.p(IndexerConstants.PID.kp);
         config.closedLoop.velocityFF(IndexerConstants.FEEDFORWARD.kv);
         motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        config.closedLoop.p(IndexerConstants.PID.kp);
-        config.closedLoop.velocityFF(IndexerConstants.FEEDFORWARD.kv);
 
         encoder = motor.getEncoder(); 
 
@@ -61,14 +61,19 @@ public class Indexer extends SubsystemBase {
         velocity = AngularVelocity.ofBaseUnits(encoder.getVelocity(), RPM);
     }
     
-    private void SpinIndexer(AngularVelocity setVelocity){
+    public void simulationPeriodic() {
+        velocity = setpoint;
+
+    }
+
+    private void spinIndexer(AngularVelocity setVelocity){
         closedLoopController.setReference(setVelocity.in(RPM), ControlType.kVelocity);
         setpoint = setVelocity;
 
     }
 
     public Command indexerCommand(AngularVelocity setVelocity) {
-        return Commands.runOnce(() -> this.SpinIndexer(setVelocity)); 
+        return Commands.runOnce(() -> this.spinIndexer(setVelocity)); 
     
     }
 
