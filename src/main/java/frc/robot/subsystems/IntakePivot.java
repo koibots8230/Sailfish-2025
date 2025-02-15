@@ -9,10 +9,8 @@ import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -60,10 +58,8 @@ public class IntakePivot extends SubsystemBase {
     config.closedLoop.p(IntakePivotConstants.PID.kp);
     config.closedLoop.velocityFF(IntakePivotConstants.FEEDFORWARD.kv);
 
-    config.encoder.positionConversionFactor(
-        IntakePivotConstants.POSITION_CONVERSION_FACTOR);
-    config.encoder.velocityConversionFactor(
-        IntakePivotConstants.VELCOITY_CONVERSION_FACTOR);
+    config.encoder.positionConversionFactor(IntakePivotConstants.POSITION_CONVERSION_FACTOR);
+    config.encoder.velocityConversionFactor(IntakePivotConstants.VELCOITY_CONVERSION_FACTOR);
 
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
