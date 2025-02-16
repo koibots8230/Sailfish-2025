@@ -59,68 +59,68 @@ public class RobotContainer {
 
   private void configureBindings() {
 
-    Trigger testEffector = xboxController.x();
-    testEffector.onTrue(endEffector.setVelocityCommand(EndEffectorConstants.INTAKE_SPEED));
-    testEffector.onFalse(endEffector.setVelocityCommand(0));
+    // Trigger testEffector = xboxController.x();
+    // testEffector.onTrue(endEffector.setVelocityCommand(EndEffectorConstants.INTAKE_SPEED));
+    // testEffector.onFalse(endEffector.setVelocityCommand(0));
 
     // Trigger intakeEffector = xboxController.a();
     // intakeEffector.onTrue(endEffector.intakeCommand());
     // intakeEffector.onFalse(endEffector.setVelocityCommand(0));
 
-    Trigger outtakeEffector = xboxController.b();
-    outtakeEffector.onTrue(endEffector.outtakeCommand());
-    outtakeEffector.onFalse(endEffector.setVelocityCommand(0));
+    // Trigger outtakeEffector = xboxController.b();
+    // outtakeEffector.onTrue(endEffector.outtakeCommand());
+    // outtakeEffector.onFalse(endEffector.setVelocityCommand(0));
 
-    // Trigger L1 = xboxController.a(); // TODO CHANGE VALUE TO SOMTHING ELSE SHOULD NOT HAVE TWO A
-    // L1.onTrue(elevator.setPositionCommand(ElevatorConstants.L1_SETPOINT));
+    Trigger L1 = xboxController.a(); // TODO CHANGE VALUE TO SOMTHING ELSE SHOULD NOT HAVE TWO A
+    L1.onTrue(elevator.setPositionCommand(ElevatorConstants.L1_SETPOINT));
 
     Trigger ElevatorDown = xboxController.y();
     ElevatorDown.onTrue(elevator.setPositionCommand(ElevatorConstants.START_SETPOINT));
 
-    Trigger zero = xboxController.y();
+    // Trigger zero = xboxController.y();
 
-    zero.onTrue(swerve.zeroGyroCommand(isBlue));
+    // zero.onTrue(swerve.zeroGyroCommand(isBlue));
 
-    Trigger spinIntake = new Trigger(xboxController.rightTrigger());
-    Trigger reverseIntake = new Trigger(xboxController.leftTrigger());
+    // Trigger spinIntake = xboxController.rightTrigger();
+    // Trigger reverseIntake = new Trigger(xboxController.leftTrigger());
 
     // TODO change this whole thing so it does the intake, intakePivot, and idexer all in one
     // command.
 
     // spinIntake.onTrue(intake.IntakeCommand(IntakeConstants.INTAKE_VELOCITY));
     // spinIntake.onFalse(intake.IntakeCommand(AngularVelocity.ofBaseUnits(0, RPM)));
-    spinIntake.onTrue(
-        Commands.parallel(
-            intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION),
-            intake.IntakeCommand(IntakeConstants.INTAKE_VELOCITY)));
-    spinIntake.onFalse(
-        Commands.parallel(
-            intake.IntakeCommand(AngularVelocity.ofBaseUnits(0, RPM)),
-            intakePivot.moveIntakePivotCommand(IntakePivotConstants.IN_POSITION)));
+    // spinIntake.onTrue(
+    //     Commands.parallel(
+    //         intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION),
+    //         intake.IntakeCommand(IntakeConstants.INTAKE_VELOCITY)));
+    // spinIntake.onFalse(
+    //     Commands.parallel(
+    //         intake.IntakeCommand(AngularVelocity.ofBaseUnits(0, RPM)),
+    //         intakePivot.moveIntakePivotCommand(IntakePivotConstants.IN_POSITION)));
 
     // reverseIntake.onTrue(intake.IntakeCommand(IntakeConstants.REVERSE_INTAKE_VELOCITY));
     // reverseIntake.onFalse(intake.IntakeCommand(AngularVelocity.ofBaseUnits(0, RPM)));
-    reverseIntake.onTrue(
-        Commands.parallel(
-            intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION),
-            intake.IntakeCommand(IntakeConstants.REVERSE_INTAKE_VELOCITY)));
-    reverseIntake.onFalse(
-        Commands.parallel(
-            intake.IntakeCommand(AngularVelocity.ofBaseUnits(0, RPM)),
-            intakePivot.moveIntakePivotCommand(IntakePivotConstants.IN_POSITION)));
+    // reverseIntake.onTrue(
+    //     Commands.parallel(
+    //         intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION),
+    //         intake.IntakeCommand(IntakeConstants.REVERSE_INTAKE_VELOCITY)));
+    // reverseIntake.onFalse(
+    //     Commands.parallel(
+    //         intake.IntakeCommand(AngularVelocity.ofBaseUnits(0, RPM)),
+    //         intakePivot.moveIntakePivotCommand(IntakePivotConstants.IN_POSITION)));
 
     // Trigger intakePivotOut = new Trigger(xboxController.b());
     // intakePivotOut.onTrue(intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION));
 
-    Trigger spinIndexer = new Trigger(xboxController.a());
-    spinIndexer.onTrue(indexer.indexerCommand(IndexerConstants.INDEX_VELOCITY));
-    spinIndexer.onFalse(indexer.indexerCommand(AngularVelocity.ofBaseUnits(0, RPM)));
+    // Trigger spinIndexer = new Trigger(xboxController.a());
+    // spinIndexer.onTrue(indexer.indexerCommand(IndexerConstants.INDEX_VELOCITY));
+    // spinIndexer.onFalse(indexer.indexerCommand(0.0));
   }
 
   private void defualtCommands() {
-    swerve.setDefaultCommand(
-        swerve.driveFieldRelativeCommand(
-            xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
+    // swerve.setDefaultCommand(
+    //     swerve.driveFieldRelativeCommand(
+    //         xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
   }
 
   public void teleopInit() {
