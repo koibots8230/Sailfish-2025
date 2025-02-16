@@ -92,7 +92,6 @@ public class EndEffector extends SubsystemBase {
 
   private void setVelocity(double velocity) {
     pid.setReference(velocity, ControlType.kVelocity);
-
     setpoint = velocity;
   }
 

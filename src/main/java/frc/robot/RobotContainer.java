@@ -58,22 +58,10 @@ public class RobotContainer {
 
   private void configureBindings() {
 
-    Trigger testEffector = xboxController.x();
-    testEffector.onTrue(endEffector.setVelocityCommand(EndEffectorConstants.INTAKE_SPEED));
-    testEffector.onFalse(endEffector.setVelocityCommand(0));
-
-    Trigger outtakeEffector = xboxController.b();
-    outtakeEffector.onTrue(endEffector.outtakeCommand());
-    outtakeEffector.onFalse(endEffector.setVelocityCommand(0));
-
-    Trigger ElevatorDown = xboxController.y();
-    ElevatorDown.onTrue(elevator.setPositionCommand(ElevatorConstants.INTAKE_SETPOINT));
-
-    Trigger zero = xboxController.y();
-
+    Trigger zero = xboxController.b();
     zero.onTrue(swerve.zeroGyroCommand(isBlue));
 
-    Trigger spinIntake = new Trigger(xboxController.rightTrigger());
+    Trigger spinIntake = new Trigger(xboxController.rightTrigger()); 
     spinIntake.onTrue(
         IntakeCommand.intakeCommand(intake, intakePivot, indexer, elevator, endEffector));
     spinIntake.onFalse(IntakeCommand.intakeStop(intake, indexer, intakePivot));
@@ -85,18 +73,12 @@ public class RobotContainer {
 
     Trigger gotoLevelThree = new Trigger(xboxController.y());
     gotoLevelThree.onTrue(ScoreCommand.levelThreeScore(elevator, endEffector));
-    gotoLevelThree.onFalse(ScoreCommand.basePosition(elevator));
+    gotoLevelThree.onFalse(ScoreCommand.basePosition(elevator, endEffector));
 
     Trigger gotoLevelTwo = new Trigger(xboxController.a());
     gotoLevelTwo.onTrue(ScoreCommand.levelTwoScore(elevator, endEffector));
-    gotoLevelTwo.onFalse(ScoreCommand.basePosition(elevator));
+    gotoLevelTwo.onFalse(ScoreCommand.basePosition(elevator, endEffector));
 
-    // Trigger intakePivotOut = new Trigger(xboxController.b());
-    // intakePivotOut.onTrue(intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION));
-
-    Trigger spinIndexer = new Trigger(xboxController.a());
-    spinIndexer.onTrue(indexer.setVelocityCommand(IndexerConstants.INDEX_VELOCITY));
-    spinIndexer.onFalse(indexer.setVelocityCommand(AngularVelocity.ofBaseUnits(0, RPM)));
   }
 
   private void defualtCommands() {

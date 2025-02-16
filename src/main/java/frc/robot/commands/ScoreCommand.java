@@ -22,7 +22,9 @@ public class ScoreCommand {
         endEffector.outtakeCommand());
   }
 
-  public static Command basePosition(Elevator elevator) {
-    return Commands.sequence(elevator.setPositionCommand(ElevatorConstants.INTAKE_SETPOINT));
+  public static Command basePosition(Elevator elevator, EndEffector endEffector) {
+    return Commands.sequence(elevator.setPositionCommand(ElevatorConstants.INTAKE_SETPOINT),
+    endEffector.setVelocityCommand(0)
+    );
   }
 }
