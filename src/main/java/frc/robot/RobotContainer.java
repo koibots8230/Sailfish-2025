@@ -52,8 +52,8 @@ public class RobotContainer {
 
   private void configureBindings() {
 
-    Trigger zero = xboxController.b();
-    zero.onTrue(swerve.zeroGyroCommand(isBlue));
+    // Trigger zero = xboxController.b();
+    // zero.onTrue(swerve.zeroGyroCommand(isBlue));
 
     Trigger spinIntake = new Trigger(xboxController.rightTrigger());
     spinIntake.onTrue(

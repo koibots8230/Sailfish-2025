@@ -51,7 +51,7 @@ public class IntakeCommands {
         elevator.setPositionCommand(ElevatorConstants.INTAKE_SETPOINT),
         Commands.waitUntil(() -> elevator.positionIsInRAnge(ElevatorConstants.INTAKE_SETPOINT)),
         intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION),
-        Commands.waitUntil(() -> intakePivot.atPosition()),
+        Commands.waitUntil(() -> intakePivot.positionIsInRange()),
         Commands.parallel(
             intake.setVeclocityCommand(IntakeConstants.REVERSE_INTAKE_VELOCITY),
             indexer.setVelocityCommand(IndexerConstants.REVERSE_VELOCITY),
