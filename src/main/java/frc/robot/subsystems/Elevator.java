@@ -145,7 +145,7 @@ public class Elevator extends SubsystemBase {
     secondaryCurrent = Current.ofBaseUnits(secondaryMotor.getOutputCurrent(), Amps);
   }
 
-  public boolean getPosition(Distance desieredPostion) {
+  public boolean positionIsInRAnge(Distance desieredPostion) {
     return (position.gte(desieredPostion.minus(Meters.of(.025)))
         && position.lt(desieredPostion.plus(Meters.of(.025))));
   }
