@@ -62,7 +62,7 @@ public class RobotContainer {
 
     Trigger reverseIntake = new Trigger(xboxController.leftTrigger());
     reverseIntake.onTrue(
-        IntakeCommands.reveseCommand(intake, intakePivot, indexer, elevator, endEffector));
+        IntakeCommands.reverseCommand(intake, intakePivot, indexer, elevator, endEffector));
     reverseIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot));
 
     Trigger gotoLevelThree = new Trigger(xboxController.y());
