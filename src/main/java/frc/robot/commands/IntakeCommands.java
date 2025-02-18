@@ -41,7 +41,7 @@ public class IntakeCommands {
         intakePivot.moveIntakePivotCommand(IntakePivotConstants.IN_POSITION));
   }
 
-  public static Command reveseCommand(
+  public static Command reverseCommand(
       Intake intake,
       IntakePivot intakePivot,
       Indexer indexer,
