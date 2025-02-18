@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Millimeters;
+
 import au.grapplerobotics.LaserCan;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -66,6 +68,8 @@ public class EndEffector extends SubsystemBase {
     pid = motor.getClosedLoopController();
 
     setpoint = 0;
+
+    sensorDistance = Millimeters.of(0);
   }
 
   @Override
@@ -87,9 +91,7 @@ public class EndEffector extends SubsystemBase {
 
   private void setVelocity(double velocity) {
     pid.setReference(velocity, ControlType.kVelocity);
-
     setpoint = velocity;
-    System.out.println(setpoint);
   }
 
   public Command intakeCommand() {
@@ -98,7 +100,7 @@ public class EndEffector extends SubsystemBase {
             Commands.run(() -> this.setVelocity(EndEffectorConstants.INTAKE_SPEED), this),
             Commands.waitUntil(
                 () ->
-                    laserCAN.getMeasurement().distance_mm
+                    sensorDistance.in(Units.Millimeters)
                         <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters))),
         Commands.runOnce(() -> this.setVelocity(0), this));
   }
@@ -109,7 +111,7 @@ public class EndEffector extends SubsystemBase {
             Commands.run(() -> this.setVelocity(EndEffectorConstants.OUTTAKE_SPEED), this),
             Commands.waitUntil(
                 () ->
-                    !(laserCAN.getMeasurement().distance_mm
+                    !(sensorDistance.in(Units.Millimeters)
                         <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters)))),
         Commands.waitSeconds(0.5),
         Commands.runOnce(() -> this.setVelocity(0), this));

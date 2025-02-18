@@ -115,6 +115,11 @@ public class IntakePivot extends SubsystemBase {
     }
   }
 
+  public boolean positionIsInRange() {
+    return (position.gte(IntakePivotConstants.OUT_POSITION.minus(IntakePivotConstants.TOLERANCE))
+        && position.lt(IntakePivotConstants.OUT_POSITION.plus(IntakePivotConstants.TOLERANCE)));
+  }
+
   @Override
   public void simulationPeriodic() {
     position = setpoint;

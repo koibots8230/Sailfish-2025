@@ -1,7 +1,6 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
-import static edu.wpi.first.units.Units.Meters;
 
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
@@ -24,8 +23,11 @@ import frc.lib.util.Wheel;
 public class Constants {
 
   public static class ElevatorConstants {
-    public static final Distance START_SETPOINT = Distance.ofBaseUnits(0.005, Units.Meters);
-    public static final Distance L1_SETPOINT = Distance.ofBaseUnits(1.5, Units.Meters);
+    public static final Distance INTAKE_SETPOINT = Distance.ofBaseUnits(0.005, Units.Meters);
+    public static final Distance L2_SETPOINT =
+        Distance.ofBaseUnits(2.65, Units.Meters); // untested value
+    public static final Distance L3_SETPOINT =
+        Distance.ofBaseUnits(2.65, Units.Meters); //  untested value
 
     public static final PIDGains PID = new PIDGains.Builder().kp(3.3).build();
     public static final FeedforwardGains FEEDFORWARD =
@@ -145,6 +147,9 @@ public class Constants {
     public static final AngularAcceleration MAX_ACCELRATION =
         AngularAcceleration.ofBaseUnits(0, Units.RotationsPerSecondPerSecond);
 
+    public static final Angle TOLERANCE =
+        Radians.of(0.025); // TODO CHANGE THE PLUS AND MINUS VALUES HERE TO SOMTHING RELEVENT
+
     public static final double POSITION_CONVERSION_FACTOR = 2.0 * Math.PI;
     public static final double VELCOITY_CONVERSION_FACTOR = (2.0 * Math.PI) / 60.0;
 
@@ -173,6 +178,7 @@ public class Constants {
 
   public static class IndexerConstants {
     public static final double INDEX_VELOCITY = 1000;
+    public static final double REVERSE_VELOCITY = -1000;
 
     public static final PIDGains PID = new PIDGains.Builder().kp(0.0000).build();
     public static final FeedforwardGains FEEDFORWARD =

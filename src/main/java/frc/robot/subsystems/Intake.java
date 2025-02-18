@@ -11,7 +11,6 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -72,7 +71,7 @@ public class Intake extends SubsystemBase {
     setpoint = setVelocity;
   }
 
-  public Command IntakeCommand(AngularVelocity setVelocity) {
+  public Command setVeclocityCommand(AngularVelocity setVelocity) {
     return Commands.runOnce(() -> this.spinIntake(setVelocity), this);
   }
 }
