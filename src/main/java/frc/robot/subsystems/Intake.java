@@ -9,6 +9,7 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -25,10 +26,9 @@ import frc.robot.Constants.IntakeConstants;
 public class Intake extends SubsystemBase {
 
   private final RelativeEncoder encoder;
-  private final SparkMax leftMotor;
-  private final SparkMax rightMotor;
-  private SparkMaxConfig config;
-  private SparkClosedLoopController closedLoopController;
+  private final SparkFlex motor;
+  private final SparkMaxConfig config;
+  private final SparkClosedLoopController closedLoopController;
 
   private AngularVelocity setpoint;
   private AngularVelocity velocity;
@@ -36,22 +36,21 @@ public class Intake extends SubsystemBase {
   private Current current;
 
   public Intake() {
-    leftMotor = new SparkMax(IntakeConstants.INTAKE_LEFT_MOTOR_ID, MotorType.kBrushless);
-    rightMotor = new SparkMax(IntakeConstants.INTAKE_RIGHT_MOTOR_ID, MotorType.kBrushless);
-    encoder = leftMotor.getEncoder();
+    motor = new SparkFlex(IntakeConstants.MOTOR_ID, MotorType.kBrushless);
 
     config = new SparkMaxConfig();
     config.closedLoop.p(IntakeConstants.PID.kp);
     config.closedLoop.velocityFF(IntakeConstants.FEEDFORWARD.kv);
 
-    leftMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-    config.follow(IntakeConstants.INTAKE_RIGHT_MOTOR_ID);
     config.inverted(true);
 
-    rightMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    config.smartCurrentLimit((int) IntakeConstants.CURRENT_LIMIT.in(Amps));
 
-    closedLoopController = leftMotor.getClosedLoopController();
+    motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    encoder = motor.getEncoder();
+
+    closedLoopController = motor.getClosedLoopController();
 
     setpoint = AngularVelocity.ofBaseUnits(0, RPM);
   }
@@ -59,8 +58,8 @@ public class Intake extends SubsystemBase {
   @Override
   public void periodic() {
     velocity = AngularVelocity.ofBaseUnits(encoder.getVelocity(), RPM);
-    voltage = Voltage.ofBaseUnits(leftMotor.getBusVoltage() * leftMotor.getAppliedOutput(), Volts);
-    current = Current.ofBaseUnits(leftMotor.getOutputCurrent(), Amps);
+    voltage = Voltage.ofBaseUnits(motor.getBusVoltage() * motor.getAppliedOutput(), Volts);
+    current = Current.ofBaseUnits(motor.getOutputCurrent(), Amps);
   }
 
   @Override

@@ -65,7 +65,7 @@ public class Elevator extends SubsystemBase {
 
     mainMotorConfig = new SparkMaxConfig();
 
-    mainMotorConfig.idleMode(IdleMode.kBrake);
+    mainMotorConfig.idleMode(IdleMode.kCoast);
 
     mainMotorConfig
         .closedLoop
@@ -82,7 +82,7 @@ public class Elevator extends SubsystemBase {
 
     secondaryMotorConfig = new SparkMaxConfig();
 
-    secondaryMotorConfig.idleMode(IdleMode.kBrake);
+    secondaryMotorConfig.idleMode(IdleMode.kCoast);
 
     secondaryMotorConfig.follow(ElevatorConstants.MAIN_MOTOR_ID);
 

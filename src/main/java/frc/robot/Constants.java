@@ -29,22 +29,22 @@ public class Constants {
     public static final Distance L3_SETPOINT =
         Distance.ofBaseUnits(2.65, Units.Meters); //  untested value
 
-    public static final PIDGains PID = new PIDGains.Builder().kp(2.2).build();
+    public static final PIDGains PID = new PIDGains.Builder().kp(3.3).build();
     public static final FeedforwardGains FEEDFORWARD =
-        new FeedforwardGains.Builder().kv(4.9).kg(0.37).build();
+        new FeedforwardGains.Builder().kv(2.05).kg(0).build();
 
     public static final LinearVelocity MAX_VELOCITY =
         LinearVelocity.ofBaseUnits(24, Units.MetersPerSecond);
     public static final LinearAcceleration MAX_ACCELRATION =
-        LinearAcceleration.ofBaseUnits(12, Units.MetersPerSecondPerSecond);
+        LinearAcceleration.ofBaseUnits(6, Units.MetersPerSecondPerSecond);
 
     public static final Distance CONVERSION_FACTOR =
         Distance.ofBaseUnits((0.05207 * Math.PI) * 2, Meters);
 
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(60, Units.Amps);
 
-    public static final int MAIN_MOTOR_ID = 31;
-    public static final int SECONDARY_MOTOR_ID = 30;
+    public static final int MAIN_MOTOR_ID = 11;
+    public static final int SECONDARY_MOTOR_ID = 12;
     public static final int HALL_EFFECTS_SENSOR = 0;
   }
 
@@ -61,8 +61,8 @@ public class Constants {
 
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(40, Units.Amps);
 
-    public static final int MOTOR_ID = 10;
-    public static final int LASERCAN_ID = 34;
+    public static final int MOTOR_ID = 22;
+    public static final int LASERCAN_ID = 21;
   }
 
   public static class RobotConstants {
@@ -84,12 +84,12 @@ public class Constants {
     public static final AngularAcceleration MAX_TURN_ACCELERATION =
         RadiansPerSecondPerSecond.of(4 * Math.PI);
 
-    public static final PIDGains TURN_PID = new PIDGains.Builder().kp(1).kd(0.0).build();
-    public static final PIDGains DRIVE_PID = new PIDGains.Builder().kp(0.07).build();
+    public static final PIDGains TURN_PID = new PIDGains.Builder().kp(0).kd(0.0).build();
+    public static final PIDGains DRIVE_PID = new PIDGains.Builder().kp(0.0).build();
     public static final FeedforwardGains TURN_FEEDFORWARD =
-        new FeedforwardGains.Builder().kv(0.55).build();
+        new FeedforwardGains.Builder().kv(0.0).build();
     public static final FeedforwardGains DRIVE_FEEDFORWARD =
-        new FeedforwardGains.Builder().kv(0.21).build();
+        new FeedforwardGains.Builder().kv(0.0).build();
 
     public static final double MAX_VELOCITY = 10 * Math.PI;
     public static final double MAX_ACCELRATION = 16 * Math.PI;
@@ -136,7 +136,7 @@ public class Constants {
     public static final int BACK_RIGHT_DRIVE_ID = 7;
     public static final int BACK_RIGHT_TURN_ID = 8;
 
-    public static final int GYRO_ID = 18;
+    public static final int GYRO_ID = 9;
   }
 
   public static class IntakePivotConstants {
@@ -157,31 +157,33 @@ public class Constants {
     public static final FeedforwardGains FEEDFORWARD =
         new FeedforwardGains.Builder().kv(0).kg(0).build();
 
-    public static final int INTAKE_PIVOT_MOTOR_ID = 12;
-    public static final int INTAKE_PIVOT_SWITCH_CHANEL = 1;
+    public static final int LEFT_MOTOR_ID = 31;
+    public static final int RIGHT_MOTOR_ID = 32;
+    public static final int LIMIT_SWITCH_CHANEL = 1;
   }
 
   public static class IntakeConstants {
     public static final AngularVelocity INTAKE_VELOCITY = AngularVelocity.ofBaseUnits(1000, RPM);
     public static final AngularVelocity REVERSE_INTAKE_VELOCITY =
-        AngularVelocity.ofBaseUnits(600, RPM);
+        AngularVelocity.ofBaseUnits(-1000, RPM);
 
     public static final PIDGains PID = new PIDGains.Builder().kp(0).build();
     public static final FeedforwardGains FEEDFORWARD =
-        new FeedforwardGains.Builder().kv(0).kg(0).build();
+        new FeedforwardGains.Builder().kv(0.00002).build();
 
-    public static final int INTAKE_LEFT_MOTOR_ID = 14;
-    public static final int INTAKE_RIGHT_MOTOR_ID = 11;
+    public static final Current CURRENT_LIMIT = Amps.of(80);
+
+    public static final int MOTOR_ID = 33;
   }
 
   public static class IndexerConstants {
-    public static final AngularVelocity INDEX_VELOCITY = AngularVelocity.ofBaseUnits(1000, RPM);
-    public static final AngularVelocity REVERSE_VELOCITY = AngularVelocity.ofBaseUnits(-1000, RPM);
+    public static final double INDEX_VELOCITY = 1000;
+    public static final double REVERSE_VELOCITY = -1000;
 
-    public static final PIDGains PID = new PIDGains.Builder().kp(0).build();
+    public static final PIDGains PID = new PIDGains.Builder().kp(0.0000).build();
     public static final FeedforwardGains FEEDFORWARD =
-        new FeedforwardGains.Builder().kv(0).kg(0).build();
+        new FeedforwardGains.Builder().kv(0.00023).kg(0).build();
 
-    public static final int INDEXER_MOTOR_ID = 13;
+    public static final int MOTOR_ID = 41;
   }
 }

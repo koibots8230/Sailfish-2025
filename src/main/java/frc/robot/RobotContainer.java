@@ -75,9 +75,9 @@ public class RobotContainer {
   }
 
   private void defualtCommands() {
-    swerve.setDefaultCommand(
-        swerve.driveFieldRelativeCommand(
-            xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
+    // swerve.setDefaultCommand(
+    //     swerve.driveFieldRelativeCommand(
+    //         xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
   }
 
   public void teleopInit() {

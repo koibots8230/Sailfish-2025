@@ -15,6 +15,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -31,41 +32,45 @@ public class Indexer extends SubsystemBase {
 
   private Voltage voltage;
   private Current current;
-  private AngularVelocity velocity;
-  private AngularVelocity setpoint;
+  private double velocity;
+  private double setpoint;
 
   public Indexer() {
-    motor = new SparkMax(IndexerConstants.INDEXER_MOTOR_ID, MotorType.kBrushless);
+    motor = new SparkMax(IndexerConstants.MOTOR_ID, MotorType.kBrushless);
 
     config = new SparkMaxConfig();
     config.closedLoop.p(IndexerConstants.PID.kp);
     config.closedLoop.velocityFF(IndexerConstants.FEEDFORWARD.kv);
+    config.inverted(true);
+
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     encoder = motor.getEncoder();
 
     closedLoopController = motor.getClosedLoopController();
 
-    setpoint = AngularVelocity.ofBaseUnits(0, RPM);
+    setpoint = 0.0;
+
+    velocity = 0.0;
   }
 
   @Override
   public void periodic() {
     voltage = Voltage.ofBaseUnits(motor.getBusVoltage() * motor.getAppliedOutput(), Volts);
     current = Current.ofBaseUnits(motor.getOutputCurrent(), Amps);
-    velocity = AngularVelocity.ofBaseUnits(encoder.getVelocity(), RPM);
+    velocity = encoder.getVelocity();
   }
 
   public void simulationPeriodic() {
-    velocity = setpoint;
+    // velocity = setpoint.mutableCopy();
   }
 
-  private void spinIndexer(AngularVelocity setVelocity) {
-    closedLoopController.setReference(setVelocity.in(RPM), ControlType.kVelocity);
+  private void spinIndexer(double setVelocity) {
+    closedLoopController.setReference(setVelocity, ControlType.kVelocity);
     setpoint = setVelocity;
   }
 
-  public Command setVelocityCommand(AngularVelocity setVelocity) {
+  public Command setVelocityCommand(double setVelocity) {
     return Commands.runOnce(() -> this.spinIndexer(setVelocity));
   }
 }
