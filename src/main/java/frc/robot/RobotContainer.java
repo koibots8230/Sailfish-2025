@@ -15,8 +15,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.EndEffectorConstants;
 import frc.robot.Constants.IndexerConstants;
-import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.ScoreCommand;
+import frc.robot.commands.IntakeCommands;
+import frc.robot.commands.ScoreCommands;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.EndEffector;
 import frc.robot.subsystems.Indexer;
@@ -63,21 +63,21 @@ public class RobotContainer {
 
     Trigger spinIntake = new Trigger(xboxController.rightTrigger()); 
     spinIntake.onTrue(
-        IntakeCommand.intakeCommand(intake, intakePivot, indexer, elevator, endEffector));
-    spinIntake.onFalse(IntakeCommand.intakeStop(intake, indexer, intakePivot));
+        IntakeCommands.intakeCommand(intake, intakePivot, indexer, elevator, endEffector));
+    spinIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot));
 
     Trigger reverseIntake = new Trigger(xboxController.leftTrigger());
     reverseIntake.onTrue(
-        IntakeCommand.reveseCommand(intake, intakePivot, indexer, elevator, endEffector));
-    reverseIntake.onFalse(IntakeCommand.intakeStop(intake, indexer, intakePivot));
+        IntakeCommands.reveseCommand(intake, intakePivot, indexer, elevator, endEffector));
+    reverseIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot));
 
     Trigger gotoLevelThree = new Trigger(xboxController.y());
-    gotoLevelThree.onTrue(ScoreCommand.levelThreeScore(elevator, endEffector));
-    gotoLevelThree.onFalse(ScoreCommand.basePosition(elevator, endEffector));
+    gotoLevelThree.onTrue(ScoreCommands.levelThree(elevator, endEffector));
+    gotoLevelThree.onFalse(ScoreCommands.basePosition(elevator, endEffector));
 
     Trigger gotoLevelTwo = new Trigger(xboxController.a());
-    gotoLevelTwo.onTrue(ScoreCommand.levelTwoScore(elevator, endEffector));
-    gotoLevelTwo.onFalse(ScoreCommand.basePosition(elevator, endEffector));
+    gotoLevelTwo.onTrue(ScoreCommands.levelTwo(elevator, endEffector));
+    gotoLevelTwo.onFalse(ScoreCommands.basePosition(elevator, endEffector));
 
   }
 
@@ -86,7 +86,6 @@ public class RobotContainer {
         swerve.driveFieldRelativeCommand(
             xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
 
-    elevator.setDefaultCommand(elevator.setPositionCommand(ElevatorConstants.INTAKE_SETPOINT));
   }
 
   public void teleopInit() {
