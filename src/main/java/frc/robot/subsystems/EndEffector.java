@@ -1,9 +1,8 @@
 package frc.robot.subsystems;
 
-import au.grapplerobotics.LaserCan;
-
 import static edu.wpi.first.units.Units.Millimeters;
 
+import au.grapplerobotics.LaserCan;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;

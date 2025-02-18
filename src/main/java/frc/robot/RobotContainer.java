@@ -4,17 +4,11 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.RPM;
-
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.ElevatorConstants;
-import frc.robot.Constants.EndEffectorConstants;
-import frc.robot.Constants.IndexerConstants;
 import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.ScoreCommands;
 import frc.robot.subsystems.Elevator;
@@ -61,7 +55,7 @@ public class RobotContainer {
     Trigger zero = xboxController.b();
     zero.onTrue(swerve.zeroGyroCommand(isBlue));
 
-    Trigger spinIntake = new Trigger(xboxController.rightTrigger()); 
+    Trigger spinIntake = new Trigger(xboxController.rightTrigger());
     spinIntake.onTrue(
         IntakeCommands.intakeCommand(intake, intakePivot, indexer, elevator, endEffector));
     spinIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot));
@@ -78,14 +72,12 @@ public class RobotContainer {
     Trigger gotoLevelTwo = new Trigger(xboxController.a());
     gotoLevelTwo.onTrue(ScoreCommands.levelTwo(elevator, endEffector));
     gotoLevelTwo.onFalse(ScoreCommands.basePosition(elevator, endEffector));
-
   }
 
   private void defualtCommands() {
     swerve.setDefaultCommand(
         swerve.driveFieldRelativeCommand(
             xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
-
   }
 
   public void teleopInit() {

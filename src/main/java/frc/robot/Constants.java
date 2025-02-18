@@ -147,7 +147,8 @@ public class Constants {
     public static final AngularAcceleration MAX_ACCELRATION =
         AngularAcceleration.ofBaseUnits(0, Units.RotationsPerSecondPerSecond);
 
-    public static final Angle TOLERANCE = Radians.of(0.025); // TODO CHANGE THE PLUS AND MINUS VALUES HERE TO SOMTHING RELEVENT
+    public static final Angle TOLERANCE =
+        Radians.of(0.025); // TODO CHANGE THE PLUS AND MINUS VALUES HERE TO SOMTHING RELEVENT
 
     public static final double POSITION_CONVERSION_FACTOR = 2.0 * Math.PI;
     public static final double VELCOITY_CONVERSION_FACTOR = (2.0 * Math.PI) / 60.0;

@@ -108,9 +108,7 @@ public class IntakePivot extends SubsystemBase {
 
   public boolean atPosition() {
     return (position.gte(IntakePivotConstants.OUT_POSITION.minus(IntakePivotConstants.TOLERANCE))
-        && position.lt(
-            IntakePivotConstants.OUT_POSITION.plus(
-                IntakePivotConstants.TOLERANCE)));
+        && position.lt(IntakePivotConstants.OUT_POSITION.plus(IntakePivotConstants.TOLERANCE)));
   }
 
   @Override
