@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.epilogue.Logged;
@@ -89,15 +90,15 @@ public class Swerve extends SubsystemBase {
     setpointStates = new SwerveModuleState[4];
     messuredStates = new SwerveModuleState[4];
 
-    // try{
-    //   config = RobotConfig.fromGUISettings();
-    // }
-    // catch (Exception e){
-    //   e.printStackTrace();
-    // }
+    try{
+      config = RobotConfig.fromGUISettings();
+    }
+    catch (Exception e){
+      e.printStackTrace();
+    }
 
-    // AutoBuilder.configure(this::getEstimatedPosition, this::setOdometry, this::getChassisSpeeds,
-    // this::driveRobotRelative, SwerveConstants.pathPlannerFF, config, () -> setColour(), this);
+    AutoBuilder.configure(this::getEstimatedPosition, this::setOdometry, this::getChassisSpeeds,
+    this::driveRobotRelative, SwerveConstants.pathPlannerFF, config, () -> getIsBlue(), this);
 
   }
 
