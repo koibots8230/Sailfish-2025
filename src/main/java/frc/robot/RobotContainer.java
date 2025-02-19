@@ -17,6 +17,7 @@ import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakePivot;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Vision;
 
 @Logged
 public class RobotContainer {
@@ -31,6 +32,8 @@ public class RobotContainer {
 
   private final Indexer indexer;
 
+  private final Vision vision;
+
   @NotLogged private final CommandXboxController xboxController;
   private boolean isBlue;
 
@@ -41,6 +44,10 @@ public class RobotContainer {
     intake = new Intake();
     intakePivot = new IntakePivot();
     indexer = new Indexer();
+
+    vision =
+        new Vision(
+            swerve::getEstimatedPosition, swerve::getGyroAngle, swerve::addVisionMeasurement);
 
     xboxController = new CommandXboxController(0);
 

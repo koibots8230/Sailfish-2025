@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -86,10 +87,14 @@ public class Constants {
 
     public static final PIDGains TURN_PID = new PIDGains.Builder().kp(0).kd(0.0).build();
     public static final PIDGains DRIVE_PID = new PIDGains.Builder().kp(0.0).build();
+
     public static final FeedforwardGains TURN_FEEDFORWARD =
         new FeedforwardGains.Builder().kv(0.0).build();
     public static final FeedforwardGains DRIVE_FEEDFORWARD =
         new FeedforwardGains.Builder().kv(0.0).build();
+
+    public static final PIDGains TRANSLATE_ASSIST_GAINS = new PIDGains.Builder().kp(0).build();
+    public static final PIDGains ANGLE_ASSIST_GAINS = new PIDGains.Builder().kp(0).build(); 
 
     public static final double MAX_VELOCITY = 10 * Math.PI;
     public static final double MAX_ACCELRATION = 16 * Math.PI;
@@ -185,5 +190,33 @@ public class Constants {
         new FeedforwardGains.Builder().kv(0.00023).kg(0).build();
 
     public static final int MOTOR_ID = 41;
+  }
+
+  public static class VisionConstants {
+    public static final int ACTIVE_CAMERAS = 2;
+
+    public static final Pose2d[] CAMERA_POSITIONS = {
+      new Pose2d(-13.5 + 0.952, 6.0, Rotation2d.fromDegrees(180)),
+      new Pose2d(-13.5 + 0.952, -6.5, Rotation2d.fromDegrees(180))
+      // new Pose2d(-0.0, 0.0, Rotation2d.fromDegrees(180)),
+      // new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0))
+    }; // x is forward, y is left, counterclockwise on rotation
+
+    public static final String[][] TOPIC_NAMES = {
+      {"Cam1Tvec", "Cam1Rvec", "Cam1Ids"},
+      {"Cam2Tvec", "Cam2Rvec", "Cam2Ids"}
+      // {"Cam3Tvec", "Cam3Rvec", "Cam3Ids"},
+      // {"Cam4Tvec", "Cam4Rvec", "Cam4Ids"}
+    };
+
+    public static final double[] VECTOR_DEFAULT_VALUE = {0};
+    public static final int ID_DEFAULT_VALUE = 0;
+
+    public static final Distance MAX_MEASUREMENT_DIFFERENCE = Meters.of(1.5);
+    public static final Rotation2d MAX_ANGLE_DIFFERENCE = Rotation2d.fromDegrees(10);
+
+    public static final double ROTATION_STDEV = 50 * Math.PI;
+    public static final double TRANSLATION_STDEV_ORDER = 2;
+    public static final double TRANSLATION_STDEV_SCALAR = 2;
   }
 }

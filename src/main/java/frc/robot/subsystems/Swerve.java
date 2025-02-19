@@ -10,18 +10,25 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.util.VisionMeasurement;
 import frc.robot.Constants;
 import frc.robot.Constants.RobotConstants;
 import frc.robot.Constants.SwerveConstants;
@@ -34,6 +41,7 @@ public class Swerve extends SubsystemBase {
   private Rotation2d gyroAngle;
   private SwerveModuleState[] setpointStates;
   private final Pigeon2 gyro;
+  private final PIDController anglePID;
 
   @Logged
   public class Modules {
@@ -99,7 +107,12 @@ public class Swerve extends SubsystemBase {
     // AutoBuilder.configure(this::getEstimatedPosition, this::setOdometry, this::getChassisSpeeds,
     // this::driveRobotRelative, SwerveConstants.pathPlannerFF, config, () -> setColour(), this);
 
-  }
+    anglePID = new PIDController(
+      SwerveConstants.ANGLE_ASSIST_GAINS.kp,
+      SwerveConstants.ANGLE_ASSIST_GAINS.ki,
+      SwerveConstants.ANGLE_ASSIST_GAINS.kd
+    );
+  } 
 
   public boolean getIsBlue() {
     return isBlue;
@@ -158,6 +171,42 @@ public class Swerve extends SubsystemBase {
     };
   }
 
+  private Pose2d getAssistVelocity(
+      Translation2d targetPose, Rotation2d targetAngle, double xInput, double yInput) {
+    Translation2d[] points =
+        new Translation2d[] {
+          this.getEstimatedPosition().getTranslation(),
+          new Translation2d(
+              this.getEstimatedPosition().getX() + xInput, this.getEstimatedPosition().getY() + yInput)
+        };
+
+    Rotation2d angleToTarget =
+        Rotation2d.fromRadians(
+            Math.atan2(
+                this.getEstimatedPosition().getY() - targetPose.getY(),
+                this.getEstimatedPosition().getX() - targetPose.getX()));
+
+    Distance distancePerpToVel =
+        Meters.of( // Looks complicated, but just the "Line from two points" from this
+            // https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
+            Math.abs(
+                    ((points[1].getY() - points[0].getY()) * targetPose.getX())
+                        - ((points[1].getX() - points[0].getX()) * targetPose.getY())
+                        + (points[1].getX() * points[0].getY())
+                        - (points[1].getY() * points[0].getX()))
+                / Math.sqrt(
+                    Math.pow((points[1].getY() - points[0].getY()), 2)
+                        + Math.pow((points[1].getX() - points[0].getX()), 2)));
+
+    LinearVelocity assistVelocity =
+        MetersPerSecond.of(distancePerpToVel.in(Meters) * SwerveConstants.TRANSLATE_ASSIST_GAINS.kp);
+
+    return new Pose2d(
+        assistVelocity.in(MetersPerSecond) * angleToTarget.getCos(),
+        assistVelocity.in(MetersPerSecond) * angleToTarget.getSin(),
+        new Rotation2d(anglePID.calculate(gyroAngle.getRadians(), targetAngle.getRadians())));
+  }
+
   private void driveFieldRelativeScaler(double x, double y, double omega) {
 
     double linearMagnitude = Math.pow(Math.hypot(x, y), SwerveConstants.LEFT_STICK_SCAILING);
@@ -170,11 +219,13 @@ public class Swerve extends SubsystemBase {
     omega =
         Math.pow(omega, SwerveConstants.RIGHT_STICK_SCAILING)
             * SwerveConstants.MAX_ROTATION.in(RadiansPerSecond);
+    
+    Pose2d assist = getAssistVelocity(new Translation2d(13.85, 5.03), Rotation2d.fromRadians(Math.PI / 3.0), x, y);
 
     driveFieldRelative(
-        MetersPerSecond.of(MathUtil.applyDeadband(-x, Constants.SwerveConstants.DEADBAND)),
-        MetersPerSecond.of(MathUtil.applyDeadband(y, Constants.SwerveConstants.DEADBAND)),
-        RadiansPerSecond.of(MathUtil.applyDeadband(-omega, Constants.SwerveConstants.DEADBAND)));
+        MetersPerSecond.of(MathUtil.applyDeadband(-x + assist.getX(), Constants.SwerveConstants.DEADBAND)),
+        MetersPerSecond.of(MathUtil.applyDeadband(y + assist.getY(), Constants.SwerveConstants.DEADBAND)),
+        RadiansPerSecond.of(MathUtil.applyDeadband(-omega + assist.getRotation().getRadians(), Constants.SwerveConstants.DEADBAND)));
   }
 
   public ChassisSpeeds getChassisSpeeds() {
@@ -194,13 +245,6 @@ public class Swerve extends SubsystemBase {
   }
 
   private void driveFieldRelative(LinearVelocity x, LinearVelocity y, AngularVelocity omega) {
-    estimatedPosition =
-        new Pose2d(
-            estimatedPosition.getX() + x.times(RobotConstants.ROBOT_CLOCK_SPEED).in(Meters),
-            estimatedPosition.getY() + (y.times(RobotConstants.ROBOT_CLOCK_SPEED).in(Meters)),
-            new Rotation2d(
-                estimatedPosition.getRotation().getRadians() + omega.in(RadiansPerSecond)));
-
     ChassisSpeeds speeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(
             x.in(MetersPerSecond), y.in(MetersPerSecond), omega.in(RadiansPerSecond), gyroAngle);
@@ -221,6 +265,18 @@ public class Swerve extends SubsystemBase {
 
   public Pose2d getEstimatedPosition() {
     return estimatedPosition;
+  }
+
+  public Rotation2d getGyroAngle() {
+    return gyro.getRotation2d();
+  }
+
+  public void addVisionMeasurement(VisionMeasurement measurement) {
+    odometry.addVisionMeasurement(
+        measurement.pose,
+        measurement.timestamp,
+        VecBuilder.fill(
+            measurement.translationStdev, measurement.translationStdev, measurement.rotationStdev));
   }
 
   public Command driveFieldRelativeCommand(

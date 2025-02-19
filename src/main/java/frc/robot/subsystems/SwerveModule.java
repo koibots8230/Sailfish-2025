@@ -113,7 +113,7 @@ public class SwerveModule {
     turnConfig.smartCurrentLimit((int) SwerveConstants.TURN_CURRENT_LIMIT.in(Amps));
 
     turnConfig.absoluteEncoder.positionConversionFactor(
-        SwerveConstants.TURN_CONVERSION_FACTOR / 60);
+        SwerveConstants.TURN_CONVERSION_FACTOR);
     turnConfig.absoluteEncoder.velocityConversionFactor(
         SwerveConstants.TURN_CONVERSION_FACTOR / 60);
     turnConfig.absoluteEncoder.inverted(true);
@@ -162,7 +162,7 @@ public class SwerveModule {
   }
 
   public void setState(SwerveModuleState swerveModuleState) {
-    swerveModuleState.optimize(currentAngle);
+    // swerveModuleState.optimize(currentAngle);
     swerveModuleState.angle.times(swerveModuleState.angle.minus(currentAngle).getCos());
 
     driveController.setReference(
