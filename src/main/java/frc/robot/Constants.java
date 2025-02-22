@@ -17,6 +17,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.SerialPort;
 import frc.lib.util.FeedforwardGains;
 import frc.lib.util.PIDGains;
 import frc.lib.util.Wheel;
@@ -167,4 +168,11 @@ public class Constants {
     public static final int INTAKE_LEFT_MOTOR_ID = 10;
     public static final int INTAKE_RIGHT_MOTOR_ID = 11;
   }
+
+  public static class LEDConstants {
+    public static final int BAUD_RATE = 115200;
+
+  }
+
+
 }
