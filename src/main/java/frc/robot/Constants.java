@@ -85,13 +85,13 @@ public class Constants {
     public static final AngularAcceleration MAX_TURN_ACCELERATION =
         RadiansPerSecondPerSecond.of(4 * Math.PI);
 
-    public static final PIDGains TURN_PID = new PIDGains.Builder().kp(0).kd(0.0).build();
-    public static final PIDGains DRIVE_PID = new PIDGains.Builder().kp(0.0).build();
+    public static final PIDGains TURN_PID = new PIDGains.Builder().kp(3).kd(0.0).build();
+    public static final PIDGains DRIVE_PID = new PIDGains.Builder().kp(0.37).build();
 
     public static final FeedforwardGains TURN_FEEDFORWARD =
-        new FeedforwardGains.Builder().kv(0.0).build();
+        new FeedforwardGains.Builder().kv(0.55).build();
     public static final FeedforwardGains DRIVE_FEEDFORWARD =
-        new FeedforwardGains.Builder().kv(0.0).build();
+        new FeedforwardGains.Builder().kv(0.24).build();
 
     public static final PIDGains TRANSLATE_ASSIST_GAINS = new PIDGains.Builder().kp(0).build();
     public static final PIDGains ANGLE_ASSIST_GAINS = new PIDGains.Builder().kp(0).build(); 
@@ -111,7 +111,7 @@ public class Constants {
 
     public static final Wheel SWERVE_WHEEL = new Wheel(Inches.of(1.5));
 
-    public static final double SWERVE_GEARING = 5.08;
+    public static final double SWERVE_GEARING = 5.50;
 
     public static final double DRIVE_CONVERSION_FACTOR = (0.038 * 2 * Math.PI) / SWERVE_GEARING;
     public static final double TURN_CONVERSION_FACTOR = 2 * Math.PI;
