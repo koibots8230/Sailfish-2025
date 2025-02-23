@@ -25,9 +25,9 @@ public class Constants {
   public static class ElevatorConstants {
     public static final Distance INTAKE_SETPOINT = Distance.ofBaseUnits(0.005, Units.Meters);
     public static final Distance L2_SETPOINT =
-        Distance.ofBaseUnits(2.65, Units.Meters); // untested value
+        Distance.ofBaseUnits(1.18, Units.Meters); // untested value
     public static final Distance L3_SETPOINT =
-        Distance.ofBaseUnits(2.65, Units.Meters); //  untested value
+        Distance.ofBaseUnits(2.04, Units.Meters); //  untested value
 
     public static final PIDGains PID = new PIDGains.Builder().kp(3.3).build();
     public static final FeedforwardGains FEEDFORWARD =
@@ -57,7 +57,7 @@ public class Constants {
     public static final FeedforwardGains FEEDFORWARD_GAINS =
         new FeedforwardGains.Builder().kv(0.0002).build();
 
-    public static final Distance TRIGGER_DISTANCE = Distance.ofBaseUnits(0.085, Units.Meters);
+    public static final Distance TRIGGER_DISTANCE = Distance.ofBaseUnits(85, Units.Millimeters);
 
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(40, Units.Amps);
 

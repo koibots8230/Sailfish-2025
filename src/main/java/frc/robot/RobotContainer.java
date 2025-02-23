@@ -8,6 +8,9 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.IntakeCommands;
+import frc.robot.commands.ScoreCommands;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.EndEffector;
 import frc.robot.subsystems.Indexer;
@@ -52,23 +55,23 @@ public class RobotContainer {
     // Trigger zero = xboxController.b();
     // zero.onTrue(swerve.zeroGyroCommand(isBlue));
 
-    // Trigger spinIntake = new Trigger(xboxController.rightTrigger());
-    // spinIntake.onTrue(
-    //     IntakeCommands.intakeCommand(intake, intakePivot, indexer, elevator, endEffector));
-    // spinIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot));
+    Trigger spinIntake = new Trigger(xboxController.rightTrigger());
+    spinIntake.onTrue(
+        IntakeCommands.intakeCommand(intake, intakePivot, indexer, elevator, endEffector));
+    spinIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector));
 
-    // Trigger reverseIntake = new Trigger(xboxController.leftTrigger());
-    // reverseIntake.onTrue(
-    //     IntakeCommands.reverseCommand(intake, intakePivot, indexer, elevator, endEffector));
-    // reverseIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot));
+    Trigger reverseIntake = new Trigger(xboxController.leftTrigger());
+    reverseIntake.onTrue(
+        IntakeCommands.reverseCommand(intake, intakePivot, indexer, elevator, endEffector));
+    reverseIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector));
 
-    // Trigger gotoLevelThree = new Trigger(xboxController.y());
-    // gotoLevelThree.onTrue(ScoreCommands.levelThree(elevator, endEffector));
-    // gotoLevelThree.onFalse(ScoreCommands.basePosition(elevator, endEffector));
+    Trigger gotoLevelThree = new Trigger(xboxController.y());
+    gotoLevelThree.onTrue(ScoreCommands.levelThree(elevator, endEffector));
+    gotoLevelThree.onFalse(ScoreCommands.basePosition(elevator, endEffector));
 
-    // Trigger gotoLevelTwo = new Trigger(xboxController.a());
-    // gotoLevelTwo.onTrue(ScoreCommands.levelTwo(elevator, endEffector));
-    // gotoLevelTwo.onFalse(ScoreCommands.basePosition(elevator, endEffector));
+    Trigger gotoLevelTwo = new Trigger(xboxController.a());
+    gotoLevelTwo.onTrue(ScoreCommands.levelTwo(elevator, endEffector));
+    gotoLevelTwo.onFalse(ScoreCommands.basePosition(elevator, endEffector));
   }
 
   private void defualtCommands() {
