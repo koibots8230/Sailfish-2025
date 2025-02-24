@@ -21,6 +21,8 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.EndEffector;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakePivot;
+import frc.robot.subsystems.LED;
+import frc.robot.subsystems.LED.State;
 import frc.robot.subsystems.Swerve;
 
 @Logged
@@ -35,6 +37,8 @@ public class RobotContainer {
   private final Intake intake;
   private final IntakePivot intakePivot;
 
+  private final LED LED;
+
   @NotLogged private final CommandXboxController xboxController;
   private boolean isBlue;
 
@@ -44,6 +48,7 @@ public class RobotContainer {
     endEffector = new EndEffector();
     intake = new Intake();
     intakePivot = new IntakePivot();
+    LED = new LED();
 
     xboxController = new CommandXboxController(0);
 
@@ -59,16 +64,16 @@ public class RobotContainer {
     testEffector.onTrue(endEffector.setVelocityCommand(EndEffectorConstants.INTAKE_SPEED));
     testEffector.onFalse(endEffector.setVelocityCommand(0));
 
-    Trigger intakeEffector = xboxController.a();
-    intakeEffector.onTrue(endEffector.intakeCommand());
-    intakeEffector.onFalse(endEffector.setVelocityCommand(0));
+    // Trigger intakeEffector = xboxController.a();
+    // intakeEffector.onTrue(endEffector.intakeCommand());
+    // intakeEffector.onFalse(endEffector.setVelocityCommand(0));
 
     Trigger outtakeEffector = xboxController.b();
     outtakeEffector.onTrue(endEffector.outtakeCommand());
     outtakeEffector.onFalse(endEffector.setVelocityCommand(0));
 
-    Trigger L1 = xboxController.a(); // TODO CHANGE VALUE TO SOMTHING ELSE SHOULD NOT HAVE TWO A
-    L1.onTrue(elevator.setPositionCommand(ElevatorConstants.L1_SETPOINT));
+    // Trigger L1 = xboxController.a(); // TODO CHANGE VALUE TO SOMTHING ELSE SHOULD NOT HAVE TWO A
+    // L1.onTrue(elevator.setPositionCommand(ElevatorConstants.L1_SETPOINT));
 
     Trigger ElevatorDown = xboxController.y();
     ElevatorDown.onTrue(elevator.setPositionCommand(ElevatorConstants.START_SETPOINT));
@@ -104,6 +109,9 @@ public class RobotContainer {
 
     // Trigger intakePivotOut = new Trigger(xboxController.b());
     // intakePivotOut.onTrue(intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION));
+
+    Trigger light = new Trigger(xboxController.a());
+    light.onTrue(LED.LEDCommand(State.S1));
   }
 
   private void defualtCommands() {
