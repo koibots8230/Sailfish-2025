@@ -219,13 +219,6 @@ public class Swerve extends SubsystemBase {
   }
 
   private void driveFieldRelative(LinearVelocity x, LinearVelocity y, AngularVelocity omega) {
-    estimatedPosition =
-        new Pose2d(
-            estimatedPosition.getX() + x.times(RobotConstants.ROBOT_CLOCK_SPEED).in(Meters),
-            estimatedPosition.getY() + (y.times(RobotConstants.ROBOT_CLOCK_SPEED).in(Meters)),
-            new Rotation2d(
-                estimatedPosition.getRotation().getRadians() + omega.in(RadiansPerSecond)));
-
     ChassisSpeeds speeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(
             x.in(MetersPerSecond), y.in(MetersPerSecond), omega.in(RadiansPerSecond), gyroAngle);

@@ -80,9 +80,9 @@ public class Constants {
     public static final LinearVelocity MAX_SPEED = MetersPerSecond.of(4.25);
     public static final AngularVelocity MAX_ROTATION = RadiansPerSecond.of(2 * Math.PI);
 
-    public static final AngularVelocity MAX_TURN_VECLOCITY = RadiansPerSecond.of(2 * Math.PI);
+    public static final AngularVelocity MAX_TURN_VECLOCITY = RadiansPerSecond.of(10 * Math.PI);
     public static final AngularAcceleration MAX_TURN_ACCELERATION =
-        RadiansPerSecondPerSecond.of(4 * Math.PI);
+        RadiansPerSecondPerSecond.of(16 * Math.PI);
 
     public static final PIDGains TURN_PID = new PIDGains.Builder().kp(3).kd(0.0).build();
     public static final PIDGains DRIVE_PID = new PIDGains.Builder().kp(0.37).build();
