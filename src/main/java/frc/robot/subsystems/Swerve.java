@@ -119,7 +119,6 @@ public class Swerve extends SubsystemBase {
 
   public void followTerjectory(SwerveSample sample) {
     Pose2d pose = getEstimatedPosition();
-
     ChassisSpeeds speeds =
         new ChassisSpeeds(
             sample.vx + xController.calculate(pose.getX(), sample.x),
@@ -127,11 +126,11 @@ public class Swerve extends SubsystemBase {
             sample.omega
                 + headingController.calculate(pose.getRotation().getRadians(), sample.heading));
 
-//    driveRobotRelative(speeds);
+      driveRobotRelative(speeds);
   }
 
   public void setOdometry(Pose2d pose) {
-    odometry.resetPose(pose);
+  odometry.resetPose(pose);
   }
 
   public void setIsBlue(boolean colour) {

@@ -71,10 +71,8 @@ public class RobotContainer {
             swerve::getEstimatedPosition,
             swerve::setOdometry,
             swerve::followTerjectory,
-            true, // fpr debugging purposes
+            isBlue, 
             swerve);
-
-    Command myTjectory = autoFactory.trajectoryCmd("New Path");
 
     autoFactory.bind("Score Level Three", ScoreCommands.levelThree(elevator, endEffector));
     autoFactory.bind("Score Level Two", ScoreCommands.levelTwo(elevator, endEffector));
@@ -137,9 +135,10 @@ public class RobotContainer {
 
   public void autonomousInit() {
     isBlue = (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
+    
   }
 
-  // public Command getAutonomousCommand() {
-    
-  // }
+  public Command getAutonomousCommand() {
+    return autoFactory.trajectoryCmd("goup");
+  }
 }
