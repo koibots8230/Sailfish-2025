@@ -55,7 +55,8 @@ public class Vision extends SubsystemBase {
     vecSubscribers = new DoubleArraySubscriber[VisionConstants.ACTIVE_CAMERAS][2];
     idSubscribers = new IntegerSubscriber[VisionConstants.ACTIVE_CAMERAS];
 
-    NetworkTable table = NetworkTableInstance.getDefault().getTable("fisheye");
+    NetworkTable table =
+        NetworkTableInstance.getDefault().getTable("fisheye");
 
     for (int a = 0; a < VisionConstants.ACTIVE_CAMERAS; a++) {
       IntegerTopic topic = table.getIntegerTopic(VisionConstants.TOPIC_NAMES[a][2]);
@@ -63,7 +64,6 @@ public class Vision extends SubsystemBase {
       idSubscribers[a] =
           topic.subscribe(
               VisionConstants.ID_DEFAULT_VALUE,
-              PubSubOption.pollStorage(10),
               PubSubOption.sendAll(true),
               PubSubOption.keepDuplicates(true));
 
@@ -73,7 +73,6 @@ public class Vision extends SubsystemBase {
         vecSubscribers[a][b] =
             topic2.subscribe(
                 VisionConstants.VECTOR_DEFAULT_VALUE,
-                PubSubOption.pollStorage(10),
                 PubSubOption.sendAll(true),
                 PubSubOption.keepDuplicates(true));
       }
@@ -143,29 +142,36 @@ public class Vision extends SubsystemBase {
   public void periodic() {
     for (int a = 0; a < VisionConstants.ACTIVE_CAMERAS; a++) {
       TimestampedDoubleArray[] tvec = vecSubscribers[a][0].readQueue();
-      TimestampedDoubleArray[] rvec = vecSubscribers[a][1].readQueue();
+      TimestampedDoubleArray[] rmat = vecSubscribers[a][1].readQueue();
       TimestampedInteger[] ids = idSubscribers[a].readQueue();
-      if (tvec.length == 0 || rvec.length == 0 || ids.length == 0) {
+
+      if (tvec.length == 0 || rmat.length == 0 || ids.length == 0) {
         continue;
       } else if (tvec[0].value.length == 1) {
         continue;
       }
-      while (!(tvec.length == rvec.length && rvec.length == ids.length)) {
-        if (tvec.length > rvec.length || tvec.length > ids.length) {
+
+      while (!(tvec.length == rmat.length && rmat.length == ids.length)) {
+        if (tvec.length > rmat.length || tvec.length > ids.length) {
           tvec = Arrays.copyOf(tvec, tvec.length - 1);
         }
-        if (rvec.length > tvec.length || rvec.length > ids.length) {
-          rvec = Arrays.copyOf(rvec, rvec.length - 1);
+        if (rmat.length > tvec.length || rmat.length > ids.length) {
+          rmat = Arrays.copyOf(rmat, rmat.length - 1);
         }
-        if (ids.length > rvec.length || ids.length > tvec.length) {
+        if (ids.length > rmat.length || ids.length > tvec.length) {
           ids = Arrays.copyOf(ids, ids.length - 1);
         }
       }
+
       for (int b = 0; b < ids.length; b++) {
         if (ids[b].value != 0
-            && tvec[b].timestamp == rvec[b].timestamp
-            && rvec[b].timestamp == ids[b].timestamp) {
-          pose = translateToFieldPose(tvec[b].value, rvec[b].value, (int) ids[b].value, a);
+            && ids[b].value != 4
+            && ids[b].value != 5
+            && ids[b].value != 14
+            && ids[b].value != 15
+            && tvec[b].timestamp == rmat[b].timestamp
+            && rmat[b].timestamp == ids[b].timestamp) {
+          pose = translateToFieldPose(tvec[b].value, rmat[b].value, (int) ids[b].value, a);
           if (withinField(pose)
               && ((RobotState.isDisabled())
                   ? true

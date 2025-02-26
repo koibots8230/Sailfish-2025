@@ -26,9 +26,9 @@ public class Constants {
   public static class ElevatorConstants {
     public static final Distance INTAKE_SETPOINT = Distance.ofBaseUnits(0.005, Units.Meters);
     public static final Distance L2_SETPOINT =
-        Distance.ofBaseUnits(2.65, Units.Meters); // untested value
+        Distance.ofBaseUnits(1.18, Units.Meters); // untested value
     public static final Distance L3_SETPOINT =
-        Distance.ofBaseUnits(2.65, Units.Meters); //  untested value
+        Distance.ofBaseUnits(2.04, Units.Meters); //  untested value
 
     public static final PIDGains PID = new PIDGains.Builder().kp(3.3).build();
     public static final FeedforwardGains FEEDFORWARD =
@@ -50,7 +50,7 @@ public class Constants {
   }
 
   public static class EndEffectorConstants {
-    public static final double INTAKE_SPEED = 250;
+    public static final double INTAKE_SPEED = 750;
     public static final double OUTTAKE_SPEED =
         1000; // TODO: Turn back into units once not bugged anymore :(
 
@@ -58,7 +58,7 @@ public class Constants {
     public static final FeedforwardGains FEEDFORWARD_GAINS =
         new FeedforwardGains.Builder().kv(0.0002).build();
 
-    public static final Distance TRIGGER_DISTANCE = Distance.ofBaseUnits(0.085, Units.Meters);
+    public static final Distance TRIGGER_DISTANCE = Distance.ofBaseUnits(85, Units.Millimeters);
 
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(40, Units.Amps);
 
@@ -81,20 +81,16 @@ public class Constants {
     public static final LinearVelocity MAX_SPEED = MetersPerSecond.of(4.25);
     public static final AngularVelocity MAX_ROTATION = RadiansPerSecond.of(2 * Math.PI);
 
-    public static final AngularVelocity MAX_TURN_VECLOCITY = RadiansPerSecond.of(2 * Math.PI);
+    public static final AngularVelocity MAX_TURN_VECLOCITY = RadiansPerSecond.of(10 * Math.PI);
     public static final AngularAcceleration MAX_TURN_ACCELERATION =
-        RadiansPerSecondPerSecond.of(4 * Math.PI);
+        RadiansPerSecondPerSecond.of(16 * Math.PI);
 
     public static final PIDGains TURN_PID = new PIDGains.Builder().kp(3).kd(0.0).build();
     public static final PIDGains DRIVE_PID = new PIDGains.Builder().kp(0.37).build();
-
     public static final FeedforwardGains TURN_FEEDFORWARD =
         new FeedforwardGains.Builder().kv(0.55).build();
     public static final FeedforwardGains DRIVE_FEEDFORWARD =
         new FeedforwardGains.Builder().kv(0.24).build();
-
-    public static final PIDGains TRANSLATE_ASSIST_GAINS = new PIDGains.Builder().kp(0).build();
-    public static final PIDGains ANGLE_ASSIST_GAINS = new PIDGains.Builder().kp(0).build(); 
 
     public static final double MAX_VELOCITY = 10 * Math.PI;
     public static final double MAX_ACCELRATION = 16 * Math.PI;
@@ -144,6 +140,31 @@ public class Constants {
     public static final int GYRO_ID = 9;
   }
 
+  public static class AlignConstants {
+    public static final Distance MIN_DISTANCE = Meters.of(2.0);
+
+    public static final Pose2d[] REEF_SIDES =
+        new Pose2d[] { // Starts from side closest to DS and goes counterclockwise
+          new Pose2d(3.2258, 4.02082, Rotation2d.fromDegrees(180)),
+          new Pose2d(3.6999562, 3.085338, Rotation2d.fromDegrees(240)),
+          new Pose2d(5.27869, 3.085338, Rotation2d.fromDegrees(300)),
+          new Pose2d(5.752846, 4.02082, Rotation2d.fromDegrees(0)),
+          new Pose2d(5.27869, 4.956302, Rotation2d.fromDegrees(60)),
+          new Pose2d(3.6999562, 4.956302, Rotation2d.fromDegrees(120))
+        };
+
+    public static final Distance RED_REEF_OFFSET = Meters.of(8.569706);
+
+    public static final PIDGains TRANSLATE_PID = new PIDGains.Builder().kp(0).build();
+    public static final PIDGains ANGLE_PID = new PIDGains.Builder().kp(0).build();
+
+    public static final Angle DIRECTION_ANGLE_RANGE_CLOSE = Radians.of(Math.PI / 1.85);
+
+    public static final double DISTANCE_ANGLE_RANGE_SCALAR = 0.65;
+
+    public static final Distance POLE_SPACING = Meters.of(0.1651);
+  }
+
   public static class IntakePivotConstants {
     public static final Angle OUT_POSITION = Angle.ofBaseUnits(10, Radians);
     public static final Angle IN_POSITION = Angle.ofBaseUnits(0, Radians);
@@ -168,9 +189,9 @@ public class Constants {
   }
 
   public static class IntakeConstants {
-    public static final AngularVelocity INTAKE_VELOCITY = AngularVelocity.ofBaseUnits(1000, RPM);
+    public static final AngularVelocity INTAKE_VELOCITY = AngularVelocity.ofBaseUnits(2500, RPM);
     public static final AngularVelocity REVERSE_INTAKE_VELOCITY =
-        AngularVelocity.ofBaseUnits(-1000, RPM);
+        AngularVelocity.ofBaseUnits(-2000, RPM);
 
     public static final PIDGains PID = new PIDGains.Builder().kp(0).build();
     public static final FeedforwardGains FEEDFORWARD =
@@ -182,8 +203,8 @@ public class Constants {
   }
 
   public static class IndexerConstants {
-    public static final double INDEX_VELOCITY = 1000;
-    public static final double REVERSE_VELOCITY = -1000;
+    public static final double INDEX_VELOCITY = 2000;
+    public static final double REVERSE_VELOCITY = -1500;
 
     public static final PIDGains PID = new PIDGains.Builder().kp(0.0000).build();
     public static final FeedforwardGains FEEDFORWARD =
@@ -203,8 +224,8 @@ public class Constants {
     }; // x is forward, y is left, counterclockwise on rotation
 
     public static final String[][] TOPIC_NAMES = {
-      {"Cam1Tvec", "Cam1Rvec", "Cam1Ids"},
-      {"Cam2Tvec", "Cam2Rvec", "Cam2Ids"}
+      {"camera0/tvec", "camera0/rmat", "camera0/id"},
+      {"camera1/tvec", "camera1/rmat", "camera1/id"}
       // {"Cam3Tvec", "Cam3Rvec", "Cam3Ids"},
       // {"Cam4Tvec", "Cam4Rvec", "Cam4Ids"}
     };
