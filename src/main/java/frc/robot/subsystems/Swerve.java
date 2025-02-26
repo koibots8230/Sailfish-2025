@@ -127,7 +127,7 @@ public class Swerve extends SubsystemBase {
             sample.omega
                 + headingController.calculate(pose.getRotation().getRadians(), sample.heading));
 
-    driveRobotRelative(speeds);
+//    driveRobotRelative(speeds);
   }
 
   public void setOdometry(Pose2d pose) {
@@ -148,11 +148,10 @@ public class Swerve extends SubsystemBase {
 
     estimatedPosition =
         odometry.update(
-            isBlue ? gyroAngle : gyroAngle.minus(new Rotation2d(Math.PI)),
+            !isBlue ? gyroAngle : gyroAngle.minus(new Rotation2d(Math.PI)),
             this.getModulePostition());
 
     gyroAngle = gyro.getRotation2d();
-
     messuredStates[0] = modules.frontLeft.getModuleState();
     messuredStates[1] = modules.frontRight.getModuleState();
     messuredStates[2] = modules.backLeft.getModuleState();
@@ -222,6 +221,7 @@ public class Swerve extends SubsystemBase {
     ChassisSpeeds speeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(
             x.in(MetersPerSecond), y.in(MetersPerSecond), omega.in(RadiansPerSecond), gyroAngle);
+        driveRobotRelative(speeds);
   }
 
   public void zeroGyro() {

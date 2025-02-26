@@ -74,7 +74,7 @@ public class RobotContainer {
             true, // fpr debugging purposes
             swerve);
 
-    Command myTjectory = autoFactory.trajectoryCmd("myTrajectory");
+    Command myTjectory = autoFactory.trajectoryCmd("New Path");
 
     autoFactory.bind("Score Level Three", ScoreCommands.levelThree(elevator, endEffector));
     autoFactory.bind("Score Level Two", ScoreCommands.levelTwo(elevator, endEffector));
@@ -82,7 +82,7 @@ public class RobotContainer {
     // autoChooser = AutoBuilder.buildAutoChooser();
     // SmartDashboard.putData("Auto Chooser", autoChooser);
     
-    autochooser.setDefaultOption("Score Level Three", autoFactory.trajectoryCmd("Newpath"));
+    autochooser.setDefaultOption("Score Level Three", autoFactory.trajectoryCmd("New Path"));
 
     SmartDashboard.putData(CommandScheduler.getInstance());
     SmartDashboard.putData(autochooser);    
@@ -139,7 +139,7 @@ public class RobotContainer {
     isBlue = (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
   }
 
-  public Command getAutonomousCommand() {
-    return autoFactory.trajectoryCmd("Newpath");
-  }
+  // public Command getAutonomousCommand() {
+    
+  // }
 }
