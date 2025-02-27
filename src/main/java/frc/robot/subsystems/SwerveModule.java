@@ -178,10 +178,9 @@ public class SwerveModule {
         Voltage.ofBaseUnits(driveMotor.getBusVoltage() * driveMotor.getAppliedOutput(), Volts);
     turnVoltage =
         Voltage.ofBaseUnits(turnMotor.getBusVoltage() * turnMotor.getAppliedOutput(), Volts);
-    // drivePosition = driveEncoder.getPosition();
-    // turnPosition = turnEncoder.getPosition() - offset.getRadians();
-    // driveVelocity = driveEncoder.getVelocity();
-    // TODO: Uncomment
+    drivePosition = driveEncoder.getPosition();
+    turnPosition = turnEncoder.getPosition() - offset.getRadians();
+    driveVelocity = driveEncoder.getVelocity();
     turnVelocity = AngularVelocity.ofBaseUnits(turnEncoder.getVelocity(), Units.RadiansPerSecond);
 
     turnGoalState = new TrapezoidProfile.State(turnSetpoint.in(Radians) + offset.getRadians(), 0);
