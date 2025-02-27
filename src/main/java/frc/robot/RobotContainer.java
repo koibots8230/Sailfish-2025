@@ -9,9 +9,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.subsystems.*;
 import frc.lib.util.ReefAlignState;
 import frc.robot.commands.*;
+import frc.robot.subsystems.*;
 
 @Logged
 public class RobotContainer {
@@ -68,12 +68,16 @@ public class RobotContainer {
 
     Trigger gotoLevelThree = new Trigger(xboxController.y());
     gotoLevelThree.onTrue(
-      Commands.sequence(ScoreCommands.levelThree(elevator, endEffector), swerve.setReefAlignStateCommand(ReefAlignState.disabled)));
+        Commands.sequence(
+            ScoreCommands.levelThree(elevator, endEffector),
+            swerve.setReefAlignStateCommand(ReefAlignState.disabled)));
     gotoLevelThree.onFalse(ScoreCommands.basePosition(elevator, endEffector));
 
     Trigger gotoLevelTwo = new Trigger(xboxController.a());
     gotoLevelTwo.onTrue(
-      Commands.sequence(ScoreCommands.levelTwo(elevator, endEffector), swerve.setReefAlignStateCommand(ReefAlignState.disabled)));
+        Commands.sequence(
+            ScoreCommands.levelTwo(elevator, endEffector),
+            swerve.setReefAlignStateCommand(ReefAlignState.disabled)));
     gotoLevelTwo.onFalse(ScoreCommands.basePosition(elevator, endEffector));
 
     Trigger alignRight = xboxController.rightBumper();

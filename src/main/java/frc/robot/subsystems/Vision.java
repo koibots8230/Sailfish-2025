@@ -55,8 +55,7 @@ public class Vision extends SubsystemBase {
     vecSubscribers = new DoubleArraySubscriber[VisionConstants.ACTIVE_CAMERAS][2];
     idSubscribers = new IntegerSubscriber[VisionConstants.ACTIVE_CAMERAS];
 
-    NetworkTable table =
-        NetworkTableInstance.getDefault().getTable("fisheye");
+    NetworkTable table = NetworkTableInstance.getDefault().getTable("fisheye");
 
     for (int a = 0; a < VisionConstants.ACTIVE_CAMERAS; a++) {
       IntegerTopic topic = table.getIntegerTopic(VisionConstants.TOPIC_NAMES[a][2]);

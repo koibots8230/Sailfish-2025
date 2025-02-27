@@ -178,7 +178,7 @@ public class SwerveModule {
         Voltage.ofBaseUnits(driveMotor.getBusVoltage() * driveMotor.getAppliedOutput(), Volts);
     turnVoltage =
         Voltage.ofBaseUnits(turnMotor.getBusVoltage() * turnMotor.getAppliedOutput(), Volts);
-    // drivePosition = driveEncoder.getPosition(); 
+    // drivePosition = driveEncoder.getPosition();
     // turnPosition = turnEncoder.getPosition() - offset.getRadians();
     // driveVelocity = driveEncoder.getVelocity();
     // TODO: Uncomment

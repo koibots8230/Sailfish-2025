@@ -15,24 +15,21 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.util.ReefAlignState;
 import frc.lib.util.VisionMeasurement;
 import frc.robot.Constants.*;
-import frc.lib.util.ReefAlignState;
 import java.util.function.DoubleSupplier;
 
 @Logged
@@ -92,10 +89,7 @@ public class Swerve extends SubsystemBase {
 
     odometry =
         new SwerveDrivePoseEstimator(
-            SwerveConstants.KINEMATICS,
-            gyroAngle,
-            this.getModulePostition(),
-            estimatedPosition);
+            SwerveConstants.KINEMATICS, gyroAngle, this.getModulePostition(), estimatedPosition);
 
     simHeading = new Rotation2d(0.0);
 
@@ -114,9 +108,7 @@ public class Swerve extends SubsystemBase {
 
     anglePID =
         new PIDController(
-            AlignConstants.ANGLE_PID.kp,
-            AlignConstants.ANGLE_PID.ki,
-            AlignConstants.ANGLE_PID.kd);
+            AlignConstants.ANGLE_PID.kp, AlignConstants.ANGLE_PID.ki, AlignConstants.ANGLE_PID.kd);
 
     anglePID.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -214,13 +206,14 @@ public class Swerve extends SubsystemBase {
                         + Math.pow((points[1].getX() - points[0].getX()), 2)));
 
     LinearVelocity assistVelocity =
-        MetersPerSecond.of(
-            distancePerpToVel.in(Meters) * AlignConstants.TRANSLATE_PID.kp);
+        MetersPerSecond.of(distancePerpToVel.in(Meters) * AlignConstants.TRANSLATE_PID.kp);
 
     return new Pose2d(
         assistVelocity.in(MetersPerSecond) * angleToTarget.getCos(),
         assistVelocity.in(MetersPerSecond) * angleToTarget.getSin(),
-        new Rotation2d(anglePID.calculate(gyroAngle.getRadians(), targetAngle.getRadians() + (isBlue ? 0 : Math.PI))));
+        new Rotation2d(
+            anglePID.calculate(
+                gyroAngle.getRadians(), targetAngle.getRadians() + (isBlue ? 0 : Math.PI))));
   }
 
   private Distance distanceToPose(Pose2d pose) {
@@ -237,10 +230,9 @@ public class Swerve extends SubsystemBase {
           isBlue
               ? side
               : new Pose2d(
-                side.getX() + AlignConstants.RED_REEF_OFFSET.in(Meters),
-                side.getY(),
-                side.getRotation()
-              );
+                  side.getX() + AlignConstants.RED_REEF_OFFSET.in(Meters),
+                  side.getY(),
+                  side.getRotation());
       closest = distanceToPose(closest).lt(distanceToPose(side)) ? closest : side;
     }
     return closest;
@@ -248,16 +240,32 @@ public class Swerve extends SubsystemBase {
 
   private Translation2d getEffectorOffset(Pose2d side) {
     return new Translation2d(
-      (Math.sin(2 * side.getRotation().getRadians()) * AlignConstants.EFFECTOR_OFFSET.in(Meters) * (side.getRotation().getRadians() >= Math.PI / 3.0 && side.getRotation().getRadians() <= (2 * Math.PI) / 3.0 ? -1 : 1)),
-      (Math.cos(2 * side.getRotation().getRadians()) * AlignConstants.EFFECTOR_OFFSET.in(Meters) * (side.getRotation().getRadians() >= Math.PI / 3.0 && side.getRotation().getRadians() <= (2 * Math.PI) / 3.0 ? -1 : 1))
-    );
+        (Math.sin(2 * side.getRotation().getRadians())
+            * AlignConstants.EFFECTOR_OFFSET.in(Meters)
+            * (side.getRotation().getRadians() >= Math.PI / 3.0
+                    && side.getRotation().getRadians() <= (2 * Math.PI) / 3.0
+                ? -1
+                : 1)),
+        (Math.cos(2 * side.getRotation().getRadians())
+            * AlignConstants.EFFECTOR_OFFSET.in(Meters)
+            * (side.getRotation().getRadians() >= Math.PI / 3.0
+                    && side.getRotation().getRadians() <= (2 * Math.PI) / 3.0
+                ? -1
+                : 1)));
   }
 
   private Translation2d getPoleTranslation(Pose2d side, boolean rightPole) {
     return new Translation2d(
-      side.getX() + (Math.sin(2 * side.getRotation().getRadians()) * AlignConstants.POLE_SPACING.in(Meters) * (rightPole ? 1 : -1) * (side.getRotation().getRadians() == Math.PI ? -1 : 1)),
-      side.getY() + (Math.cos(2 * side.getRotation().getRadians()) * AlignConstants.POLE_SPACING.in(Meters) * (rightPole ? 1 : -1) * (side.getRotation().getRadians() == Math.PI ? -1 : 1))
-    );
+        side.getX()
+            + (Math.sin(2 * side.getRotation().getRadians())
+                * AlignConstants.POLE_SPACING.in(Meters)
+                * (rightPole ? 1 : -1)
+                * (side.getRotation().getRadians() == Math.PI ? -1 : 1)),
+        side.getY()
+            + (Math.cos(2 * side.getRotation().getRadians())
+                * AlignConstants.POLE_SPACING.in(Meters)
+                * (rightPole ? 1 : -1)
+                * (side.getRotation().getRadians() == Math.PI ? -1 : 1)));
   }
 
   private Pose2d reefAlignAssist(double xInput, double yInput, double omega) {
@@ -265,22 +273,21 @@ public class Swerve extends SubsystemBase {
     yInput = isBlue ? yInput : -yInput;
     omega = isBlue ? omega : -omega;
 
-
     Pose2d closestSide = getReefSide();
 
     Pose2d pose;
-    switch(reefAlignState) {
+    switch (reefAlignState) {
       case rightSide:
-        pose = new Pose2d(
-          getPoleTranslation(closestSide, true).plus(getEffectorOffset(closestSide)),
-          closestSide.getRotation()
-        );
+        pose =
+            new Pose2d(
+                getPoleTranslation(closestSide, true).plus(getEffectorOffset(closestSide)),
+                closestSide.getRotation());
         break;
       case leftSide:
-        pose = new Pose2d(
-          getPoleTranslation(closestSide, false).plus(getEffectorOffset(closestSide)),
-          closestSide.getRotation()
-        );
+        pose =
+            new Pose2d(
+                getPoleTranslation(closestSide, false).plus(getEffectorOffset(closestSide)),
+                closestSide.getRotation());
         break;
       case disabled:
         alignTarget = Pose2d.kZero;
@@ -289,7 +296,7 @@ public class Swerve extends SubsystemBase {
         alignTarget = Pose2d.kZero;
         return Pose2d.kZero;
     }
-    
+
     if (distanceToPose(pose).gte(AlignConstants.MIN_DISTANCE)) {
       alignTarget = Pose2d.kZero;
       return Pose2d.kZero;
@@ -300,10 +307,15 @@ public class Swerve extends SubsystemBase {
     Rotation2d angleRange =
         Rotation2d.fromRadians(
             AlignConstants.DIRECTION_ANGLE_RANGE_CLOSE.in(Radians)
-                - (distanceToPose(pose).in(Meters)
-                    * AlignConstants.DISTANCE_ANGLE_RANGE_SCALAR));
+                - (distanceToPose(pose).in(Meters) * AlignConstants.DISTANCE_ANGLE_RANGE_SCALAR));
 
-    if (Math.abs((movementDirection.getRadians() - pose.getRotation().unaryMinus().getRadians() + Math.PI) % (2 * Math.PI) - Math.PI) > angleRange.getRadians()) {
+    if (Math.abs(
+            (movementDirection.getRadians()
+                        - pose.getRotation().unaryMinus().getRadians()
+                        + Math.PI)
+                    % (2 * Math.PI)
+                - Math.PI)
+        > angleRange.getRadians()) {
       alignTarget = Pose2d.kZero;
       return Pose2d.kZero;
     }
@@ -329,9 +341,11 @@ public class Swerve extends SubsystemBase {
 
     driveFieldRelative(
         MetersPerSecond.of(
-            MathUtil.applyDeadband(x + (assist.getX() * (isBlue ? -1 : 1)), SwerveConstants.DEADBAND)),
+            MathUtil.applyDeadband(
+                x + (assist.getX() * (isBlue ? -1 : 1)), SwerveConstants.DEADBAND)),
         MetersPerSecond.of(
-            MathUtil.applyDeadband(y + (assist.getY() * (isBlue ? -1 : 1)), SwerveConstants.DEADBAND)),
+            MathUtil.applyDeadband(
+                y + (assist.getY() * (isBlue ? -1 : 1)), SwerveConstants.DEADBAND)),
         RadiansPerSecond.of(
             MathUtil.applyDeadband(
                 -omega + assist.getRotation().getRadians(), SwerveConstants.DEADBAND)));
@@ -344,8 +358,7 @@ public class Swerve extends SubsystemBase {
   public void driveRobotRelative(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
     setpointStates = SwerveConstants.KINEMATICS.toSwerveModuleStates(speeds);
 
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        setpointStates, SwerveConstants.MAX_SPEED);
+    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, SwerveConstants.MAX_SPEED);
 
     modules.frontLeft.setState(setpointStates[0]);
     modules.frontRight.setState(setpointStates[1]);
