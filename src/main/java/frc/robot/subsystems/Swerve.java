@@ -125,6 +125,10 @@ public class Swerve extends SubsystemBase {
   public void followTrajectory(SwerveSample sample) {
     trajectorySample = new Pose2d(sample.x, sample.y, new Rotation2d(sample.heading));
 
+    System.out.println("Sample:");
+    System.out.println("T: " + trajectorySample.toString());
+    System.out.println("P: " + estimatedPosition);
+
     ChassisSpeeds speeds =
         new ChassisSpeeds(
             sample.vx + xController.calculate(estimatedPosition.getX(), sample.x),
@@ -133,12 +137,19 @@ public class Swerve extends SubsystemBase {
                 + headingController.calculate(
                     estimatedPosition.getRotation().getRadians(), sample.heading));
 
+    System.out.println("S: " + speeds);
     driveRobotRelative(speeds);
   }
 
   public void setOdometry(Pose2d pose) {
+    System.out.println("Reset Pose: " + pose);
+    System.out.println("Current odometry: " + odometry.getEstimatedPosition());
     odometry.resetPose(pose);
+    System.out.println("New odometry: " + odometry.getEstimatedPosition());
+    System.out.println("Current Pose: " + estimatedPosition);
     estimatedPosition = pose; // odometry.getEstimatedPosition();
+    simHeading = pose.getRotation();
+    System.out.println("New Pose: " + estimatedPosition);
   }
 
   public void setIsBlue(boolean colour) {
@@ -155,7 +166,8 @@ public class Swerve extends SubsystemBase {
 
     estimatedPosition =
         odometry.update(
-            isBlue ? gyroAngle : gyroAngle.minus(new Rotation2d(Math.PI)),
+            gyroAngle,
+            //isBlue ? gyroAngle : gyroAngle.minus(new Rotation2d(Math.PI)),
             this.getModulePostition());
 
     gyroAngle = gyro.getRotation2d();
@@ -227,7 +239,7 @@ public class Swerve extends SubsystemBase {
   private void driveFieldRelative(LinearVelocity x, LinearVelocity y, AngularVelocity omega) {
     ChassisSpeeds speeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(
-            x.in(MetersPerSecond), y.in(MetersPerSecond), omega.in(RadiansPerSecond), gyroAngle);
+            x.in(MetersPerSecond), y.in(MetersPerSecond), omega.in(RadiansPerSecond), isBlue ? gyroAngle : gyroAngle.minus(new Rotation2d(Math.PI)));
     driveRobotRelative(speeds);
   }
 
