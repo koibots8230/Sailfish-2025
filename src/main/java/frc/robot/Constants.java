@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -49,7 +50,7 @@ public class Constants {
   }
 
   public static class EndEffectorConstants {
-    public static final double INTAKE_SPEED = 250;
+    public static final double INTAKE_SPEED = 750;
     public static final double OUTTAKE_SPEED =
         1000; // TODO: Turn back into units once not bugged anymore :(
 
@@ -80,9 +81,9 @@ public class Constants {
     public static final LinearVelocity MAX_SPEED = MetersPerSecond.of(4.25);
     public static final AngularVelocity MAX_ROTATION = RadiansPerSecond.of(2 * Math.PI);
 
-    public static final AngularVelocity MAX_TURN_VECLOCITY = RadiansPerSecond.of(2 * Math.PI);
+    public static final AngularVelocity MAX_TURN_VECLOCITY = RadiansPerSecond.of(10 * Math.PI);
     public static final AngularAcceleration MAX_TURN_ACCELERATION =
-        RadiansPerSecondPerSecond.of(4 * Math.PI);
+        RadiansPerSecondPerSecond.of(16 * Math.PI);
 
     public static final PIDGains TURN_PID = new PIDGains.Builder().kp(3).kd(0.0).build();
     public static final PIDGains DRIVE_PID = new PIDGains.Builder().kp(0.37).build();
@@ -106,7 +107,7 @@ public class Constants {
 
     public static final Wheel SWERVE_WHEEL = new Wheel(Inches.of(1.5));
 
-    public static final double SWERVE_GEARING = 5.5;
+    public static final double SWERVE_GEARING = 5.50;
 
     public static final double DRIVE_CONVERSION_FACTOR = (0.038 * 2 * Math.PI) / SWERVE_GEARING;
     public static final double TURN_CONVERSION_FACTOR = 2 * Math.PI;
@@ -139,6 +140,33 @@ public class Constants {
     public static final int GYRO_ID = 9;
   }
 
+  public static class AlignConstants {
+    public static final Distance MIN_DISTANCE = Meters.of(2.0);
+
+    public static final Pose2d[] REEF_SIDES =
+        new Pose2d[] { // Starts from side closest to DS and goes counterclockwise
+          new Pose2d(3.23215, 4.02082, Rotation2d.fromDegrees(180)),
+          new Pose2d(3.861181, 2.93278749196, Rotation2d.fromDegrees(240)),
+          new Pose2d(5.117465, 2.93278749196, Rotation2d.fromDegrees(300)),
+          new Pose2d(5.746496, 4.02082, Rotation2d.fromDegrees(0)),
+          new Pose2d(5.117465, 5.10885250804, Rotation2d.fromDegrees(60)),
+          new Pose2d(3.861181, 5.10885250804, Rotation2d.fromDegrees(120))
+        };
+
+    public static final Distance RED_REEF_OFFSET = Meters.of(8.569706);
+
+    public static final PIDGains TRANSLATE_PID = new PIDGains.Builder().kp(2).build();
+    public static final PIDGains ANGLE_PID = new PIDGains.Builder().kp(2).build();
+
+    public static final Angle DIRECTION_ANGLE_RANGE_CLOSE = Radians.of(Math.PI / 1.85);
+
+    public static final double DISTANCE_ANGLE_RANGE_SCALAR = 0.85;
+
+    public static final Distance POLE_SPACING = Meters.of(0.1651);
+
+    public static final Distance EFFECTOR_OFFSET = Meters.of(0.0216154);
+  }
+
   public static class IntakePivotConstants {
     public static final Angle OUT_POSITION = Angle.ofBaseUnits(10, Radians);
     public static final Angle IN_POSITION = Angle.ofBaseUnits(0, Radians);
@@ -163,9 +191,9 @@ public class Constants {
   }
 
   public static class IntakeConstants {
-    public static final AngularVelocity INTAKE_VELOCITY = AngularVelocity.ofBaseUnits(1000, RPM);
+    public static final AngularVelocity INTAKE_VELOCITY = AngularVelocity.ofBaseUnits(2500, RPM);
     public static final AngularVelocity REVERSE_INTAKE_VELOCITY =
-        AngularVelocity.ofBaseUnits(-1000, RPM);
+        AngularVelocity.ofBaseUnits(-2000, RPM);
 
     public static final PIDGains PID = new PIDGains.Builder().kp(0).build();
     public static final FeedforwardGains FEEDFORWARD =
@@ -177,13 +205,41 @@ public class Constants {
   }
 
   public static class IndexerConstants {
-    public static final double INDEX_VELOCITY = 1000;
-    public static final double REVERSE_VELOCITY = -1000;
+    public static final double INDEX_VELOCITY = 2000;
+    public static final double REVERSE_VELOCITY = -1500;
 
     public static final PIDGains PID = new PIDGains.Builder().kp(0.0000).build();
     public static final FeedforwardGains FEEDFORWARD =
         new FeedforwardGains.Builder().kv(0.00023).kg(0).build();
 
     public static final int MOTOR_ID = 41;
+  }
+
+  public static class VisionConstants {
+    public static final int ACTIVE_CAMERAS = 2;
+
+    public static final Pose2d[] CAMERA_POSITIONS = {
+      new Pose2d(-13.5 + 0.952, 6.0, Rotation2d.fromDegrees(180)),
+      new Pose2d(-13.5 + 0.952, -6.5, Rotation2d.fromDegrees(180))
+      // new Pose2d(-0.0, 0.0, Rotation2d.fromDegrees(180)),
+      // new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0))
+    }; // x is forward, y is left, counterclockwise on rotation
+
+    public static final String[][] TOPIC_NAMES = {
+      {"camera0/tvec", "camera0/rmat", "camera0/id"},
+      {"camera1/tvec", "camera1/rmat", "camera1/id"}
+      // {"Cam3Tvec", "Cam3Rvec", "Cam3Ids"},
+      // {"Cam4Tvec", "Cam4Rvec", "Cam4Ids"}
+    };
+
+    public static final double[] VECTOR_DEFAULT_VALUE = {0};
+    public static final int ID_DEFAULT_VALUE = 0;
+
+    public static final Distance MAX_MEASUREMENT_DIFFERENCE = Meters.of(1.5);
+    public static final Rotation2d MAX_ANGLE_DIFFERENCE = Rotation2d.fromDegrees(10);
+
+    public static final double ROTATION_STDEV = 50 * Math.PI;
+    public static final double TRANSLATION_STDEV_ORDER = 2;
+    public static final double TRANSLATION_STDEV_SCALAR = 2;
   }
 }
