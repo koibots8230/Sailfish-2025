@@ -39,7 +39,6 @@ public class Swerve extends SubsystemBase {
   private Rotation2d gyroAngle;
   private SwerveModuleState[] setpointStates;
   private final Pigeon2 gyro;
-  private final PIDController anglePID;
 
   @Logged
   public class Modules {
@@ -72,6 +71,8 @@ public class Swerve extends SubsystemBase {
   private ReefAlignState reefAlignState;
 
   private Pose2d alignTarget;
+
+  private final PIDController anglePID;
 
   RobotConfig config;
 
