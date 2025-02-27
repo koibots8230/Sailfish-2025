@@ -145,24 +145,26 @@ public class Constants {
 
     public static final Pose2d[] REEF_SIDES =
         new Pose2d[] { // Starts from side closest to DS and goes counterclockwise
-          new Pose2d(3.2258, 4.02082, Rotation2d.fromDegrees(180)),
-          new Pose2d(3.6999562, 3.085338, Rotation2d.fromDegrees(240)),
-          new Pose2d(5.27869, 3.085338, Rotation2d.fromDegrees(300)),
-          new Pose2d(5.752846, 4.02082, Rotation2d.fromDegrees(0)),
-          new Pose2d(5.27869, 4.956302, Rotation2d.fromDegrees(60)),
-          new Pose2d(3.6999562, 4.956302, Rotation2d.fromDegrees(120))
+          new Pose2d(3.23215, 4.02082, Rotation2d.fromDegrees(180)),
+          new Pose2d(3.861181, 2.93278749196, Rotation2d.fromDegrees(240)),
+          new Pose2d(5.117465, 2.93278749196, Rotation2d.fromDegrees(300)),
+          new Pose2d(5.746496, 4.02082, Rotation2d.fromDegrees(0)),
+          new Pose2d(5.117465, 5.10885250804, Rotation2d.fromDegrees(60)),
+          new Pose2d(3.861181, 5.10885250804, Rotation2d.fromDegrees(120))
         };
 
     public static final Distance RED_REEF_OFFSET = Meters.of(8.569706);
 
-    public static final PIDGains TRANSLATE_PID = new PIDGains.Builder().kp(0).build();
-    public static final PIDGains ANGLE_PID = new PIDGains.Builder().kp(0).build();
+    public static final PIDGains TRANSLATE_PID = new PIDGains.Builder().kp(2).build();
+    public static final PIDGains ANGLE_PID = new PIDGains.Builder().kp(2).build();
 
     public static final Angle DIRECTION_ANGLE_RANGE_CLOSE = Radians.of(Math.PI / 1.85);
 
-    public static final double DISTANCE_ANGLE_RANGE_SCALAR = 0.65;
+    public static final double DISTANCE_ANGLE_RANGE_SCALAR = 0.85;
 
     public static final Distance POLE_SPACING = Meters.of(0.1651);
+
+    public static final Distance EFFECTOR_OFFSET = Meters.of(0.0216154);
   }
 
   public static class IntakePivotConstants {
