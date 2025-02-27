@@ -435,7 +435,7 @@ public class Swerve extends SubsystemBase {
 
     // Apply the generated speeds
     System.out.println("Spd: " + speeds);
-    driveFieldRelative(speeds);
+    driveFieldRelative(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, pose.getRotation()));
   }
 
   public Command driveFieldRelativeCommand(
