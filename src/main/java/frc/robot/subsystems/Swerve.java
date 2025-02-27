@@ -171,42 +171,6 @@ public class Swerve extends SubsystemBase {
     };
   }
 
-  private Pose2d getAssistVelocity(
-      Translation2d targetPose, Rotation2d targetAngle, double xInput, double yInput) {
-    Translation2d[] points =
-        new Translation2d[] {
-          this.getEstimatedPosition().getTranslation(),
-          new Translation2d(
-              this.getEstimatedPosition().getX() + xInput, this.getEstimatedPosition().getY() + yInput)
-        };
-
-    Rotation2d angleToTarget =
-        Rotation2d.fromRadians(
-            Math.atan2(
-                this.getEstimatedPosition().getY() - targetPose.getY(),
-                this.getEstimatedPosition().getX() - targetPose.getX()));
-
-    Distance distancePerpToVel =
-        Meters.of( // Looks complicated, but just the "Line from two points" from this
-            // https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
-            Math.abs(
-                    ((points[1].getY() - points[0].getY()) * targetPose.getX())
-                        - ((points[1].getX() - points[0].getX()) * targetPose.getY())
-                        + (points[1].getX() * points[0].getY())
-                        - (points[1].getY() * points[0].getX()))
-                / Math.sqrt(
-                    Math.pow((points[1].getY() - points[0].getY()), 2)
-                        + Math.pow((points[1].getX() - points[0].getX()), 2)));
-
-    LinearVelocity assistVelocity =
-        MetersPerSecond.of(distancePerpToVel.in(Meters) * SwerveConstants.TRANSLATE_ASSIST_GAINS.kp);
-
-    return new Pose2d(
-        assistVelocity.in(MetersPerSecond) * angleToTarget.getCos(),
-        assistVelocity.in(MetersPerSecond) * angleToTarget.getSin(),
-        new Rotation2d(anglePID.calculate(gyroAngle.getRadians(), targetAngle.getRadians())));
-  }
-
   private void driveFieldRelativeScaler(double x, double y, double omega) {
 
     double linearMagnitude = Math.pow(Math.hypot(x, y), SwerveConstants.LEFT_STICK_SCAILING);
@@ -219,13 +183,11 @@ public class Swerve extends SubsystemBase {
     omega =
         Math.pow(omega, SwerveConstants.RIGHT_STICK_SCAILING)
             * SwerveConstants.MAX_ROTATION.in(RadiansPerSecond);
-    
-    Pose2d assist = getAssistVelocity(new Translation2d(13.85, 5.03), Rotation2d.fromRadians(Math.PI / 3.0), x, y);
 
     driveFieldRelative(
-        MetersPerSecond.of(MathUtil.applyDeadband(-x + assist.getX(), Constants.SwerveConstants.DEADBAND)),
-        MetersPerSecond.of(MathUtil.applyDeadband(y + assist.getY(), Constants.SwerveConstants.DEADBAND)),
-        RadiansPerSecond.of(MathUtil.applyDeadband(-omega + assist.getRotation().getRadians(), Constants.SwerveConstants.DEADBAND)));
+        MetersPerSecond.of(MathUtil.applyDeadband(-x, Constants.SwerveConstants.DEADBAND)),
+        MetersPerSecond.of(MathUtil.applyDeadband(y, Constants.SwerveConstants.DEADBAND)),
+        RadiansPerSecond.of(MathUtil.applyDeadband(-omega, Constants.SwerveConstants.DEADBAND)));
   }
 
   public ChassisSpeeds getChassisSpeeds() {

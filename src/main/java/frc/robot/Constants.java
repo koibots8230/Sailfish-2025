@@ -126,7 +126,7 @@ public class Constants {
     public static final Current TURN_CURRENT_LIMIT = Current.ofBaseUnits(30, Units.Amps);
     public static final Current DRIVE_CURRENT_LIMIT = Current.ofBaseUnits(80, Units.Amps);
 
-    public static final double DEADBAND = 0.05;
+    public static final double DEADBAND = 0.1;
 
     public static final double LEFT_STICK_SCAILING = 2;
 
@@ -196,15 +196,15 @@ public class Constants {
     public static final int ACTIVE_CAMERAS = 2;
 
     public static final Pose2d[] CAMERA_POSITIONS = {
-      new Pose2d(-13.5 + 0.952, 6.0, Rotation2d.fromDegrees(180)),
-      new Pose2d(-13.5 + 0.952, -6.5, Rotation2d.fromDegrees(180))
+      new Pose2d(-0.3429 + 0.0241808, 0.1524, Rotation2d.fromDegrees(180)),
+      new Pose2d(-0.3429 + 0.0241808, -0.1651, Rotation2d.fromDegrees(180))
       // new Pose2d(-0.0, 0.0, Rotation2d.fromDegrees(180)),
       // new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0))
     }; // x is forward, y is left, counterclockwise on rotation
 
     public static final String[][] TOPIC_NAMES = {
-      {"Cam1Tvec", "Cam1Rvec", "Cam1Ids"},
-      {"Cam2Tvec", "Cam2Rvec", "Cam2Ids"}
+      {"Cam1Tvec", "Cam1Rmat", "Cam1Ids"},
+      {"Cam2Tvec", "Cam2Rmat", "Cam2Ids"}
       // {"Cam3Tvec", "Cam3Rvec", "Cam3Ids"},
       // {"Cam4Tvec", "Cam4Rvec", "Cam4Ids"}
     };

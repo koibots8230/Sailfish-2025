@@ -98,6 +98,8 @@ public class Vision extends SubsystemBase {
 
     double hypotenuse = Math.hypot(translation[0], translation[2]);
 
+    System.out.println(hypotenuse);
+    
     double hypangle =
         layout.getTagPose(tagId).get().getRotation().toRotation2d().getRadians()
             - Math.atan(translation[0] / translation[2]);
@@ -107,7 +109,7 @@ public class Vision extends SubsystemBase {
             layout.getTagPose(tagId).get().getX() + (hypotenuse * Math.cos(hypangle)),
             layout.getTagPose(tagId).get().getY() + (hypotenuse * Math.sin(hypangle)),
             new Rotation2d());
-
+    
     Rotation2d angle =
         new Rotation2d(
             Math.PI
@@ -145,6 +147,7 @@ public class Vision extends SubsystemBase {
       TimestampedDoubleArray[] tvec = vecSubscribers[a][0].readQueue();
       TimestampedDoubleArray[] rvec = vecSubscribers[a][1].readQueue();
       TimestampedInteger[] ids = idSubscribers[a].readQueue();
+
       if (tvec.length == 0 || rvec.length == 0 || ids.length == 0) {
         continue;
       } else if (tvec[0].value.length == 1) {
