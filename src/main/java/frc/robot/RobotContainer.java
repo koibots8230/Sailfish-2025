@@ -4,21 +4,17 @@
 
 package frc.robot;
 
-import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.simulation.SendableChooserSim;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.ScoreCommands;
 import frc.robot.subsystems.Elevator;
@@ -46,8 +42,8 @@ public class RobotContainer {
   @NotLogged private final CommandXboxController xboxController;
   private boolean isBlue;
 
-  public RobotContainer() {
-    swerve = new Swerve();
+  public RobotContainer(boolean isSimulated) {
+    swerve = new Swerve(isSimulated);
     elevator = new Elevator();
     endEffector = new EndEffector();
     intake = new Intake();
@@ -70,8 +66,8 @@ public class RobotContainer {
         new AutoFactory(
             swerve::getEstimatedPosition,
             swerve::setOdometry,
-            swerve::followTerjectory,
-            isBlue, 
+            swerve::followTrajectory,
+            true,
             swerve);
 
     autoFactory.bind("Score Level Three", ScoreCommands.levelThree(elevator, endEffector));
@@ -79,18 +75,18 @@ public class RobotContainer {
 
     // autoChooser = AutoBuilder.buildAutoChooser();
     // SmartDashboard.putData("Auto Chooser", autoChooser);
-    
+
     autochooser.setDefaultOption("Score Level Three", autoFactory.trajectoryCmd("New Path"));
 
     SmartDashboard.putData(CommandScheduler.getInstance());
-    SmartDashboard.putData(autochooser);    
+    SmartDashboard.putData(autochooser);
 
     configureBindings();
     defualtCommands();
   }
 
   private Command scoreLevelThree() {
-  System.out.println("this is being run");
+    System.out.println("this is being run");
     return ScoreCommands.levelThree(elevator, endEffector);
   }
 
@@ -129,16 +125,18 @@ public class RobotContainer {
             xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
   }
 
+  // Setting isBlue in both teleopInit and autoInit to make it easier for testing with Glass
   public void teleopInit() {
+    isBlue = (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
     swerve.setIsBlue(isBlue);
   }
 
   public void autonomousInit() {
     isBlue = (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
-    
+    swerve.setIsBlue(isBlue);
   }
 
   public Command getAutonomousCommand() {
-    return autoFactory.trajectoryCmd("goup");
+    return Commands.sequence(autoFactory.resetOdometry("Test"), autoFactory.trajectoryCmd("Test"));
   }
 }

@@ -73,8 +73,10 @@ public class SwerveModule {
   private final Rotation2d offset;
 
   private final Rotation2d currentAngle;
+  private boolean isSimulated;
 
-  public SwerveModule(int driveID, int turnID) {
+  public SwerveModule(int driveID, int turnID, boolean isSimulated) {
+    this.isSimulated = isSimulated;
 
     if (driveID == SwerveConstants.FRONT_LEFT_DRIVE_ID) {
       offset = SwerveConstants.OFFSETS[0];
@@ -172,28 +174,31 @@ public class SwerveModule {
   }
 
   public void periodic() {
-    // driveCurrent = Current.ofBaseUnits(driveMotor.getOutputCurrent(), Units.Amps);
-    // turnCurrent = Current.ofBaseUnits(turnMotor.getOutputCurrent(), Units.Amps);
-    // driveVoltage =
-    //     Voltage.ofBaseUnits(driveMotor.getBusVoltage() * driveMotor.getAppliedOutput(), Volts);
-    // turnVoltage =
-    //     Voltage.ofBaseUnits(turnMotor.getBusVoltage() * turnMotor.getAppliedOutput(), Volts);
-    // drivePosition = driveEncoder.getPosition();
-    // turnPosition = turnEncoder.getPosition() - offset.getRadians();
-    // driveVelocity = driveEncoder.getVelocity();
-    // turnVelocity = AngularVelocity.ofBaseUnits(turnEncoder.getVelocity(), Units.RadiansPerSecond);
+    if (!isSimulated) {
+      drivePosition = driveEncoder.getPosition();
+      turnPosition = turnEncoder.getPosition() - offset.getRadians();
+      driveVelocity = driveEncoder.getVelocity();
+      turnVelocity = AngularVelocity.ofBaseUnits(turnEncoder.getVelocity(), Units.RadiansPerSecond);
+    }
+    turnGoalState = new TrapezoidProfile.State(turnSetpoint.in(Radians) + offset.getRadians(), 0);
 
-    // turnGoalState = new TrapezoidProfile.State(turnSetpoint.in(Radians) + offset.getRadians(), 0);
+    turnSetpointState =
+        turnProfile.calculate(
+            RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds), turnSetpointState, turnGoalState);
 
-    // turnSetpointState =
-    //     turnProfile.calculate(
-    //         RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds), turnSetpointState, turnGoalState);
+    turnController.setReference(
+        turnSetpointState.position,
+        ControlType.kPosition,
+        ClosedLoopSlot.kSlot0,
+        turnFeedforward.calculate(turnSetpointState.velocity));
 
-    // turnController.setReference(
-    //     turnSetpointState.position,
-    //     ControlType.kPosition,
-    //     ClosedLoopSlot.kSlot0,
-    //     turnFeedforward.calculate(turnSetpointState.velocity));
+    // Logging
+    driveCurrent = Current.ofBaseUnits(driveMotor.getOutputCurrent(), Units.Amps);
+    turnCurrent = Current.ofBaseUnits(turnMotor.getOutputCurrent(), Units.Amps);
+    driveVoltage =
+        Voltage.ofBaseUnits(driveMotor.getBusVoltage() * driveMotor.getAppliedOutput(), Volts);
+    turnVoltage =
+        Voltage.ofBaseUnits(turnMotor.getBusVoltage() * turnMotor.getAppliedOutput(), Volts);
   }
 
   public void simulationPeriodic() {

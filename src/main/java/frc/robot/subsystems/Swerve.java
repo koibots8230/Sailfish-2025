@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
@@ -37,6 +36,7 @@ public class Swerve extends SubsystemBase {
   private final PIDController headingController = new PIDController(7.5, 0.0, 0.0);
 
   private Pose2d estimatedPosition;
+  private Pose2d trajectorySample = new Pose2d();
   private Rotation2d simHeading;
   private Rotation2d gyroAngle;
   private SwerveModuleState[] setpointStates;
@@ -49,16 +49,21 @@ public class Swerve extends SubsystemBase {
     final SwerveModule backLeft;
     final SwerveModule backRight;
 
-    public Modules() {
+    public Modules(boolean isSimulated) {
       frontLeft =
-          new SwerveModule(SwerveConstants.FRONT_LEFT_DRIVE_ID, SwerveConstants.FRONT_LEFT_TURN_ID);
+          new SwerveModule(
+              SwerveConstants.FRONT_LEFT_DRIVE_ID, SwerveConstants.FRONT_LEFT_TURN_ID, isSimulated);
       frontRight =
           new SwerveModule(
-              SwerveConstants.FRONT_RIGHT_DRIVE_ID, SwerveConstants.FRONT_RIGHT_TURN_ID);
+              SwerveConstants.FRONT_RIGHT_DRIVE_ID,
+              SwerveConstants.FRONT_RIGHT_TURN_ID,
+              isSimulated);
       backLeft =
-          new SwerveModule(SwerveConstants.BACK_LEFT_DRIVE_ID, SwerveConstants.BACK_LEFT_TURN_ID);
+          new SwerveModule(
+              SwerveConstants.BACK_LEFT_DRIVE_ID, SwerveConstants.BACK_LEFT_TURN_ID, isSimulated);
       backRight =
-          new SwerveModule(SwerveConstants.BACK_RIGHT_DRIVE_ID, SwerveConstants.BACK_RIGHT_TURN_ID);
+          new SwerveModule(
+              SwerveConstants.BACK_RIGHT_DRIVE_ID, SwerveConstants.BACK_RIGHT_TURN_ID, isSimulated);
     }
   }
 
@@ -72,11 +77,11 @@ public class Swerve extends SubsystemBase {
 
   RobotConfig config;
 
-  public Swerve() {
+  public Swerve(boolean isSimulated) {
 
     this.isBlue = true;
 
-    modules = new Modules();
+    modules = new Modules(isSimulated);
 
     estimatedPosition = new Pose2d();
 
@@ -117,20 +122,23 @@ public class Swerve extends SubsystemBase {
     return isBlue;
   }
 
-  public void followTerjectory(SwerveSample sample) {
-    Pose2d pose = getEstimatedPosition();
+  public void followTrajectory(SwerveSample sample) {
+    trajectorySample = new Pose2d(sample.x, sample.y, new Rotation2d(sample.heading));
+
     ChassisSpeeds speeds =
         new ChassisSpeeds(
-            sample.vx + xController.calculate(pose.getX(), sample.x),
-            sample.vy + yController.calculate(pose.getY(), sample.y),
+            sample.vx + xController.calculate(estimatedPosition.getX(), sample.x),
+            sample.vy + yController.calculate(estimatedPosition.getY(), sample.y),
             sample.omega
-                + headingController.calculate(pose.getRotation().getRadians(), sample.heading));
+                + headingController.calculate(
+                    estimatedPosition.getRotation().getRadians(), sample.heading));
 
-      driveRobotRelative(speeds);
+    driveRobotRelative(speeds);
   }
 
   public void setOdometry(Pose2d pose) {
-  odometry.resetPose(pose);
+    odometry.resetPose(pose);
+    estimatedPosition = pose; // odometry.getEstimatedPosition();
   }
 
   public void setIsBlue(boolean colour) {
@@ -147,7 +155,7 @@ public class Swerve extends SubsystemBase {
 
     estimatedPosition =
         odometry.update(
-            !isBlue ? gyroAngle : gyroAngle.minus(new Rotation2d(Math.PI)),
+            isBlue ? gyroAngle : gyroAngle.minus(new Rotation2d(Math.PI)),
             this.getModulePostition());
 
     gyroAngle = gyro.getRotation2d();
@@ -220,7 +228,7 @@ public class Swerve extends SubsystemBase {
     ChassisSpeeds speeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(
             x.in(MetersPerSecond), y.in(MetersPerSecond), omega.in(RadiansPerSecond), gyroAngle);
-        driveRobotRelative(speeds);
+    driveRobotRelative(speeds);
   }
 
   public void zeroGyro() {
@@ -241,13 +249,4 @@ public class Swerve extends SubsystemBase {
   public Command zeroGyroCommand(boolean colour) {
     return Commands.runOnce(() -> zeroGyro(), this);
   }
-
-  /**
-   * Step 3b: Public command factory driveFieldRelativeCommand that takes field-relative inputs and
-   * returns a command that passes the input parameters into the private driveFieldRelative
-   *
-   * @param X field-relative X with range of -1.0 to 1.0
-   * @param Y field-relative Y with range of -1.0 to 1.0
-   * @param Omega field-relative omega with range of -1.0 to 1.0
-   */
 }
