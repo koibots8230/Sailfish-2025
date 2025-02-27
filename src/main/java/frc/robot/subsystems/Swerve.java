@@ -41,7 +41,6 @@ public class Swerve extends SubsystemBase {
   private Rotation2d gyroAngle;
   private SwerveModuleState[] setpointStates;
   private final Pigeon2 gyro;
-  private final PIDController anglePID;
 
   @Logged
   public class Modules {
@@ -106,12 +105,6 @@ public class Swerve extends SubsystemBase {
 
     // AutoBuilder.configure(this::getEstimatedPosition, this::setOdometry, this::getChassisSpeeds,
     // this::driveRobotRelative, SwerveConstants.pathPlannerFF, config, () -> setColour(), this);
-
-    anglePID = new PIDController(
-      SwerveConstants.ANGLE_ASSIST_GAINS.kp,
-      SwerveConstants.ANGLE_ASSIST_GAINS.ki,
-      SwerveConstants.ANGLE_ASSIST_GAINS.kd
-    );
   } 
 
   public boolean getIsBlue() {
