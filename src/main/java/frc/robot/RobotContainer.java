@@ -4,8 +4,10 @@
 
 package frc.robot;
 
+import choreo.auto.AutoFactory;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -17,6 +19,7 @@ import frc.robot.subsystems.*;
 public class RobotContainer {
 
   private final Swerve swerve;
+  private final AutoFactory autoFactory;
   private final Elevator elevator;
   private final EndEffector endEffector;
 
@@ -33,6 +36,13 @@ public class RobotContainer {
 
   public RobotContainer() {
     swerve = new Swerve();
+    autoFactory =
+        new AutoFactory(
+            swerve::getEstimatedPosition,
+            swerve::setOdometry,
+            swerve::followTrajectory,
+            true,
+            swerve);
     elevator = new Elevator();
     endEffector = new EndEffector();
     intake = new Intake();
@@ -98,7 +108,7 @@ public class RobotContainer {
     swerve.setIsBlue(isBlue);
   }
 
-  // public Command getAutonomousCommand() {
-  //   return chooser.getSelected();
-  // }
+  public Command getAutonomousCommand() {
+    return Commands.sequence(autoFactory.resetOdometry("Test2"), autoFactory.trajectoryCmd("Test2"));
+  }
 }
