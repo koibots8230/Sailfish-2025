@@ -123,7 +123,7 @@ public class Constants {
     public static final Current TURN_CURRENT_LIMIT = Current.ofBaseUnits(30, Units.Amps);
     public static final Current DRIVE_CURRENT_LIMIT = Current.ofBaseUnits(80, Units.Amps);
 
-    public static final double DEADBAND = 0.1;
+    public static final double DEADBAND = 0.05;
 
     public static final double LEFT_STICK_SCAILING = 2;
 
