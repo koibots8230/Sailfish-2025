@@ -23,6 +23,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -39,21 +40,21 @@ import frc.robot.Constants.SwerveConstants;
 
 @Logged
 public class SwerveModule {
-  private final SparkFlex driveMotor;
-  private final SparkMax turnMotor;
+  @NotLogged private final SparkFlex driveMotor;
+  @NotLogged private final SparkMax turnMotor;
 
-  private final SparkMaxConfig turnConfig;
-  private final SparkFlexConfig driveConfig;
+  @NotLogged private final SparkMaxConfig turnConfig;
+  @NotLogged private final SparkFlexConfig driveConfig;
 
-  private final AbsoluteEncoder turnEncoder;
-  private final RelativeEncoder driveEncoder;
+  @NotLogged private final AbsoluteEncoder turnEncoder;
+  @NotLogged private final RelativeEncoder driveEncoder;
 
-  private final SparkClosedLoopController turnController;
-  private final SparkClosedLoopController driveController;
+  @NotLogged private final SparkClosedLoopController turnController;
+  @NotLogged private final SparkClosedLoopController driveController;
 
-  private final SimpleMotorFeedforward turnFeedforward;
+  @NotLogged private final SimpleMotorFeedforward turnFeedforward;
 
-  private final TrapezoidProfile turnProfile;
+  @NotLogged private final TrapezoidProfile turnProfile;
   private TrapezoidProfile.State turnGoalState;
   private TrapezoidProfile.State turnSetpointState;
 

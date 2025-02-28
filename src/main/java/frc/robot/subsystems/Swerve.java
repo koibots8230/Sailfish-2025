@@ -10,6 +10,7 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
@@ -57,11 +58,11 @@ public class Swerve extends SubsystemBase {
 
   private final Modules modules;
 
-  private final Pigeon2 gyro;
+  @NotLogged private final Pigeon2 gyro;
 
-  private final SwerveDrivePoseEstimator odometry;
+  @NotLogged private final SwerveDrivePoseEstimator odometry;
 
-  private final PIDController anglePID;
+  @NotLogged private final PIDController anglePID;
 
   private Pose2d estimatedPosition;
   private Rotation2d simHeading;
