@@ -42,13 +42,22 @@ public class SwerveModule {
   private final SparkFlex driveMotor;
   private final SparkMax turnMotor;
 
-  private final AbsoluteEncoder turnEncoder;
-  private final RelativeEncoder driveEncoder;
-
   private final SparkMaxConfig turnConfig;
   private final SparkFlexConfig driveConfig;
 
-  private SimpleMotorFeedforward turnFeedforward;
+  private final AbsoluteEncoder turnEncoder;
+  private final RelativeEncoder driveEncoder;
+
+  private final SparkClosedLoopController turnController;
+  private final SparkClosedLoopController driveController;
+
+  private final SimpleMotorFeedforward turnFeedforward;
+
+  private final TrapezoidProfile turnProfile;
+  private TrapezoidProfile.State turnGoalState;
+  private TrapezoidProfile.State turnSetpointState;
+
+  private final Rotation2d offset;
 
   private Angle turnSetpoint;
   private LinearVelocity driveSetpoint;
@@ -63,17 +72,6 @@ public class SwerveModule {
   private Current turnCurrent;
   private Current driveCurrent;
 
-  private final SparkClosedLoopController turnController;
-  private final SparkClosedLoopController driveController;
-
-  private final TrapezoidProfile turnProfile;
-  private TrapezoidProfile.State turnGoalState;
-  private TrapezoidProfile.State turnSetpointState;
-
-  private final Rotation2d offset;
-
-  private final Rotation2d currentAngle;
-
   public SwerveModule(int driveID, int turnID) {
 
     if (driveID == SwerveConstants.FRONT_LEFT_DRIVE_ID) {
@@ -85,8 +83,6 @@ public class SwerveModule {
     } else {
       offset = SwerveConstants.OFFSETS[3];
     }
-
-    currentAngle = new Rotation2d();
 
     turnProfile =
         new TrapezoidProfile(
@@ -162,7 +158,7 @@ public class SwerveModule {
 
   public void setState(SwerveModuleState swerveModuleState) {
     // swerveModuleState.optimize(currentAngle);
-    swerveModuleState.angle.times(swerveModuleState.angle.minus(currentAngle).getCos());
+    swerveModuleState.angle = swerveModuleState.angle.times(Math.cos(swerveModuleState.angle.getRadians() - turnPosition));
 
     driveController.setReference(
         swerveModuleState.speedMetersPerSecond, SparkBase.ControlType.kVelocity);
@@ -204,10 +200,10 @@ public class SwerveModule {
   }
 
   public SwerveModuleState getModuleState() {
-    return new SwerveModuleState(driveVelocity, new Rotation2d(turnPosition));
+    return new SwerveModuleState(driveVelocity, Rotation2d.fromRadians(turnPosition));
   }
 
   public SwerveModulePosition getPosition() {
-    return new SwerveModulePosition(drivePosition, new Rotation2d(turnPosition));
+    return new SwerveModulePosition(drivePosition, Rotation2d.fromRadians(turnPosition));
   }
 }

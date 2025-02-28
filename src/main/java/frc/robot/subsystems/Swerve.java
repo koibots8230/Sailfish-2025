@@ -34,11 +34,6 @@ import java.util.function.DoubleSupplier;
 
 @Logged
 public class Swerve extends SubsystemBase {
-  private Pose2d estimatedPosition;
-  private Rotation2d simHeading;
-  private Rotation2d gyroAngle;
-  private SwerveModuleState[] setpointStates;
-  private final Pigeon2 gyro;
 
   @Logged
   public class Modules {
@@ -62,40 +57,38 @@ public class Swerve extends SubsystemBase {
 
   private final Modules modules;
 
-  private final SwerveModuleState[] messuredStates;
-
+  private final Pigeon2 gyro;
+  
   private final SwerveDrivePoseEstimator odometry;
+
+  private final PIDController anglePID;
+
+  private Pose2d estimatedPosition;
+  private Rotation2d simHeading;
+  private Rotation2d gyroAngle;
+
+  private SwerveModuleState[] setpointStates;
+  private SwerveModuleState[] measuredStates;
 
   private boolean isBlue;
 
   private ReefAlignState reefAlignState;
-
   private Pose2d alignTarget;
-
-  private final PIDController anglePID;
 
   RobotConfig config;
 
   public Swerve() {
 
-    this.isBlue = true;
-
     modules = new Modules();
-
-    estimatedPosition = new Pose2d();
 
     gyro = new Pigeon2(SwerveConstants.GYRO_ID);
 
-    gyroAngle = new Rotation2d();
-
     odometry =
         new SwerveDrivePoseEstimator(
-            SwerveConstants.KINEMATICS, gyroAngle, this.getModulePostition(), estimatedPosition);
-
-    simHeading = new Rotation2d(0.0);
+            SwerveConstants.KINEMATICS, gyroAngle, this.getModulePostitions(), estimatedPosition);
 
     setpointStates = new SwerveModuleState[4];
-    messuredStates = new SwerveModuleState[4];
+    measuredStates = new SwerveModuleState[4];
 
     // try{
     //   config = RobotConfig.fromGUISettings();
@@ -114,23 +107,8 @@ public class Swerve extends SubsystemBase {
     anglePID.enableContinuousInput(-Math.PI, Math.PI);
 
     reefAlignState = ReefAlignState.disabled;
-    alignTarget = new Pose2d();
-  }
 
-  public boolean getIsBlue() {
-    return isBlue;
-  }
-
-  public void setOdometry(Pose2d pose) {
-    odometry.resetPose(pose);
-  }
-
-  public void setIsBlue(boolean colour) {
-    isBlue = colour;
-  }
-
-  private void setReefAlignState(ReefAlignState state) {
-    reefAlignState = state;
+    this.isBlue = true;
   }
 
   @Override
@@ -144,14 +122,14 @@ public class Swerve extends SubsystemBase {
     estimatedPosition =
         odometry.update(
             isBlue ? gyroAngle : gyroAngle.minus(new Rotation2d(Math.PI)),
-            this.getModulePostition());
+            this.getModulePostitions());
 
     gyroAngle = gyro.getRotation2d();
 
-    messuredStates[0] = modules.frontLeft.getModuleState();
-    messuredStates[1] = modules.frontRight.getModuleState();
-    messuredStates[2] = modules.backLeft.getModuleState();
-    messuredStates[3] = modules.backRight.getModuleState();
+    measuredStates[0] = modules.frontLeft.getModuleState();
+    measuredStates[1] = modules.frontRight.getModuleState();
+    measuredStates[2] = modules.backLeft.getModuleState();
+    measuredStates[3] = modules.backRight.getModuleState();
   }
 
   @Override
@@ -169,7 +147,48 @@ public class Swerve extends SubsystemBase {
     modules.backRight.simulationPeriodic();
   }
 
-  public SwerveModulePosition[] getModulePostition() {
+
+  // ===================== Alliance Color ===================== \\
+
+  public void setIsBlue(boolean color) {
+    isBlue = color;
+  }
+
+  public boolean getIsBlue() {
+    return isBlue;
+  }
+
+  // ===================== Odometry ===================== \\
+
+  public void setOdometry(Pose2d pose) {
+    odometry.resetPose(pose);
+  }
+
+  public Pose2d getEstimatedPosition() {
+    return odometry.getEstimatedPosition();
+  }
+
+  public void addVisionMeasurement(VisionMeasurement measurement) {
+    odometry.addVisionMeasurement(
+        measurement.pose,
+        measurement.timestamp,
+        VecBuilder.fill(
+            measurement.translationStdev, measurement.translationStdev, measurement.rotationStdev));
+  }
+
+  // ===================== Gyro ===================== \\
+
+  public void zeroGyro() {
+    gyro.setYaw(0);
+  }
+
+  public Rotation2d getGyroAngle() {
+    return gyro.getRotation2d();
+  }
+
+  // ===================== Module Positions ===================== \\
+
+  public SwerveModulePosition[] getModulePostitions() {
     return new SwerveModulePosition[] {
       modules.frontLeft.getPosition(),
       modules.frontRight.getPosition(),
@@ -178,44 +197,19 @@ public class Swerve extends SubsystemBase {
     };
   }
 
-  private Pose2d getAssistVelocity(
-      Translation2d targetPose, Rotation2d targetAngle, double xInput, double yInput) {
-    Translation2d[] points =
-        new Translation2d[] {
-          this.getEstimatedPosition().getTranslation(),
-          new Translation2d(
-              this.getEstimatedPosition().getX() + xInput,
-              this.getEstimatedPosition().getY() + yInput)
-        };
+  // ===================== Chassis Speeds ===================== \\
 
-    Rotation2d angleToTarget =
-        Rotation2d.fromRadians(
-            Math.atan2(
-                this.getEstimatedPosition().getY() - targetPose.getY(),
-                this.getEstimatedPosition().getX() - targetPose.getX()));
-
-    Distance distancePerpToVel =
-        Meters.of( // Looks complicated, but just the "Line from two points" from this
-            // https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
-            Math.abs(
-                    ((points[1].getY() - points[0].getY()) * targetPose.getX())
-                        - ((points[1].getX() - points[0].getX()) * targetPose.getY())
-                        + (points[1].getX() * points[0].getY())
-                        - (points[1].getY() * points[0].getX()))
-                / Math.sqrt(
-                    Math.pow((points[1].getY() - points[0].getY()), 2)
-                        + Math.pow((points[1].getX() - points[0].getX()), 2)));
-
-    LinearVelocity assistVelocity =
-        MetersPerSecond.of(distancePerpToVel.in(Meters) * AlignConstants.TRANSLATE_PID.kp);
-
-    return new Pose2d(
-        assistVelocity.in(MetersPerSecond) * angleToTarget.getCos(),
-        assistVelocity.in(MetersPerSecond) * angleToTarget.getSin(),
-        new Rotation2d(
-            anglePID.calculate(
-                gyroAngle.getRadians(), targetAngle.getRadians() + (isBlue ? 0 : Math.PI))));
+  public ChassisSpeeds getChassisSpeeds() {
+    return SwerveConstants.KINEMATICS.toChassisSpeeds(measuredStates);
   }
+
+  // ===================== Reef Align State ===================== \\
+
+  private void setReefAlignState(ReefAlignState state) {
+    reefAlignState = state;
+  }
+
+  // ===================== Pose Helper Functions ===================== \\
 
   private Distance distanceToPose(Pose2d pose) {
     return Meters.of(
@@ -268,6 +262,8 @@ public class Swerve extends SubsystemBase {
                 * (rightPole ? 1 : -1)
                 * (side.getRotation().getRadians() == Math.PI ? -1 : 1)));
   }
+
+  // ===================== Align Assist ===================== \\
 
   private Pose2d reefAlignAssist(double xInput, double yInput, double omega) {
     xInput = isBlue ? xInput : -xInput;
@@ -326,6 +322,47 @@ public class Swerve extends SubsystemBase {
     return getAssistVelocity(pose.getTranslation(), pose.getRotation(), xInput, yInput);
   }
 
+  private Pose2d getAssistVelocity(
+      Translation2d targetPose, Rotation2d targetAngle, double xInput, double yInput) {
+    Translation2d[] points =
+        new Translation2d[] {
+          this.getEstimatedPosition().getTranslation(),
+          new Translation2d(
+              this.getEstimatedPosition().getX() + xInput,
+              this.getEstimatedPosition().getY() + yInput)
+        };
+
+    Rotation2d angleToTarget =
+        Rotation2d.fromRadians(
+            Math.atan2(
+                this.getEstimatedPosition().getY() - targetPose.getY(),
+                this.getEstimatedPosition().getX() - targetPose.getX()));
+
+    Distance distancePerpToVel =
+        Meters.of( // Looks complicated, but just the "Line from two points" from this
+            // https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
+            Math.abs(
+                    ((points[1].getY() - points[0].getY()) * targetPose.getX())
+                        - ((points[1].getX() - points[0].getX()) * targetPose.getY())
+                        + (points[1].getX() * points[0].getY())
+                        - (points[1].getY() * points[0].getX()))
+                / Math.sqrt(
+                    Math.pow((points[1].getY() - points[0].getY()), 2)
+                        + Math.pow((points[1].getX() - points[0].getX()), 2)));
+
+    LinearVelocity assistVelocity =
+        MetersPerSecond.of(distancePerpToVel.in(Meters) * AlignConstants.TRANSLATE_PID.kp);
+
+    return new Pose2d(
+        assistVelocity.in(MetersPerSecond) * angleToTarget.getCos(),
+        assistVelocity.in(MetersPerSecond) * angleToTarget.getSin(),
+        new Rotation2d(
+            anglePID.calculate(
+                gyroAngle.getRadians(), targetAngle.getRadians() + (isBlue ? 0 : Math.PI))));
+  }
+
+  // ===================== Teleop Driving ===================== \\
+
   private void driveFieldRelativeScaler(double x, double y, double omega) {
     double linearMagnitude = Math.pow(Math.hypot(x, y), SwerveConstants.TRANSLATION_SCALAR);
 
@@ -350,10 +387,6 @@ public class Swerve extends SubsystemBase {
         RadiansPerSecond.of(
             MathUtil.applyDeadband(
                 -omega + assist.getRotation().getRadians(), SwerveConstants.DEADBAND)));
-  }
-
-  public ChassisSpeeds getChassisSpeeds() {
-    return SwerveConstants.KINEMATICS.toChassisSpeeds(messuredStates);
   }
 
   public void driveRobotRelative(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
@@ -382,25 +415,7 @@ public class Swerve extends SubsystemBase {
             new double[] {0.0}));
   }
 
-  public void zeroGyro() {
-    gyro.setYaw(0);
-  }
-
-  public Pose2d getEstimatedPosition() {
-    return odometry.getEstimatedPosition();
-  }
-
-  public Rotation2d getGyroAngle() {
-    return gyro.getRotation2d();
-  }
-
-  public void addVisionMeasurement(VisionMeasurement measurement) {
-    odometry.addVisionMeasurement(
-        measurement.pose,
-        measurement.timestamp,
-        VecBuilder.fill(
-            measurement.translationStdev, measurement.translationStdev, measurement.rotationStdev));
-  }
+  // ===================== Commands ===================== \\
 
   public Command driveFieldRelativeCommand(
       DoubleSupplier x, DoubleSupplier y, DoubleSupplier omega) {
