@@ -4,38 +4,31 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.RPM;
-
 import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.NotLogged;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.ElevatorConstants;
-import frc.robot.Constants.EndEffectorConstants;
-import frc.robot.Constants.IntakeConstants;
-import frc.robot.Constants.IntakePivotConstants;
-import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.EndEffector;
-import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.IntakePivot;
-import frc.robot.subsystems.Swerve;
+import frc.lib.util.ReefAlignState;
+import frc.robot.commands.*;
+import frc.robot.subsystems.*;
 
 @Logged
 public class RobotContainer {
 
   private final Swerve swerve;
   private final Elevator elevator;
-
   private final EndEffector endEffector;
 
   // SendableChooser<Command> chooser = new SendableChooser<>();
   private final Intake intake;
   private final IntakePivot intakePivot;
 
-  @NotLogged private final CommandXboxController xboxController;
+  private final Indexer indexer;
+
+  private final Vision vision;
+
+  private final CommandXboxController xboxController;
   private boolean isBlue;
 
   public RobotContainer() {
@@ -44,6 +37,11 @@ public class RobotContainer {
     endEffector = new EndEffector();
     intake = new Intake();
     intakePivot = new IntakePivot();
+    indexer = new Indexer();
+
+    vision =
+        new Vision(
+            swerve::getEstimatedPosition, swerve::getGyroAngle, swerve::addVisionMeasurement);
 
     xboxController = new CommandXboxController(0);
 
@@ -55,55 +53,38 @@ public class RobotContainer {
 
   private void configureBindings() {
 
-    Trigger testEffector = xboxController.x();
-    testEffector.onTrue(endEffector.setVelocityCommand(EndEffectorConstants.INTAKE_SPEED));
-    testEffector.onFalse(endEffector.setVelocityCommand(0));
-
-    Trigger intakeEffector = xboxController.a();
-    intakeEffector.onTrue(endEffector.intakeCommand());
-    intakeEffector.onFalse(endEffector.setVelocityCommand(0));
-
-    Trigger outtakeEffector = xboxController.b();
-    outtakeEffector.onTrue(endEffector.outtakeCommand());
-    outtakeEffector.onFalse(endEffector.setVelocityCommand(0));
-
-    Trigger L1 = xboxController.a(); // TODO CHANGE VALUE TO SOMTHING ELSE SHOULD NOT HAVE TWO A
-    L1.onTrue(elevator.setPositionCommand(ElevatorConstants.L1_SETPOINT));
-
-    Trigger ElevatorDown = xboxController.y();
-    ElevatorDown.onTrue(elevator.setPositionCommand(ElevatorConstants.START_SETPOINT));
-
-    Trigger zero = xboxController.y();
-
-    zero.onTrue(swerve.zeroGyroCommand(isBlue));
+    // Trigger zero = xboxController.b();
+    // zero.onTrue(swerve.zeroGyroCommand(isBlue));
 
     Trigger spinIntake = new Trigger(xboxController.rightTrigger());
-    Trigger reverseIntake = new Trigger(xboxController.leftTrigger());
-
-    // spinIntake.onTrue(intake.IntakeCommand(IntakeConstants.INTAKE_VELOCITY));
-    // spinIntake.onFalse(intake.IntakeCommand(AngularVelocity.ofBaseUnits(0, RPM)));
     spinIntake.onTrue(
-        Commands.parallel(
-            intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION),
-            intake.IntakeCommand(IntakeConstants.INTAKE_VELOCITY)));
-    spinIntake.onFalse(
-        Commands.sequence(
-            intake.IntakeCommand(AngularVelocity.ofBaseUnits(0, RPM)),
-            intakePivot.moveIntakePivotCommand(IntakePivotConstants.START_POSITION)));
+        IntakeCommands.intakeCommand(intake, intakePivot, indexer, elevator, endEffector));
+    spinIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector));
 
-    // reverseIntake.onTrue(intake.IntakeCommand(IntakeConstants.REVERSE_INTAKE_VELOCITY));
-    // reverseIntake.onFalse(intake.IntakeCommand(AngularVelocity.ofBaseUnits(0, RPM)));
+    Trigger reverseIntake = new Trigger(xboxController.leftTrigger());
     reverseIntake.onTrue(
-        Commands.sequence(
-            intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION),
-            intake.IntakeCommand(IntakeConstants.REVERSE_INTAKE_VELOCITY)));
-    reverseIntake.onFalse(
-        Commands.parallel(
-            intake.IntakeCommand(AngularVelocity.ofBaseUnits(0, RPM)),
-            intakePivot.moveIntakePivotCommand(IntakePivotConstants.START_POSITION)));
+        IntakeCommands.reverseCommand(intake, intakePivot, indexer, elevator, endEffector));
+    reverseIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector));
 
-    // Trigger intakePivotOut = new Trigger(xboxController.b());
-    // intakePivotOut.onTrue(intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION));
+    Trigger gotoLevelThree = new Trigger(xboxController.y());
+    gotoLevelThree.onTrue(
+        Commands.sequence(
+            ScoreCommands.levelThree(elevator, endEffector),
+            swerve.setReefAlignStateCommand(ReefAlignState.disabled)));
+    gotoLevelThree.onFalse(ScoreCommands.basePosition(elevator, endEffector));
+
+    Trigger gotoLevelTwo = new Trigger(xboxController.a());
+    gotoLevelTwo.onTrue(
+        Commands.sequence(
+            ScoreCommands.levelTwo(elevator, endEffector),
+            swerve.setReefAlignStateCommand(ReefAlignState.disabled)));
+    gotoLevelTwo.onFalse(ScoreCommands.basePosition(elevator, endEffector));
+
+    Trigger alignRight = xboxController.rightBumper();
+    alignRight.onTrue(swerve.setReefAlignStateCommand(ReefAlignState.rightSide));
+
+    Trigger alignLeft = xboxController.leftBumper();
+    alignLeft.onTrue(swerve.setReefAlignStateCommand(ReefAlignState.leftSide));
   }
 
   private void defualtCommands() {
