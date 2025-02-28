@@ -58,7 +58,7 @@ public class Swerve extends SubsystemBase {
   private final Modules modules;
 
   private final Pigeon2 gyro;
-  
+
   private final SwerveDrivePoseEstimator odometry;
 
   private final PIDController anglePID;
@@ -146,7 +146,6 @@ public class Swerve extends SubsystemBase {
     modules.backLeft.simulationPeriodic();
     modules.backRight.simulationPeriodic();
   }
-
 
   // ===================== Alliance Color ===================== \\
 
@@ -368,8 +367,14 @@ public class Swerve extends SubsystemBase {
 
     Rotation2d direction = new Rotation2d(y, x);
 
-    y = linearMagnitude * -direction.getCos() * SwerveConstants.MAX_LINEAR_VELOCITY.in(MetersPerSecond);
-    x = linearMagnitude * -direction.getSin() * SwerveConstants.MAX_LINEAR_VELOCITY.in(MetersPerSecond);
+    y =
+        linearMagnitude
+            * -direction.getCos()
+            * SwerveConstants.MAX_LINEAR_VELOCITY.in(MetersPerSecond);
+    x =
+        linearMagnitude
+            * -direction.getSin()
+            * SwerveConstants.MAX_LINEAR_VELOCITY.in(MetersPerSecond);
 
     omega =
         Math.pow(omega, SwerveConstants.ROTATION_SCALAR)
@@ -392,7 +397,8 @@ public class Swerve extends SubsystemBase {
   public void driveRobotRelative(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
     setpointStates = SwerveConstants.KINEMATICS.toSwerveModuleStates(speeds);
 
-    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, SwerveConstants.MAX_LINEAR_VELOCITY);
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        setpointStates, SwerveConstants.MAX_LINEAR_VELOCITY);
 
     modules.frontLeft.setState(setpointStates[0]);
     modules.frontRight.setState(setpointStates[1]);

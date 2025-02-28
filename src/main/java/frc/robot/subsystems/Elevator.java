@@ -10,10 +10,10 @@ import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
@@ -55,7 +55,7 @@ public class Elevator extends SubsystemBase {
 
   private TrapezoidProfile.State goal;
   private TrapezoidProfile.State motorSetpoint;
-  
+
   private Distance setpoint;
   private Distance position;
   private LinearVelocity velocity;
@@ -85,8 +85,7 @@ public class Elevator extends SubsystemBase {
 
     mainMotorConfig.smartCurrentLimit((int) ElevatorConstants.CURRENT_LIMIT.in(Amps));
 
-    mainMotorConfig.alternateEncoder.positionConversionFactor(
-        ElevatorConstants.CONVERSION_FACTOR);
+    mainMotorConfig.alternateEncoder.positionConversionFactor(ElevatorConstants.CONVERSION_FACTOR);
     mainMotorConfig.alternateEncoder.velocityConversionFactor(
         ElevatorConstants.CONVERSION_FACTOR / 60.0);
     mainMotorConfig.alternateEncoder.inverted(true);
@@ -142,10 +141,10 @@ public class Elevator extends SubsystemBase {
         profile.calculate(RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds), motorSetpoint, goal);
 
     pid.setReference(
-            motorSetpoint.position,
-            ControlType.kPosition,
-            ClosedLoopSlot.kSlot0,
-            feedforward.calculate(motorSetpoint.velocity));
+        motorSetpoint.position,
+        ControlType.kPosition,
+        ClosedLoopSlot.kSlot0,
+        feedforward.calculate(motorSetpoint.velocity));
 
     position = Distance.ofBaseUnits(encoder.getPosition(), Meters);
     velocity = LinearVelocity.ofBaseUnits(encoder.getVelocity(), MetersPerSecond);

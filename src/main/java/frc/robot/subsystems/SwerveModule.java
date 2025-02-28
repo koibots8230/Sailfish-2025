@@ -158,7 +158,9 @@ public class SwerveModule {
 
   public void setState(SwerveModuleState swerveModuleState) {
     // swerveModuleState.optimize(currentAngle);
-    swerveModuleState.angle = swerveModuleState.angle.times(Math.cos(swerveModuleState.angle.getRadians() - turnPosition));
+    swerveModuleState.angle =
+        swerveModuleState.angle.times(
+            Math.cos(swerveModuleState.angle.getRadians() - turnPosition));
 
     driveController.setReference(
         swerveModuleState.speedMetersPerSecond, SparkBase.ControlType.kVelocity);

@@ -28,7 +28,7 @@ public class Indexer extends SubsystemBase {
   @NotLogged private final SparkMaxConfig config;
 
   @NotLogged private final RelativeEncoder encoder;
-  
+
   @NotLogged private final SparkClosedLoopController closedLoopController;
 
   private double setpoint;

@@ -141,8 +141,7 @@ public class Constants {
     public static final FeedforwardGains FEEDFORWARD =
         new FeedforwardGains.Builder().kv(0).kg(0).build();
 
-    public static final Angle TOLERANCE =
-        Radians.of(0.025);
+    public static final Angle TOLERANCE = Radians.of(0.025);
 
     public static final double GEARING = 1;
 
@@ -184,10 +183,8 @@ public class Constants {
 
   public static class ElevatorConstants {
     public static final Distance INTAKE_POSITION = Distance.ofBaseUnits(0.005, Units.Meters);
-    public static final Distance L2_POSITION =
-        Distance.ofBaseUnits(1.18, Units.Meters);
-    public static final Distance L3_POSITION =
-        Distance.ofBaseUnits(2.04, Units.Meters);
+    public static final Distance L2_POSITION = Distance.ofBaseUnits(1.18, Units.Meters);
+    public static final Distance L3_POSITION = Distance.ofBaseUnits(2.04, Units.Meters);
 
     public static final PIDGains PID = new PIDGains.Builder().kp(3.3).build();
     public static final FeedforwardGains FEEDFORWARD =
@@ -198,14 +195,13 @@ public class Constants {
     public static final LinearAcceleration MAX_ACCELRATION =
         LinearAcceleration.ofBaseUnits(6, Units.MetersPerSecondPerSecond);
 
-    public static final double CONVERSION_FACTOR =
-        (0.05207 * Math.PI) * 2;
+    public static final double CONVERSION_FACTOR = (0.05207 * Math.PI) * 2;
 
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(60, Units.Amps);
 
     public static final int MAIN_MOTOR_ID = 11;
     public static final int SECONDARY_MOTOR_ID = 12;
-    
+
     public static final int HALL_EFFECTS_SENSOR = 0;
   }
 

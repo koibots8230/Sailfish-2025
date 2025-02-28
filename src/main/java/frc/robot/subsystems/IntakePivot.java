@@ -11,10 +11,10 @@ import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -107,12 +107,11 @@ public class IntakePivot extends SubsystemBase {
     motorSetpoint =
         profile.calculate(RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds), motorSetpoint, goal);
 
-    pid
-        .setReference(
-            motorSetpoint.position,
-            ControlType.kPosition,
-            ClosedLoopSlot.kSlot0,
-            feedforward.calculate(motorSetpoint.velocity));
+    pid.setReference(
+        motorSetpoint.position,
+        ControlType.kPosition,
+        ClosedLoopSlot.kSlot0,
+        feedforward.calculate(motorSetpoint.velocity));
 
     position = Angle.ofBaseUnits(encoder.getPosition(), Degrees);
     velocity = AngularVelocity.ofBaseUnits(encoder.getVelocity(), DegreesPerSecond);
