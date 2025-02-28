@@ -60,7 +60,7 @@ public class SwerveModule {
 
   private Voltage turnVoltage;
   private Voltage driveVoltage;
-  private Current turnCurrent;
+  private double turnCurrent;
   private Current driveCurrent;
 
   private final SparkClosedLoopController turnController;
@@ -157,7 +157,7 @@ public class SwerveModule {
     turnVoltage =
         Voltage.ofBaseUnits(turnMotor.getBusVoltage() * turnMotor.getAppliedOutput(), Volts);
     driveCurrent = Current.ofBaseUnits(driveMotor.getOutputCurrent(), Amps);
-    turnCurrent = Current.ofBaseUnits(turnMotor.getOutputCurrent(), Amps);
+    turnCurrent = turnMotor.getOutputCurrent();
   }
 
   public void setState(SwerveModuleState swerveModuleState) {
@@ -173,7 +173,7 @@ public class SwerveModule {
 
   public void periodic() {
     driveCurrent = Current.ofBaseUnits(driveMotor.getOutputCurrent(), Units.Amps);
-    turnCurrent = Current.ofBaseUnits(turnMotor.getOutputCurrent(), Units.Amps);
+    turnCurrent = turnMotor.getOutputCurrent();
     driveVoltage =
         Voltage.ofBaseUnits(driveMotor.getBusVoltage() * driveMotor.getAppliedOutput(), Volts);
     turnVoltage =

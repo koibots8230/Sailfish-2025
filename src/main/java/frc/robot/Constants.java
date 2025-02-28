@@ -93,8 +93,8 @@ public class Constants {
     public static final FeedforwardGains DRIVE_FEEDFORWARD =
         new FeedforwardGains.Builder().kv(0.24).build();
 
-    public static final double MAX_VELOCITY = 10 * Math.PI;
-    public static final double MAX_ACCELRATION = 16 * Math.PI;
+    public static final double MAX_VELOCITY = 20 * Math.PI;
+    public static final double MAX_ACCELRATION = 30 * Math.PI;
 
     public static final PPHolonomicDriveController pathPlannerFF =
         new PPHolonomicDriveController(new PIDConstants(0, 0, 0), new PIDConstants(0, 0, 0));
@@ -156,8 +156,8 @@ public class Constants {
 
     public static final Distance RED_REEF_OFFSET = Meters.of(8.569706);
 
-    public static final PIDGains TRANSLATE_PID = new PIDGains.Builder().kp(2).build();
-    public static final PIDGains ANGLE_PID = new PIDGains.Builder().kp(2).build();
+    public static final PIDGains TRANSLATE_PID = new PIDGains.Builder().kp(0.75).build();
+    public static final PIDGains ANGLE_PID = new PIDGains.Builder().kp(1).build();
 
     public static final Angle DIRECTION_ANGLE_RANGE_CLOSE = Radians.of(Math.PI / 1.85);
 
