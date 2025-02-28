@@ -24,8 +24,8 @@ import frc.lib.util.Wheel;
 public class Constants {
 
   public static class SwerveConstants {
-    public static final LinearVelocity MAX_SPEED = MetersPerSecond.of(4.25);
-    public static final AngularVelocity MAX_ROTATION = RadiansPerSecond.of(2 * Math.PI);
+    public static final LinearVelocity MAX_LINEAR_VELOCITY = MetersPerSecond.of(4.25);
+    public static final AngularVelocity MAX_ANGULAR_VELOCITY = RadiansPerSecond.of(2 * Math.PI);
 
     public static final AngularVelocity MAX_TURN_VECLOCITY = RadiansPerSecond.of(10 * Math.PI);
     public static final AngularAcceleration MAX_TURN_ACCELERATION =
@@ -42,7 +42,7 @@ public class Constants {
     public static final double MAX_VELOCITY = 10 * Math.PI;
     public static final double MAX_ACCELRATION = 16 * Math.PI;
 
-    public static final PPHolonomicDriveController pathPlannerFF =
+    public static final PPHolonomicDriveController PATH_PLANNER_FF =
         new PPHolonomicDriveController(new PIDConstants(0, 0, 0), new PIDConstants(0, 0, 0));
 
     public static final SwerveDriveKinematics KINEMATICS =
@@ -71,9 +71,9 @@ public class Constants {
 
     public static final double DEADBAND = 0.05;
 
-    public static final double LEFT_STICK_SCAILING = 2;
+    public static final double TRANSLATION_SCALAR = 2;
 
-    public static final double RIGHT_STICK_SCAILING = 1;
+    public static final double ROTATION_SCALAR = 1;
 
     public static final int FRONT_LEFT_DRIVE_ID = 1;
     public static final int FRONT_LEFT_TURN_ID = 2;
@@ -131,23 +131,26 @@ public class Constants {
   public static class IntakePivotConstants {
     public static final Angle OUT_POSITION = Angle.ofBaseUnits(10, Radians);
     public static final Angle IN_POSITION = Angle.ofBaseUnits(0, Radians);
+
     public static final AngularVelocity MAX_VELOCITY =
         AngularVelocity.ofBaseUnits(0, Units.RotationsPerSecond);
     public static final AngularAcceleration MAX_ACCELRATION =
         AngularAcceleration.ofBaseUnits(0, Units.RotationsPerSecondPerSecond);
 
-    public static final Angle TOLERANCE =
-        Radians.of(0.025);
-
-    public static final double POSITION_CONVERSION_FACTOR = 2.0 * Math.PI;
-    public static final double VELCOITY_CONVERSION_FACTOR = (2.0 * Math.PI) / 60.0;
-
     public static final PIDGains PID = new PIDGains.Builder().kp(0).build();
     public static final FeedforwardGains FEEDFORWARD =
         new FeedforwardGains.Builder().kv(0).kg(0).build();
 
+    public static final Angle TOLERANCE =
+        Radians.of(0.025);
+
+    public static final double GEARING = 1;
+
+    public static final double CONVERSION_FACTOR = 2.0 * Math.PI * GEARING;
+
     public static final int LEFT_MOTOR_ID = 31;
     public static final int RIGHT_MOTOR_ID = 32;
+
     public static final int LIMIT_SWITCH_CHANEL = 1;
   }
 
@@ -167,8 +170,8 @@ public class Constants {
     public static final double OUTTAKE_SPEED =
         1000; // TODO: Turn back into units once not bugged anymore :(
 
-    public static final PIDGains PID_GAINS = new PIDGains.Builder().kp(0.0001).build();
-    public static final FeedforwardGains FEEDFORWARD_GAINS =
+    public static final PIDGains PID = new PIDGains.Builder().kp(0.0001).build();
+    public static final FeedforwardGains FEEDFORWARD =
         new FeedforwardGains.Builder().kv(0.0002).build();
 
     public static final Distance TRIGGER_DISTANCE = Distance.ofBaseUnits(85, Units.Millimeters);
@@ -180,11 +183,11 @@ public class Constants {
   }
 
   public static class ElevatorConstants {
-    public static final Distance INTAKE_SETPOINT = Distance.ofBaseUnits(0.005, Units.Meters);
-    public static final Distance L2_SETPOINT =
-        Distance.ofBaseUnits(1.18, Units.Meters); // untested value
-    public static final Distance L3_SETPOINT =
-        Distance.ofBaseUnits(2.04, Units.Meters); //  untested value
+    public static final Distance INTAKE_POSITION = Distance.ofBaseUnits(0.005, Units.Meters);
+    public static final Distance L2_POSITION =
+        Distance.ofBaseUnits(1.18, Units.Meters);
+    public static final Distance L3_POSITION =
+        Distance.ofBaseUnits(2.04, Units.Meters);
 
     public static final PIDGains PID = new PIDGains.Builder().kp(3.3).build();
     public static final FeedforwardGains FEEDFORWARD =
@@ -195,13 +198,14 @@ public class Constants {
     public static final LinearAcceleration MAX_ACCELRATION =
         LinearAcceleration.ofBaseUnits(6, Units.MetersPerSecondPerSecond);
 
-    public static final Distance CONVERSION_FACTOR =
-        Distance.ofBaseUnits((0.05207 * Math.PI) * 2, Meters);
+    public static final double CONVERSION_FACTOR =
+        (0.05207 * Math.PI) * 2;
 
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(60, Units.Amps);
 
     public static final int MAIN_MOTOR_ID = 11;
     public static final int SECONDARY_MOTOR_ID = 12;
+    
     public static final int HALL_EFFECTS_SENSOR = 0;
   }
 

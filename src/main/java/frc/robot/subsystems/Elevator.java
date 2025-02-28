@@ -86,9 +86,9 @@ public class Elevator extends SubsystemBase {
     mainMotorConfig.smartCurrentLimit((int) ElevatorConstants.CURRENT_LIMIT.in(Amps));
 
     mainMotorConfig.alternateEncoder.positionConversionFactor(
-        ElevatorConstants.CONVERSION_FACTOR.in(Meters));
+        ElevatorConstants.CONVERSION_FACTOR);
     mainMotorConfig.alternateEncoder.velocityConversionFactor(
-        ElevatorConstants.CONVERSION_FACTOR.in(Meters) / 60);
+        ElevatorConstants.CONVERSION_FACTOR / 60.0);
     mainMotorConfig.alternateEncoder.inverted(true);
 
     secondaryMotorConfig = new SparkMaxConfig();
@@ -118,7 +118,7 @@ public class Elevator extends SubsystemBase {
     hallEffectSensor = new DigitalInput(ElevatorConstants.HALL_EFFECTS_SENSOR);
 
     goal = new TrapezoidProfile.State();
-    setpoint = ElevatorConstants.INTAKE_SETPOINT;
+    setpoint = ElevatorConstants.INTAKE_POSITION;
     motorSetpoint = new TrapezoidProfile.State();
 
     position = Distance.ofBaseUnits(0, Meters);

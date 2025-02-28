@@ -71,8 +71,8 @@ public class IntakePivot extends SubsystemBase {
     config.closedLoop.p(IntakePivotConstants.PID.kp);
     config.closedLoop.velocityFF(IntakePivotConstants.FEEDFORWARD.kv);
 
-    config.encoder.positionConversionFactor(IntakePivotConstants.POSITION_CONVERSION_FACTOR);
-    config.encoder.velocityConversionFactor(IntakePivotConstants.VELCOITY_CONVERSION_FACTOR);
+    config.encoder.positionConversionFactor(IntakePivotConstants.CONVERSION_FACTOR);
+    config.encoder.velocityConversionFactor(IntakePivotConstants.CONVERSION_FACTOR / 60.0);
 
     leftMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 

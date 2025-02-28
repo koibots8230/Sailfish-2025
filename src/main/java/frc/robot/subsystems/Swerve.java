@@ -327,16 +327,16 @@ public class Swerve extends SubsystemBase {
   }
 
   private void driveFieldRelativeScaler(double x, double y, double omega) {
-    double linearMagnitude = Math.pow(Math.hypot(x, y), SwerveConstants.LEFT_STICK_SCAILING);
+    double linearMagnitude = Math.pow(Math.hypot(x, y), SwerveConstants.TRANSLATION_SCALAR);
 
     Rotation2d direction = new Rotation2d(y, x);
 
-    y = linearMagnitude * -direction.getCos() * SwerveConstants.MAX_SPEED.in(MetersPerSecond);
-    x = linearMagnitude * -direction.getSin() * SwerveConstants.MAX_SPEED.in(MetersPerSecond);
+    y = linearMagnitude * -direction.getCos() * SwerveConstants.MAX_LINEAR_VELOCITY.in(MetersPerSecond);
+    x = linearMagnitude * -direction.getSin() * SwerveConstants.MAX_LINEAR_VELOCITY.in(MetersPerSecond);
 
     omega =
-        Math.pow(omega, SwerveConstants.RIGHT_STICK_SCAILING)
-            * SwerveConstants.MAX_ROTATION.in(RadiansPerSecond);
+        Math.pow(omega, SwerveConstants.ROTATION_SCALAR)
+            * SwerveConstants.MAX_ANGULAR_VELOCITY.in(RadiansPerSecond);
 
     Pose2d assist = reefAlignAssist(-x, y, omega);
 
@@ -359,7 +359,7 @@ public class Swerve extends SubsystemBase {
   public void driveRobotRelative(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
     setpointStates = SwerveConstants.KINEMATICS.toSwerveModuleStates(speeds);
 
-    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, SwerveConstants.MAX_SPEED);
+    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, SwerveConstants.MAX_LINEAR_VELOCITY);
 
     modules.frontLeft.setState(setpointStates[0]);
     modules.frontRight.setState(setpointStates[1]);

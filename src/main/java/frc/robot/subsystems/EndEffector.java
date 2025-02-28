@@ -61,8 +61,8 @@ public class EndEffector extends SubsystemBase {
 
     config.idleMode(IdleMode.kBrake);
 
-    config.closedLoop.p(EndEffectorConstants.PID_GAINS.kp);
-    config.closedLoop.velocityFF(EndEffectorConstants.FEEDFORWARD_GAINS.kv);
+    config.closedLoop.p(EndEffectorConstants.PID.kp);
+    config.closedLoop.velocityFF(EndEffectorConstants.FEEDFORWARD.kv);
 
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
