@@ -24,7 +24,7 @@ public class IntakeCommands {
       EndEffector endEffector) {
     return Commands.sequence(
         elevator.setPositionCommand(ElevatorConstants.INTAKE_SETPOINT),
-        Commands.waitUntil(() -> elevator.positionIsInRAnge(ElevatorConstants.INTAKE_SETPOINT)),
+        Commands.waitUntil(() -> elevator.atPosition(ElevatorConstants.INTAKE_SETPOINT)),
         Commands.parallel(
             intake.setVeclocityCommand(IntakeConstants.INTAKE_VELOCITY),
             // intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION),
@@ -50,7 +50,7 @@ public class IntakeCommands {
       EndEffector endEffector) {
     return Commands.sequence(
         elevator.setPositionCommand(ElevatorConstants.INTAKE_SETPOINT),
-        Commands.waitUntil(() -> elevator.positionIsInRAnge(ElevatorConstants.INTAKE_SETPOINT)),
+        Commands.waitUntil(() -> elevator.atPosition(ElevatorConstants.INTAKE_SETPOINT)),
         // intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION),
         // Commands.waitUntil(() -> intakePivot.positionIsInRange()),
         Commands.parallel(

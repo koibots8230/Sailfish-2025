@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -18,6 +19,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
@@ -35,15 +37,23 @@ import frc.robot.Constants.RobotConstants;
 @Logged
 public class IntakePivot extends SubsystemBase {
 
-  private final SparkMax leftMotor;
-  private final SparkMax rightMotor;
-  private final TrapezoidProfile profile;
-  private final SimpleMotorFeedforward feedforward;
-  private final RelativeEncoder encoder;
-  private final DigitalInput limitSwitch;
+  @NotLogged private final SparkMax leftMotor;
+  @NotLogged private final SparkMax rightMotor;
+
+  @NotLogged private final DigitalInput limitSwitch;
+
+  @NotLogged private final SparkMaxConfig config;
+
+  @NotLogged private final RelativeEncoder encoder;
+
+  @NotLogged private final SparkClosedLoopController pid;
+
+  @NotLogged private final SimpleMotorFeedforward feedforward;
+
+  @NotLogged private final TrapezoidProfile profile;
+
   private TrapezoidProfile.State goal;
   private TrapezoidProfile.State motorSetpoint;
-  private final SparkMaxConfig config;
 
   private Angle setpoint;
   private AngularVelocity velocity;
@@ -67,6 +77,8 @@ public class IntakePivot extends SubsystemBase {
     leftMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     encoder = leftMotor.getEncoder();
+
+    pid = leftMotor.getClosedLoopController();
 
     config.follow(leftMotor);
     config.inverted(true);
@@ -95,8 +107,7 @@ public class IntakePivot extends SubsystemBase {
     motorSetpoint =
         profile.calculate(RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds), motorSetpoint, goal);
 
-    leftMotor
-        .getClosedLoopController()
+    pid
         .setReference(
             motorSetpoint.position,
             ControlType.kPosition,
@@ -115,7 +126,7 @@ public class IntakePivot extends SubsystemBase {
     }
   }
 
-  public boolean positionIsInRange() {
+  public boolean atSetpoint() {
     return (position.gte(IntakePivotConstants.OUT_POSITION.minus(IntakePivotConstants.TOLERANCE))
         && position.lt(IntakePivotConstants.OUT_POSITION.plus(IntakePivotConstants.TOLERANCE)));
   }
@@ -125,12 +136,12 @@ public class IntakePivot extends SubsystemBase {
     position = setpoint;
   }
 
-  private void movePivot(Angle position) {
+  private void setPosition(Angle position) {
     goal = new TrapezoidProfile.State(position.in(Radians), 0);
     setpoint = position;
   }
 
-  public Command moveIntakePivotCommand(Angle position) {
-    return Commands.runOnce(() -> this.movePivot(position), this);
+  public Command setPositionCommand(Angle position) {
+    return Commands.runOnce(() -> this.setPosition(position), this);
   }
 }

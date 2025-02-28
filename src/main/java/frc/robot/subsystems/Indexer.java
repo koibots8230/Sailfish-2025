@@ -12,6 +12,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,22 +23,27 @@ import frc.robot.Constants.IndexerConstants;
 @Logged
 public class Indexer extends SubsystemBase {
 
-  private final SparkMax motor;
-  private final RelativeEncoder encoder;
-  private final SparkMaxConfig config;
-  private final SparkClosedLoopController closedLoopController;
+  @NotLogged private final SparkMax motor;
 
+  @NotLogged private final SparkMaxConfig config;
+
+  @NotLogged private final RelativeEncoder encoder;
+  
+  @NotLogged private final SparkClosedLoopController closedLoopController;
+
+  private double setpoint;
+  private double velocity;
   private Voltage voltage;
   private Current current;
-  private double velocity;
-  private double setpoint;
 
   public Indexer() {
     motor = new SparkMax(IndexerConstants.MOTOR_ID, MotorType.kBrushless);
 
     config = new SparkMaxConfig();
+
     config.closedLoop.p(IndexerConstants.PID.kp);
     config.closedLoop.velocityFF(IndexerConstants.FEEDFORWARD.kv);
+
     config.inverted(true);
 
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -59,15 +65,15 @@ public class Indexer extends SubsystemBase {
   }
 
   public void simulationPeriodic() {
-    // velocity = setpoint.mutableCopy();
+    velocity = setpoint;
   }
 
-  private void spinIndexer(double setVelocity) {
+  private void setVelocity(double setVelocity) {
     closedLoopController.setReference(setVelocity, ControlType.kVelocity);
     setpoint = setVelocity;
   }
 
   public Command setVelocityCommand(double setVelocity) {
-    return Commands.runOnce(() -> this.spinIndexer(setVelocity));
+    return Commands.runOnce(() -> this.setVelocity(setVelocity));
   }
 }

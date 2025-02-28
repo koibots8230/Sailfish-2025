@@ -11,7 +11,7 @@ public class ScoreCommands {
   public static Command levelThree(Elevator elevator, EndEffector endEffector) {
     return Commands.sequence(
         elevator.setPositionCommand(ElevatorConstants.L3_SETPOINT),
-        Commands.waitUntil(() -> elevator.positionIsInRAnge(ElevatorConstants.L3_SETPOINT)),
+        Commands.waitUntil(() -> elevator.atPosition(ElevatorConstants.L3_SETPOINT)),
         endEffector.outtakeCommand(),
         elevator.setPositionCommand(ElevatorConstants.INTAKE_SETPOINT));
   }
@@ -19,7 +19,7 @@ public class ScoreCommands {
   public static Command levelTwo(Elevator elevator, EndEffector endEffector) {
     return Commands.sequence(
         elevator.setPositionCommand(ElevatorConstants.L2_SETPOINT),
-        Commands.waitUntil(() -> elevator.positionIsInRAnge(ElevatorConstants.L2_SETPOINT)),
+        Commands.waitUntil(() -> elevator.atPosition(ElevatorConstants.L2_SETPOINT)),
         endEffector.outtakeCommand(),
         elevator.setPositionCommand(ElevatorConstants.INTAKE_SETPOINT));
   }
