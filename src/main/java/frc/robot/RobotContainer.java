@@ -19,6 +19,7 @@ public class RobotContainer {
   private final Swerve swerve;
   private final Elevator elevator;
   private final EndEffector endEffector;
+  private final EffectorPivot effectorPivot;
 
   // SendableChooser<Command> chooser = new SendableChooser<>();
   private final Intake intake;
@@ -35,6 +36,7 @@ public class RobotContainer {
     swerve = new Swerve();
     elevator = new Elevator();
     endEffector = new EndEffector();
+    effectorPivot = new EffectorPivot();
     intake = new Intake();
     intakePivot = new IntakePivot();
     indexer = new Indexer();

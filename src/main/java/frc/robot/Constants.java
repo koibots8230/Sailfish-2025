@@ -66,8 +66,11 @@ public class Constants {
     public static final int LASERCAN_ID = 21;
   }
 
-  public static class EffectorPivotConsants {
+  public static class EffectorPivotConstants {
 
+    public static final Angle INTAKE_POSTIION = Radians.of(0);
+
+    
     public static final AngularVelocity MAX_VELOCITY = RadiansPerSecond.of(4 * Math.PI);
     public static final AngularAcceleration MAX_ACCELERATION =
         RadiansPerSecondPerSecond.of(3 * Math.PI);
