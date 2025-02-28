@@ -4,12 +4,19 @@
 
 package frc.robot;
 
+import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
+import choreo.auto.AutoRoutine;
+import choreo.auto.AutoTrajectory;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.ReefAlignState;
 import frc.robot.commands.*;
@@ -20,6 +27,11 @@ public class RobotContainer {
 
   private final Swerve swerve;
   private final AutoFactory autoFactory;
+  private final AutoChooser autoChooser;
+  @NotLogged
+  private final SendableChooser<String> sendableChooser = new SendableChooser<>();
+
+  // private final AutoRoutines autoRoutines;
   private final Elevator elevator;
   private final EndEffector endEffector;
 
@@ -43,6 +55,7 @@ public class RobotContainer {
             swerve::followTrajectory,
             true,
             swerve);
+    autoChooser = new AutoChooser();
     elevator = new Elevator();
     endEffector = new EndEffector();
     intake = new Intake();
@@ -57,8 +70,27 @@ public class RobotContainer {
 
     //  chooser = AutoBuilder.buildAutoChooser();
 
+    // autoRoutines = new AutoRoutines();
+    autoChooser.addRoutine("Test Routine", this::testRoutine);
+    sendableChooser.addOption("Test Routine", "TEST_ROUTINE");
+    SmartDashboard.putData("Auto choices", sendableChooser);
+
+    //RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
+
     configureBindings();
     defualtCommands();
+  }
+
+  private AutoRoutine testRoutine() {
+    AutoRoutine routine = autoFactory.newRoutine("taxi");
+
+    // Load the routine's trajectories
+    AutoTrajectory driveToMiddle = routine.trajectory("Test");
+
+    // When the routine begins, reset odometry and start the first trajectory (1)
+    routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
+
+    return routine;
   }
 
   private void configureBindings() {
@@ -109,6 +141,12 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
+  if (sendableChooser.getSelected() == "TEST_ROUTINE") {
     return Commands.sequence(autoFactory.resetOdometry("Test2"), autoFactory.trajectoryCmd("Test2"));
+  }
+  return null;
+  //return autoChooser.selectedCommand();
+   //return Commands.sequence(autoFactory.resetOdometry("Test2"),
+   //   autoFactory.trajectoryCmd("Test2"));
   }
 }
