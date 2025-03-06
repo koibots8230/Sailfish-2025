@@ -72,8 +72,11 @@ public class RobotContainer {
 
     // autoRoutines = new AutoRoutines();
     autoChooser.addRoutine("Test Routine", this::testRoutine);
+    autoChooser.addRoutine("Score Front Left Right Reef", this::scoreFrontLeftRightReefRoutine);
     sendableChooser.addOption("Test Routine", "TEST_ROUTINE");
+    sendableChooser.addOption("Score Front Left Right Reef", "FRONT_LEFT_RIGHT_REEF");
     SmartDashboard.putData("Auto choices", sendableChooser);
+
 
     //RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
 
@@ -91,6 +94,13 @@ public class RobotContainer {
     routine.active().onTrue(Commands.sequence(driveToMiddle.resetOdometry(), driveToMiddle.cmd()));
 
     return routine;
+  }
+
+  private AutoRoutine scoreFrontLeftRightReefRoutine() {
+  AutoRoutine routine = autoFactory.newRoutine("taxi");
+  AutoTrajectory driveToFrontLeftRightReef = routine.trajectory("ScoreFrontLeftRightReef");
+  routine.active().onTrue(Commands.sequence(driveToFrontLeftRightReef.resetOdometry(), Commands.parallel(driveToFrontLeftRightReef.cmd(), ScoreCommands.levelTwo(elevator, endEffector))));
+  return routine;
   }
 
   private void configureBindings() {
@@ -144,9 +154,18 @@ public class RobotContainer {
   if (sendableChooser.getSelected() == "TEST_ROUTINE") {
     return Commands.sequence(autoFactory.resetOdometry("Test2"), autoFactory.trajectoryCmd("Test2"));
   }
+
+  if (sendableChooser.getSelected() == "FRONT_LEFT_RIGHT_REEF"){
+    return Commands.sequence(autoFactory.resetOdometry("ScoreFrontLeftRightReef"), autoFactory.trajectoryCmd("ScoreFrontLeftRightReef"), ScoreCommands.levelTwo(elevator, endEffector));
+  }
   return null;
   //return autoChooser.selectedCommand();
    //return Commands.sequence(autoFactory.resetOdometry("Test2"),
    //   autoFactory.trajectoryCmd("Test2"));
+  }
+
+  public void autonomousInit(){
+    isBlue = (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
+    swerve.setIsBlue(isBlue);
   }
 }
