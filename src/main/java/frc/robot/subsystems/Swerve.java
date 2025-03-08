@@ -207,7 +207,7 @@ public class Swerve extends SubsystemBase {
                         + Math.pow((points[1].getX() - points[0].getX()), 2)));
 
     LinearVelocity assistVelocity =
-        MetersPerSecond.of(distancePerpToVel.in(Meters) * AlignConstants.TRANSLATE_PID.kp);
+        MetersPerSecond.of(Math.sqrt(distancePerpToVel.in(Meters)) * AlignConstants.TRANSLATE_PID.kp);
 
     return new Pose2d(
         assistVelocity.in(MetersPerSecond) * angleToTarget.getCos(),
@@ -245,14 +245,12 @@ public class Swerve extends SubsystemBase {
             * AlignConstants.EFFECTOR_OFFSET.in(Meters)
             * (side.getRotation().getRadians() >= Math.PI / 3.0
                     && side.getRotation().getRadians() <= (2 * Math.PI) / 3.0
-                ? -1
-                : 1)),
+                ? 1 : -1)),
         (Math.cos(2 * side.getRotation().getRadians())
             * AlignConstants.EFFECTOR_OFFSET.in(Meters)
             * (side.getRotation().getRadians() >= Math.PI / 3.0
                     && side.getRotation().getRadians() <= (2 * Math.PI) / 3.0
-                ? -1
-                : 1)));
+                ? 1 : -1)));
   }
 
   private Translation2d getPoleTranslation(Pose2d side, boolean rightPole) {
@@ -261,11 +259,13 @@ public class Swerve extends SubsystemBase {
             + (Math.sin(2 * side.getRotation().getRadians())
                 * AlignConstants.POLE_SPACING.in(Meters)
                 * (rightPole ? 1 : -1)
+                * (isBlue ? 1 : -1)
                 * (side.getRotation().getRadians() == Math.PI ? -1 : 1)),
         side.getY()
             + (Math.cos(2 * side.getRotation().getRadians())
                 * AlignConstants.POLE_SPACING.in(Meters)
                 * (rightPole ? 1 : -1)
+                * (isBlue ? 1 : -1)
                 * (side.getRotation().getRadians() == Math.PI ? -1 : 1)));
   }
 
@@ -343,13 +343,13 @@ public class Swerve extends SubsystemBase {
     driveFieldRelative(
         MetersPerSecond.of(
             MathUtil.applyDeadband(
-                x + (assist.getX() * (isBlue ? -1 : 1)), SwerveConstants.DEADBAND)),
+                x + (assist.getX() * Math.sqrt(linearMagnitude) * (isBlue ? -1 : 1)), SwerveConstants.DEADBAND)),
         MetersPerSecond.of(
             MathUtil.applyDeadband(
-                y + (assist.getY() * (isBlue ? -1 : 1)), SwerveConstants.DEADBAND)),
+                y + (assist.getY() * Math.sqrt(linearMagnitude) * (isBlue ? -1 : 1)), SwerveConstants.DEADBAND)),
         RadiansPerSecond.of(
             MathUtil.applyDeadband(
-                -omega + assist.getRotation().getRadians(), SwerveConstants.DEADBAND)));
+                -omega + (assist.getRotation().getRadians() * Math.sqrt(Math.abs(omega))), SwerveConstants.DEADBAND)));
   }
 
   public ChassisSpeeds getChassisSpeeds() {
@@ -405,7 +405,7 @@ public class Swerve extends SubsystemBase {
   public Command driveFieldRelativeCommand(
       DoubleSupplier x, DoubleSupplier y, DoubleSupplier omega) {
     return Commands.run(
-        () -> driveFieldRelativeScaler(x.getAsDouble(), y.getAsDouble(), omega.getAsDouble()),
+        () -> driveFieldRelativeScaler(MathUtil.applyDeadband(x.getAsDouble(), SwerveConstants.DEADBAND), MathUtil.applyDeadband(y.getAsDouble(), SwerveConstants.DEADBAND), MathUtil.applyDeadband(omega.getAsDouble(), SwerveConstants.DEADBAND)),
         this);
   }
 
