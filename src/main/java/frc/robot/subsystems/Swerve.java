@@ -84,6 +84,9 @@ public class Swerve extends SubsystemBase {
 
     gyro = new Pigeon2(SwerveConstants.GYRO_ID);
 
+    gyroAngle = gyro.getRotation2d();
+    estimatedPosition = new Pose2d();
+
     odometry =
         new SwerveDrivePoseEstimator(
             SwerveConstants.KINEMATICS, gyroAngle, this.getModulePostitions(), estimatedPosition);
