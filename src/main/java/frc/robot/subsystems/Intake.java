@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.RelativeEncoder;
@@ -14,7 +13,6 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -33,8 +31,8 @@ public class Intake extends SubsystemBase {
 
   @NotLogged private final SparkClosedLoopController closedLoopController;
 
-  private AngularVelocity setpoint;
-  private AngularVelocity velocity;
+  private double setpoint;
+  private double velocity;
   private Voltage voltage;
   private Current current;
 
@@ -55,12 +53,12 @@ public class Intake extends SubsystemBase {
 
     closedLoopController = motor.getClosedLoopController();
 
-    setpoint = AngularVelocity.ofBaseUnits(0, RPM);
+    setpoint = 0;
   }
 
   @Override
   public void periodic() {
-    velocity = AngularVelocity.ofBaseUnits(encoder.getVelocity(), RPM);
+    velocity = encoder.getVelocity();
     voltage = Voltage.ofBaseUnits(motor.getBusVoltage() * motor.getAppliedOutput(), Volts);
     current = Current.ofBaseUnits(motor.getOutputCurrent(), Amps);
   }
@@ -70,12 +68,12 @@ public class Intake extends SubsystemBase {
     velocity = setpoint;
   }
 
-  private void setVelocity(AngularVelocity setVelocity) {
-    closedLoopController.setReference(setVelocity.in(RPM), ControlType.kVelocity);
+  private void setVelocity(double setVelocity) {
+    closedLoopController.setReference(setVelocity, ControlType.kVelocity);
     setpoint = setVelocity;
   }
 
-  public Command setVeclocityCommand(AngularVelocity setVelocity) {
+  public Command setVeclocityCommand(double setVelocity) {
     return Commands.runOnce(() -> this.setVelocity(setVelocity), this);
   }
 }

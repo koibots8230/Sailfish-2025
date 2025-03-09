@@ -23,54 +23,84 @@ import frc.robot.Constants.IndexerConstants;
 @Logged
 public class Indexer extends SubsystemBase {
 
-  @NotLogged private final SparkMax motor;
+  @NotLogged private final SparkMax topMotor;
+  @NotLogged private final SparkMax bottomMotor;
 
-  @NotLogged private final SparkMaxConfig config;
+  @NotLogged private final SparkMaxConfig topConfig;
+  @NotLogged private final SparkMaxConfig bottomConfig;
 
-  @NotLogged private final RelativeEncoder encoder;
+  @NotLogged private final RelativeEncoder topEncoder;
+  @NotLogged private final RelativeEncoder bottomEncoder;
 
-  @NotLogged private final SparkClosedLoopController closedLoopController;
+  @NotLogged private final SparkClosedLoopController topClosedLoopController;
+  @NotLogged private final SparkClosedLoopController bottomClosedLoopController;
 
-  private double setpoint;
-  private double velocity;
-  private Voltage voltage;
-  private Current current;
+  private Voltage topVoltage;
+  private Current topCurrent;
+  private double topVelocity;
+  private double topSetpoint;
+
+  private Voltage bottomVoltage;
+  private Current bottomCurrent;
+  private double bottomVelocity;
+  private double bottomSetpoint;
 
   public Indexer() {
-    motor = new SparkMax(IndexerConstants.MOTOR_ID, MotorType.kBrushless);
+    topMotor = new SparkMax(IndexerConstants.TOP_ID, MotorType.kBrushless);
+    bottomMotor = new SparkMax(IndexerConstants.BOTTOM_ID, MotorType.kBrushless);
 
-    config = new SparkMaxConfig();
+    topConfig = new SparkMaxConfig();
+    topConfig.closedLoop.p(IndexerConstants.TOP_PID.kp);
+    topConfig.closedLoop.velocityFF(IndexerConstants.TOP_FF.kv);
+    topConfig.inverted(false);
+    topConfig.smartCurrentLimit(60);
 
-    config.closedLoop.p(IndexerConstants.PID.kp);
-    config.closedLoop.velocityFF(IndexerConstants.FEEDFORWARD.kv);
+    topMotor.configure(topConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    config.inverted(true);
+    topEncoder = topMotor.getEncoder();
 
-    motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    topClosedLoopController = topMotor.getClosedLoopController();
 
-    encoder = motor.getEncoder();
+    bottomConfig = new SparkMaxConfig();
+    bottomConfig.closedLoop.p(IndexerConstants.BOTTOM_PID.kp);
+    bottomConfig.closedLoop.velocityFF(IndexerConstants.BOTTOM_FF.kv);
+    bottomConfig.inverted(true);
+    bottomConfig.smartCurrentLimit(60);
 
-    closedLoopController = motor.getClosedLoopController();
+    bottomMotor.configure(
+        bottomConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    setpoint = 0.0;
+    bottomEncoder = bottomMotor.getEncoder();
 
-    velocity = 0.0;
+    bottomClosedLoopController = bottomMotor.getClosedLoopController();
+
+    topSetpoint = 0.0;
+    bottomSetpoint = 0.0;
   }
 
   @Override
   public void periodic() {
-    voltage = Voltage.ofBaseUnits(motor.getBusVoltage() * motor.getAppliedOutput(), Volts);
-    current = Current.ofBaseUnits(motor.getOutputCurrent(), Amps);
-    velocity = encoder.getVelocity();
+    topVoltage = Voltage.ofBaseUnits(topMotor.getBusVoltage() * topMotor.getAppliedOutput(), Volts);
+    topCurrent = Current.ofBaseUnits(topMotor.getOutputCurrent(), Amps);
+    topVelocity = topEncoder.getVelocity();
+
+    bottomVoltage =
+        Voltage.ofBaseUnits(bottomMotor.getBusVoltage() * bottomMotor.getAppliedOutput(), Volts);
+    bottomCurrent = Current.ofBaseUnits(bottomMotor.getOutputCurrent(), Amps);
+    bottomVelocity = bottomEncoder.getVelocity();
   }
 
   public void simulationPeriodic() {
-    velocity = setpoint;
+    topVelocity = topSetpoint;
+    bottomVelocity = bottomSetpoint;
   }
 
   private void setVelocity(double setVelocity) {
-    closedLoopController.setReference(setVelocity, ControlType.kVelocity);
-    setpoint = setVelocity;
+    topClosedLoopController.setReference(setVelocity, ControlType.kVelocity);
+    bottomClosedLoopController.setReference(setVelocity, ControlType.kVelocity);
+
+    topSetpoint = setVelocity;
+    bottomSetpoint = setVelocity;
   }
 
   public Command setVelocityCommand(double setVelocity) {
