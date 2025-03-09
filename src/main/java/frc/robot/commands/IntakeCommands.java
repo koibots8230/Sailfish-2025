@@ -23,8 +23,8 @@ public class IntakeCommands {
       Elevator elevator,
       EndEffector endEffector) {
     return Commands.sequence(
-        elevator.setPositionCommand(ElevatorConstants.INTAKE_SETPOINT),
-        Commands.waitUntil(() -> elevator.positionIsInRAnge(ElevatorConstants.INTAKE_SETPOINT)),
+        elevator.setPositionCommand(ElevatorConstants.INTAKE_POSITION),
+        Commands.waitUntil(() -> elevator.atPosition(ElevatorConstants.INTAKE_POSITION)),
         Commands.parallel(
             intake.setVeclocityCommand(IntakeConstants.INTAKE_VELOCITY),
             // intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION),
@@ -49,8 +49,8 @@ public class IntakeCommands {
       Elevator elevator,
       EndEffector endEffector) {
     return Commands.sequence(
-        elevator.setPositionCommand(ElevatorConstants.INTAKE_SETPOINT),
-        Commands.waitUntil(() -> elevator.positionIsInRAnge(ElevatorConstants.INTAKE_SETPOINT)),
+        elevator.setPositionCommand(ElevatorConstants.INTAKE_POSITION),
+        Commands.waitUntil(() -> elevator.atPosition(ElevatorConstants.INTAKE_POSITION)),
         // intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION),
         // Commands.waitUntil(() -> intakePivot.positionIsInRange()),
         Commands.parallel(

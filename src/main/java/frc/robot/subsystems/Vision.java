@@ -41,8 +41,9 @@ public class Vision extends SubsystemBase {
   @NotLogged private final Supplier<Rotation2d> getGyro;
   @NotLogged private final Consumer<VisionMeasurement> addMeasurement;
 
+  @NotLogged private AprilTagFieldLayout layout;
+
   private Pose2d pose;
-  private AprilTagFieldLayout layout;
 
   public Vision(
       Supplier<Pose2d> getOdometry,
