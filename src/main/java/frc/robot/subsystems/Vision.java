@@ -42,8 +42,9 @@ public class Vision extends SubsystemBase {
   @NotLogged private final Supplier<Rotation2d> getGyro;
   @NotLogged private final Consumer<VisionMeasurement> addMeasurement;
 
+  @NotLogged private AprilTagFieldLayout layout;
+
   private Pose2d pose;
-  private AprilTagFieldLayout layout;
 
   private final BooleanSupplier isBlue;
 
@@ -127,12 +128,14 @@ public class Vision extends SubsystemBase {
             + ((-VisionConstants.CAMERA_POSITIONS[camera].getX()
                     * Math.cos(getGyro.get().getRadians() + (isBlue.getAsBoolean() ? 0 : Math.PI)))
                 + (VisionConstants.CAMERA_POSITIONS[camera].getY()
-                    * Math.sin(getGyro.get().getRadians() + (isBlue.getAsBoolean() ? 0 : Math.PI)))),
+                    * Math.sin(
+                        getGyro.get().getRadians() + (isBlue.getAsBoolean() ? 0 : Math.PI)))),
         camPose.getY()
             + ((-VisionConstants.CAMERA_POSITIONS[camera].getY()
                     * Math.cos(getGyro.get().getRadians() + (isBlue.getAsBoolean() ? 0 : Math.PI)))
                 - (VisionConstants.CAMERA_POSITIONS[camera].getX()
-                    * Math.sin(getGyro.get().getRadians() + (isBlue.getAsBoolean() ? 0 : Math.PI)))),
+                    * Math.sin(
+                        getGyro.get().getRadians() + (isBlue.getAsBoolean() ? 0 : Math.PI)))),
         angle);
   }
 

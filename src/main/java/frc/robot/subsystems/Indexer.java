@@ -12,6 +12,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,17 +23,17 @@ import frc.robot.Constants.IndexerConstants;
 @Logged
 public class Indexer extends SubsystemBase {
 
-  private final SparkMax topMotor;
-  private final SparkMax bottomMotor;
+  @NotLogged private final SparkMax topMotor;
+  @NotLogged private final SparkMax bottomMotor;
 
-  private final RelativeEncoder topEncoder;
-  private final RelativeEncoder bottomEncoder;
+  @NotLogged private final SparkMaxConfig topConfig;
+  @NotLogged private final SparkMaxConfig bottomConfig;
 
-  private final SparkMaxConfig topConfig;
-  private final SparkMaxConfig bottomConfig;
+  @NotLogged private final RelativeEncoder topEncoder;
+  @NotLogged private final RelativeEncoder bottomEncoder;
 
-  private final SparkClosedLoopController topClosedLoopController;
-  private final SparkClosedLoopController bottomClosedLoopController;
+  @NotLogged private final SparkClosedLoopController topClosedLoopController;
+  @NotLogged private final SparkClosedLoopController bottomClosedLoopController;
 
   private Voltage topVoltage;
   private Current topCurrent;
@@ -51,7 +52,7 @@ public class Indexer extends SubsystemBase {
     topConfig = new SparkMaxConfig();
     topConfig.closedLoop.p(IndexerConstants.TOP_PID.kp);
     topConfig.closedLoop.velocityFF(IndexerConstants.TOP_FF.kv);
-    topConfig.inverted(true);
+    topConfig.inverted(false);
     topConfig.smartCurrentLimit(60);
 
     topMotor.configure(topConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -66,7 +67,8 @@ public class Indexer extends SubsystemBase {
     bottomConfig.inverted(true);
     bottomConfig.smartCurrentLimit(60);
 
-    bottomMotor.configure(bottomConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    bottomMotor.configure(
+        bottomConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     bottomEncoder = bottomMotor.getEncoder();
 
@@ -82,16 +84,18 @@ public class Indexer extends SubsystemBase {
     topCurrent = Current.ofBaseUnits(topMotor.getOutputCurrent(), Amps);
     topVelocity = topEncoder.getVelocity();
 
-    bottomVoltage = Voltage.ofBaseUnits(bottomMotor.getBusVoltage() * bottomMotor.getAppliedOutput(), Volts);
+    bottomVoltage =
+        Voltage.ofBaseUnits(bottomMotor.getBusVoltage() * bottomMotor.getAppliedOutput(), Volts);
     bottomCurrent = Current.ofBaseUnits(bottomMotor.getOutputCurrent(), Amps);
     bottomVelocity = bottomEncoder.getVelocity();
   }
 
   public void simulationPeriodic() {
-    // velocity = setpoint.mutableCopy();
+    topVelocity = topSetpoint;
+    bottomVelocity = bottomSetpoint;
   }
 
-  private void spinIndexer(double setVelocity) {
+  private void setVelocity(double setVelocity) {
     topClosedLoopController.setReference(setVelocity, ControlType.kVelocity);
     bottomClosedLoopController.setReference(setVelocity, ControlType.kVelocity);
 
@@ -100,6 +104,6 @@ public class Indexer extends SubsystemBase {
   }
 
   public Command setVelocityCommand(double setVelocity) {
-    return Commands.runOnce(() -> this.spinIndexer(setVelocity));
+    return Commands.runOnce(() -> this.setVelocity(setVelocity));
   }
 }

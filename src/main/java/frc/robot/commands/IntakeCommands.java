@@ -1,8 +1,5 @@
 package frc.robot.commands;
 
-import static edu.wpi.first.units.Units.RPM;
-
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.ElevatorConstants;
@@ -23,8 +20,8 @@ public class IntakeCommands {
       Elevator elevator,
       EndEffector endEffector) {
     return Commands.sequence(
-        elevator.setPositionCommand(ElevatorConstants.INTAKE_SETPOINT),
-        Commands.waitUntil(() -> elevator.positionIsInRAnge(ElevatorConstants.INTAKE_SETPOINT)),
+        elevator.setPositionCommand(ElevatorConstants.INTAKE_POSITION),
+        Commands.waitUntil(() -> elevator.atPosition(ElevatorConstants.INTAKE_POSITION)),
         Commands.parallel(
             intake.setVeclocityCommand(IntakeConstants.INTAKE_VELOCITY),
             // intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION),
@@ -36,7 +33,7 @@ public class IntakeCommands {
   public static Command intakeStop(
       Intake intake, Indexer indexer, IntakePivot intakePivot, EndEffector endEffector) {
     return Commands.parallel(
-        intake.setVeclocityCommand(AngularVelocity.ofBaseUnits(0, RPM)),
+        intake.setVeclocityCommand(0),
         indexer.setVelocityCommand(0),
         // intakePivot.moveIntakePivotCommand(IntakePivotConstants.IN_POSITION),
         endEffector.setVelocityCommand(0));
@@ -49,8 +46,8 @@ public class IntakeCommands {
       Elevator elevator,
       EndEffector endEffector) {
     return Commands.sequence(
-        elevator.setPositionCommand(ElevatorConstants.INTAKE_SETPOINT),
-        Commands.waitUntil(() -> elevator.positionIsInRAnge(ElevatorConstants.INTAKE_SETPOINT)),
+        elevator.setPositionCommand(ElevatorConstants.INTAKE_POSITION),
+        Commands.waitUntil(() -> elevator.atPosition(ElevatorConstants.INTAKE_POSITION)),
         // intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION),
         // Commands.waitUntil(() -> intakePivot.positionIsInRange()),
         Commands.parallel(
