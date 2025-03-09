@@ -203,14 +203,13 @@ public class Swerve extends SubsystemBase {
     return SwerveConstants.KINEMATICS.toChassisSpeeds(measuredStates);
   }
 
-  // ===================== Reef Align State ===================== \\
+  // ===================== Module Positions ===================== \\
 
   private void setReefAlignState(ReefAlignState state) {
-    reefAlignState = state;
+    this.reefAlignState = state;
   }
 
-  // ===================== Pose Helper Functions ===================== \\
-
+  // ===================== Pose Helpers ===================== \\
   private Distance distanceToPose(Pose2d pose) {
     return Meters.of(
         Math.hypot(
@@ -239,14 +238,14 @@ public class Swerve extends SubsystemBase {
             * AlignConstants.EFFECTOR_OFFSET.in(Meters)
             * (side.getRotation().getRadians() >= Math.PI / 3.0
                     && side.getRotation().getRadians() <= (2 * Math.PI) / 3.0
-                ? -1
-                : 1)),
+                ? 1
+                : -1)),
         (Math.cos(2 * side.getRotation().getRadians())
             * AlignConstants.EFFECTOR_OFFSET.in(Meters)
             * (side.getRotation().getRadians() >= Math.PI / 3.0
                     && side.getRotation().getRadians() <= (2 * Math.PI) / 3.0
-                ? -1
-                : 1)));
+                ? 1
+                : -1)));
   }
 
   private Translation2d getPoleTranslation(Pose2d side, boolean rightPole) {
@@ -255,15 +254,57 @@ public class Swerve extends SubsystemBase {
             + (Math.sin(2 * side.getRotation().getRadians())
                 * AlignConstants.POLE_SPACING.in(Meters)
                 * (rightPole ? 1 : -1)
+                * (isBlue ? 1 : -1)
                 * (side.getRotation().getRadians() == Math.PI ? -1 : 1)),
         side.getY()
             + (Math.cos(2 * side.getRotation().getRadians())
                 * AlignConstants.POLE_SPACING.in(Meters)
                 * (rightPole ? 1 : -1)
+                * (isBlue ? 1 : -1)
                 * (side.getRotation().getRadians() == Math.PI ? -1 : 1)));
   }
 
   // ===================== Align Assist ===================== \\
+
+  private Pose2d getAssistVelocity(
+      Translation2d targetPose, Rotation2d targetAngle, double xInput, double yInput) {
+    Translation2d[] points =
+        new Translation2d[] {
+          this.getEstimatedPosition().getTranslation(),
+          new Translation2d(
+              this.getEstimatedPosition().getX() + xInput,
+              this.getEstimatedPosition().getY() + yInput)
+        };
+
+    Rotation2d angleToTarget =
+        Rotation2d.fromRadians(
+            Math.atan2(
+                this.getEstimatedPosition().getY() - targetPose.getY(),
+                this.getEstimatedPosition().getX() - targetPose.getX()));
+
+    Distance distancePerpToVel =
+        Meters.of( // Looks complicated, but just the "Line from two points" from this
+            // https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
+            Math.abs(
+                    ((points[1].getY() - points[0].getY()) * targetPose.getX())
+                        - ((points[1].getX() - points[0].getX()) * targetPose.getY())
+                        + (points[1].getX() * points[0].getY())
+                        - (points[1].getY() * points[0].getX()))
+                / Math.sqrt(
+                    Math.pow((points[1].getY() - points[0].getY()), 2)
+                        + Math.pow((points[1].getX() - points[0].getX()), 2)));
+
+    LinearVelocity assistVelocity =
+        MetersPerSecond.of(
+            Math.sqrt(distancePerpToVel.in(Meters)) * AlignConstants.TRANSLATE_PID.kp);
+
+    return new Pose2d(
+        assistVelocity.in(MetersPerSecond) * angleToTarget.getCos(),
+        assistVelocity.in(MetersPerSecond) * angleToTarget.getSin(),
+        new Rotation2d(
+            anglePID.calculate(
+                gyroAngle.getRadians(), targetAngle.getRadians() + (isBlue ? 0 : Math.PI))));
+  }
 
   private Pose2d reefAlignAssist(double xInput, double yInput, double omega) {
     xInput = isBlue ? xInput : -xInput;
@@ -322,45 +363,6 @@ public class Swerve extends SubsystemBase {
     return getAssistVelocity(pose.getTranslation(), pose.getRotation(), xInput, yInput);
   }
 
-  private Pose2d getAssistVelocity(
-      Translation2d targetPose, Rotation2d targetAngle, double xInput, double yInput) {
-    Translation2d[] points =
-        new Translation2d[] {
-          this.getEstimatedPosition().getTranslation(),
-          new Translation2d(
-              this.getEstimatedPosition().getX() + xInput,
-              this.getEstimatedPosition().getY() + yInput)
-        };
-
-    Rotation2d angleToTarget =
-        Rotation2d.fromRadians(
-            Math.atan2(
-                this.getEstimatedPosition().getY() - targetPose.getY(),
-                this.getEstimatedPosition().getX() - targetPose.getX()));
-
-    Distance distancePerpToVel =
-        Meters.of( // Looks complicated, but just the "Line from two points" from this
-            // https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
-            Math.abs(
-                    ((points[1].getY() - points[0].getY()) * targetPose.getX())
-                        - ((points[1].getX() - points[0].getX()) * targetPose.getY())
-                        + (points[1].getX() * points[0].getY())
-                        - (points[1].getY() * points[0].getX()))
-                / Math.sqrt(
-                    Math.pow((points[1].getY() - points[0].getY()), 2)
-                        + Math.pow((points[1].getX() - points[0].getX()), 2)));
-
-    LinearVelocity assistVelocity =
-        MetersPerSecond.of(distancePerpToVel.in(Meters) * AlignConstants.TRANSLATE_PID.kp);
-
-    return new Pose2d(
-        assistVelocity.in(MetersPerSecond) * angleToTarget.getCos(),
-        assistVelocity.in(MetersPerSecond) * angleToTarget.getSin(),
-        new Rotation2d(
-            anglePID.calculate(
-                gyroAngle.getRadians(), targetAngle.getRadians() + (isBlue ? 0 : Math.PI))));
-  }
-
   // ===================== Teleop Driving ===================== \\
 
   private void driveFieldRelativeScaler(double x, double y, double omega) {
@@ -386,13 +388,16 @@ public class Swerve extends SubsystemBase {
     driveFieldRelative(
         MetersPerSecond.of(
             MathUtil.applyDeadband(
-                x + (assist.getX() * (isBlue ? -1 : 1)), SwerveConstants.DEADBAND)),
+                x + (assist.getX() * Math.sqrt(linearMagnitude) * (isBlue ? -1 : 1)),
+                SwerveConstants.DEADBAND)),
         MetersPerSecond.of(
             MathUtil.applyDeadband(
-                y + (assist.getY() * (isBlue ? -1 : 1)), SwerveConstants.DEADBAND)),
+                y + (assist.getY() * Math.sqrt(linearMagnitude) * (isBlue ? -1 : 1)),
+                SwerveConstants.DEADBAND)),
         RadiansPerSecond.of(
             MathUtil.applyDeadband(
-                -omega + assist.getRotation().getRadians(), SwerveConstants.DEADBAND)));
+                -omega + (assist.getRotation().getRadians() * Math.sqrt(Math.abs(omega))),
+                SwerveConstants.DEADBAND)));
   }
 
   public void driveRobotRelative(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
@@ -427,7 +432,11 @@ public class Swerve extends SubsystemBase {
   public Command driveFieldRelativeCommand(
       DoubleSupplier x, DoubleSupplier y, DoubleSupplier omega) {
     return Commands.run(
-        () -> driveFieldRelativeScaler(x.getAsDouble(), y.getAsDouble(), omega.getAsDouble()),
+        () ->
+            driveFieldRelativeScaler(
+                MathUtil.applyDeadband(x.getAsDouble(), SwerveConstants.DEADBAND),
+                MathUtil.applyDeadband(y.getAsDouble(), SwerveConstants.DEADBAND),
+                MathUtil.applyDeadband(omega.getAsDouble(), SwerveConstants.DEADBAND)),
         this);
   }
 

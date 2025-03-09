@@ -28,6 +28,7 @@ import frc.lib.util.VisionMeasurement;
 import frc.robot.Constants.VisionConstants;
 import java.io.UncheckedIOException;
 import java.util.Arrays;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -45,10 +46,13 @@ public class Vision extends SubsystemBase {
 
   private Pose2d pose;
 
+  private final BooleanSupplier isBlue;
+
   public Vision(
       Supplier<Pose2d> getOdometry,
       Supplier<Rotation2d> getGyro,
-      Consumer<VisionMeasurement> addMeasurement) {
+      Consumer<VisionMeasurement> addMeasurement,
+      BooleanSupplier isBlue) {
     this.getOdometry = getOdometry;
     this.getGyro = getGyro;
     this.addMeasurement = addMeasurement;
@@ -82,6 +86,8 @@ public class Vision extends SubsystemBase {
     } catch (UncheckedIOException e) {
       System.err.println("ERROR: Could not find apriltag field layout!");
     }
+
+    this.isBlue = isBlue;
   }
 
   private Pose2d translateToFieldPose(
@@ -120,14 +126,16 @@ public class Vision extends SubsystemBase {
     return new Pose2d(
         camPose.getX()
             + ((-VisionConstants.CAMERA_POSITIONS[camera].getX()
-                    * Math.cos(getGyro.get().getRadians()))
+                    * Math.cos(getGyro.get().getRadians() + (isBlue.getAsBoolean() ? 0 : Math.PI)))
                 + (VisionConstants.CAMERA_POSITIONS[camera].getY()
-                    * Math.sin(getGyro.get().getRadians()))),
+                    * Math.sin(
+                        getGyro.get().getRadians() + (isBlue.getAsBoolean() ? 0 : Math.PI)))),
         camPose.getY()
             + ((-VisionConstants.CAMERA_POSITIONS[camera].getY()
-                    * Math.cos(getGyro.get().getRadians()))
+                    * Math.cos(getGyro.get().getRadians() + (isBlue.getAsBoolean() ? 0 : Math.PI)))
                 - (VisionConstants.CAMERA_POSITIONS[camera].getX()
-                    * Math.sin(getGyro.get().getRadians()))),
+                    * Math.sin(
+                        getGyro.get().getRadians() + (isBlue.getAsBoolean() ? 0 : Math.PI)))),
         angle);
   }
 

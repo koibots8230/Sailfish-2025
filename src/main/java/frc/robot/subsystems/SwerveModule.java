@@ -24,6 +24,7 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -70,7 +71,7 @@ public class SwerveModule {
 
   private Voltage turnVoltage;
   private Voltage driveVoltage;
-  private Current turnCurrent;
+  private double turnCurrent;
   private Current driveCurrent;
 
   public SwerveModule(int driveID, int turnID) {
@@ -154,7 +155,7 @@ public class SwerveModule {
     turnVoltage =
         Voltage.ofBaseUnits(turnMotor.getBusVoltage() * turnMotor.getAppliedOutput(), Volts);
     driveCurrent = Current.ofBaseUnits(driveMotor.getOutputCurrent(), Amps);
-    turnCurrent = Current.ofBaseUnits(turnMotor.getOutputCurrent(), Amps);
+    turnCurrent = turnMotor.getOutputCurrent();
   }
 
   public void setState(SwerveModuleState swerveModuleState) {
@@ -167,12 +168,12 @@ public class SwerveModule {
         swerveModuleState.speedMetersPerSecond, SparkBase.ControlType.kVelocity);
 
     driveSetpoint = MetersPerSecond.of(swerveModuleState.speedMetersPerSecond);
-    turnSetpoint = Radians.of(swerveModuleState.angle.getRadians());
+    turnSetpoint = Radians.of(MathUtil.angleModulus(swerveModuleState.angle.getRadians()));
   }
 
   public void periodic() {
     driveCurrent = Current.ofBaseUnits(driveMotor.getOutputCurrent(), Units.Amps);
-    turnCurrent = Current.ofBaseUnits(turnMotor.getOutputCurrent(), Units.Amps);
+    turnCurrent = turnMotor.getOutputCurrent();
     driveVoltage =
         Voltage.ofBaseUnits(driveMotor.getBusVoltage() * driveMotor.getAppliedOutput(), Volts);
     turnVoltage =
