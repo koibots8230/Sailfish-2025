@@ -67,7 +67,8 @@ public class Indexer extends SubsystemBase {
     bottomConfig.inverted(true);
     bottomConfig.smartCurrentLimit(60);
 
-    bottomMotor.configure(bottomConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    bottomMotor.configure(
+        bottomConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     bottomEncoder = bottomMotor.getEncoder();
 
@@ -83,7 +84,8 @@ public class Indexer extends SubsystemBase {
     topCurrent = Current.ofBaseUnits(topMotor.getOutputCurrent(), Amps);
     topVelocity = topEncoder.getVelocity();
 
-    bottomVoltage = Voltage.ofBaseUnits(bottomMotor.getBusVoltage() * bottomMotor.getAppliedOutput(), Volts);
+    bottomVoltage =
+        Voltage.ofBaseUnits(bottomMotor.getBusVoltage() * bottomMotor.getAppliedOutput(), Volts);
     bottomCurrent = Current.ofBaseUnits(bottomMotor.getOutputCurrent(), Amps);
     bottomVelocity = bottomEncoder.getVelocity();
   }
