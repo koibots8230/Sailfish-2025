@@ -13,6 +13,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
@@ -25,13 +26,15 @@ import frc.robot.Constants.EndEffectorConstants;
 @Logged
 public class EndEffector extends SubsystemBase {
 
-  private final SparkMax motor;
-  private final SparkMaxConfig config;
-  private final RelativeEncoder encoder;
+  @NotLogged private final SparkMax motor;
 
-  private final SparkClosedLoopController pid;
+  @NotLogged private final LaserCan laserCAN;
 
-  private final LaserCan laserCAN;
+  @NotLogged private final SparkMaxConfig config;
+
+  @NotLogged private final RelativeEncoder encoder;
+
+  @NotLogged private final SparkClosedLoopController pid;
 
   double setpoint;
   double velocity;
@@ -58,8 +61,8 @@ public class EndEffector extends SubsystemBase {
 
     config.idleMode(IdleMode.kBrake);
 
-    config.closedLoop.p(EndEffectorConstants.PID_GAINS.kp);
-    config.closedLoop.velocityFF(EndEffectorConstants.FEEDFORWARD_GAINS.kv);
+    config.closedLoop.p(EndEffectorConstants.PID.kp);
+    config.closedLoop.velocityFF(EndEffectorConstants.FEEDFORWARD.kv);
 
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
