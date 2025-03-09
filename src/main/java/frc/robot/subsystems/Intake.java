@@ -29,8 +29,8 @@ public class Intake extends SubsystemBase {
   private final SparkMaxConfig config;
   private final SparkClosedLoopController closedLoopController;
 
-  private AngularVelocity setpoint;
-  private AngularVelocity velocity;
+  private double setpoint;
+  private double velocity;
   private Voltage voltage;
   private Current current;
 
@@ -51,12 +51,12 @@ public class Intake extends SubsystemBase {
 
     closedLoopController = motor.getClosedLoopController();
 
-    setpoint = AngularVelocity.ofBaseUnits(0, RPM);
+    setpoint = 0;
   }
 
   @Override
   public void periodic() {
-    velocity = AngularVelocity.ofBaseUnits(encoder.getVelocity(), RPM);
+    velocity = encoder.getVelocity();
     voltage = Voltage.ofBaseUnits(motor.getBusVoltage() * motor.getAppliedOutput(), Volts);
     current = Current.ofBaseUnits(motor.getOutputCurrent(), Amps);
   }
@@ -66,12 +66,12 @@ public class Intake extends SubsystemBase {
     velocity = setpoint;
   }
 
-  private void spinIntake(AngularVelocity setVelocity) {
-    closedLoopController.setReference(setVelocity.in(RPM), ControlType.kVelocity);
+  private void spinIntake(double setVelocity) {
+    closedLoopController.setReference(setVelocity, ControlType.kVelocity);
     setpoint = setVelocity;
   }
 
-  public Command setVeclocityCommand(AngularVelocity setVelocity) {
+  public Command setVeclocityCommand(double setVelocity) {
     return Commands.runOnce(() -> this.spinIntake(setVelocity), this);
   }
 }

@@ -36,7 +36,7 @@ public class IntakeCommands {
   public static Command intakeStop(
       Intake intake, Indexer indexer, IntakePivot intakePivot, EndEffector endEffector) {
     return Commands.parallel(
-        intake.setVeclocityCommand(AngularVelocity.ofBaseUnits(0, RPM)),
+        intake.setVeclocityCommand(0),
         indexer.setVelocityCommand(0),
         // intakePivot.moveIntakePivotCommand(IntakePivotConstants.IN_POSITION),
         endEffector.setVelocityCommand(0));

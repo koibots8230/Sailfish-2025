@@ -58,7 +58,7 @@ public class Constants {
     public static final FeedforwardGains FEEDFORWARD_GAINS =
         new FeedforwardGains.Builder().kv(0.0002).build();
 
-    public static final Distance TRIGGER_DISTANCE = Distance.ofBaseUnits(85, Units.Millimeters);
+    public static final Distance TRIGGER_DISTANCE = Distance.ofBaseUnits(90, Units.Millimeters);
 
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(40, Units.Amps);
 
@@ -192,13 +192,12 @@ public class Constants {
   }
 
   public static class IntakeConstants {
-    public static final AngularVelocity INTAKE_VELOCITY = AngularVelocity.ofBaseUnits(2500, RPM);
-    public static final AngularVelocity REVERSE_INTAKE_VELOCITY =
-        AngularVelocity.ofBaseUnits(-2000, RPM);
+    public static final double INTAKE_VELOCITY = 2500;
+    public static final double REVERSE_INTAKE_VELOCITY = -2000;
 
-    public static final PIDGains PID = new PIDGains.Builder().kp(0).build();
+    public static final PIDGains PID = new PIDGains.Builder().kp(0.00006).build();
     public static final FeedforwardGains FEEDFORWARD =
-        new FeedforwardGains.Builder().kv(0.00002).build();
+        new FeedforwardGains.Builder().kv(0.00018).build();
 
     public static final Current CURRENT_LIMIT = Amps.of(80);
 
@@ -206,14 +205,19 @@ public class Constants {
   }
 
   public static class IndexerConstants {
-    public static final double INDEX_VELOCITY = 2000;
+    public static final double INDEX_VELOCITY = 1500;
     public static final double REVERSE_VELOCITY = -1500;
 
-    public static final PIDGains PID = new PIDGains.Builder().kp(0.0000).build();
-    public static final FeedforwardGains FEEDFORWARD =
-        new FeedforwardGains.Builder().kv(0.00023).kg(0).build();
+    public static final PIDGains TOP_PID = new PIDGains.Builder().kp(0.000032).build();
+    public static final FeedforwardGains TOP_FF =
+        new FeedforwardGains.Builder().kv(0.00022).kg(0).build();
 
-    public static final int MOTOR_ID = 41;
+    public static final PIDGains BOTTOM_PID = new PIDGains.Builder().kp(0.000034).build();
+    public static final FeedforwardGains BOTTOM_FF =
+        new FeedforwardGains.Builder().kv(0.00028).kg(0).build();
+
+    public static final int TOP_ID = 41;
+    public static final int BOTTOM_ID = 42;
   }
 
   public static class VisionConstants {
