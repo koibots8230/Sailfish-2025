@@ -126,7 +126,6 @@ public class Swerve extends SubsystemBase {
   }
 
   public void setOdometry(Pose2d pose) {
-    System.out.println("Resetting Odometry: " + pose);
     simHeading = pose.getRotation();
     odometry.resetPose(pose);
   }
@@ -441,12 +440,8 @@ public class Swerve extends SubsystemBase {
 
   public void followTrajectory(SwerveSample sample) {
     trajectoryToFollow = sample.getPose();
-    System.out.println("Traj: " + trajectoryToFollow);
-    // Get the current pose of the robot
     Pose2d pose = odometry.getEstimatedPosition();
-    System.out.println("Pose: " + pose);
 
-    // Generate the next speeds for the robot
     ChassisSpeeds speeds =
         new ChassisSpeeds(
             sample.vx + xController.calculate(pose.getX(), sample.x),
@@ -454,8 +449,6 @@ public class Swerve extends SubsystemBase {
             sample.omega
                 + headingController.calculate(pose.getRotation().getRadians(), sample.heading));
 
-    // Apply the generated speeds
-    System.out.println("Spd: " + speeds);
     driveFieldRelative(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, pose.getRotation()));
   }
 

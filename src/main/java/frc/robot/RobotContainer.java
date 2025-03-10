@@ -11,7 +11,6 @@ import choreo.auto.AutoTrajectory;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -28,13 +27,10 @@ public class RobotContainer {
   private final Swerve swerve;
   private final AutoFactory autoFactory;
   private final AutoChooser autoChooser;
-  @NotLogged private final SendableChooser<String> sendableChooser = new SendableChooser<>();
 
-  // private final AutoRoutines autoRoutines;
   private final Elevator elevator;
   private final EndEffector endEffector;
 
-  // SendableChooser<Command> chooser = new SendableChooser<>();
   private final Intake intake;
   private final IntakePivot intakePivot;
 
@@ -73,9 +69,9 @@ public class RobotContainer {
 
     //  chooser = AutoBuilder.buildAutoChooser();
 
-    autoChooser.addRoutine("Score Front Left Right Reef", this::scoreFrontLeftRightReefRoutine);
-    autoChooser.addRoutine("move stright tune test", this::moveStrightAutoTuneTest);
-    autoChooser.addRoutine("rotate tune test", this::rotateAutoTuneTest);
+    autoChooser.addRoutine("Score Front Left Right Reef", this::SeFLRRf);
+    autoChooser.addRoutine("move stright tune test", this::MeSATTt);
+    autoChooser.addRoutine("rotate tune test", this::ReATTt);
     SmartDashboard.putData("auto choices", autoChooser);
 
     RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
@@ -84,10 +80,10 @@ public class RobotContainer {
     defualtCommands();
   }
 
-  private AutoRoutine scoreFrontLeftRightReefRoutine() {
+  private AutoRoutine SeFLRRf() {
     AutoRoutine routine = autoFactory.newRoutine("taxi");
 
-    AutoTrajectory driveToFrontLeftRightReef = routine.trajectory("ScoreFrontLeftRightReef");
+    AutoTrajectory driveToFrontLeftRightReef = routine.trajectory("SeFLRRf");
 
     routine
         .active()
@@ -100,7 +96,7 @@ public class RobotContainer {
     return routine;
   }
 
-  private AutoRoutine moveStrightAutoTuneTest() {
+  private AutoRoutine MeSATTt() {
     AutoRoutine routine = autoFactory.newRoutine("taxi");
 
     AutoTrajectory MvST = routine.trajectory("MvST");
@@ -110,10 +106,10 @@ public class RobotContainer {
     return routine;
   }
 
-  private AutoRoutine rotateAutoTuneTest() {
+  private AutoRoutine ReATTt() {
     AutoRoutine routine = autoFactory.newRoutine("taxi");
 
-    AutoTrajectory rotate = routine.trajectory("rotate");
+    AutoTrajectory rotate = routine.trajectory("Re");
 
     routine.active().onTrue(Commands.sequence(rotate.resetOdometry(), rotate.cmd()));
 
@@ -165,24 +161,6 @@ public class RobotContainer {
   public void teleopInit() {
     isBlue = (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
     swerve.setIsBlue(isBlue);
-  }
-
-  public Command getAutonomousCommand() {
-    if (sendableChooser.getSelected() == "TEST_ROUTINE") {
-      return Commands.sequence(
-          autoFactory.resetOdometry("Test2"), autoFactory.trajectoryCmd("Test2"));
-    }
-
-    if (sendableChooser.getSelected() == "FRONT_LEFT_RIGHT_REEF") {
-      return Commands.sequence(
-          autoFactory.resetOdometry("ScoreFrontLeftRightReef"),
-          autoFactory.trajectoryCmd("ScoreFrontLeftRightReef"),
-          autoFactory.trajectoryCmd("SFLRRf"));
-    }
-    return null;
-    // return autoChooser.selectedCommand();
-    // return Commands.sequence(autoFactory.resetOdometry("Test2"),
-    //   autoFactory.trajectoryCmd("Test2"));
   }
 
   public void autonomousInit() {
