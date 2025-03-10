@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -26,9 +27,12 @@ public class RobotContainer {
 
   private final Indexer indexer;
 
+  private final Climber climber;
+
   private final Vision vision;
 
   private final CommandXboxController xboxController;
+  private final CommandXboxController opperatorPad;
   private boolean isBlue;
 
   public RobotContainer() {
@@ -38,6 +42,7 @@ public class RobotContainer {
     intake = new Intake();
     intakePivot = new IntakePivot();
     indexer = new Indexer();
+    climber = new Climber();
 
     vision =
         new Vision(
@@ -47,6 +52,8 @@ public class RobotContainer {
             swerve::getIsBlue);
 
     xboxController = new CommandXboxController(0);
+
+    opperatorPad = new CommandXboxController(1);
 
     //  chooser = AutoBuilder.buildAutoChooser();
 
@@ -88,6 +95,16 @@ public class RobotContainer {
 
     Trigger alignLeft = xboxController.leftBumper();
     alignLeft.onTrue(swerve.setReefAlignStateCommand(ReefAlignState.leftSide));
+
+    Trigger prepClimb = new Trigger(opperatorPad.b());
+    prepClimb.onTrue(
+      ClimbCommands.prepClimb(climber)
+    );
+
+    Trigger climb = new Trigger(opperatorPad.a());
+    climb.onTrue(
+      ClimbCommands.climb(climber)
+    );
   }
 
   private void defualtCommands() {
