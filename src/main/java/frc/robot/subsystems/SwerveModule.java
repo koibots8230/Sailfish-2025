@@ -24,7 +24,6 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -160,15 +159,14 @@ public class SwerveModule {
 
   public void setState(SwerveModuleState swerveModuleState) {
     // swerveModuleState.optimize(currentAngle);
-    swerveModuleState.angle =
-        swerveModuleState.angle.times(
-            Math.cos(swerveModuleState.angle.getRadians() - turnPosition));
+    swerveModuleState.speedMetersPerSecond *=
+        Math.cos(swerveModuleState.angle.getRadians() - turnPosition);
 
     driveController.setReference(
         swerveModuleState.speedMetersPerSecond, SparkBase.ControlType.kVelocity);
 
     driveSetpoint = MetersPerSecond.of(swerveModuleState.speedMetersPerSecond);
-    turnSetpoint = Radians.of(MathUtil.angleModulus(swerveModuleState.angle.getRadians()));
+    turnSetpoint = Radians.of(swerveModuleState.angle.getRadians());
   }
 
   public void periodic() {
