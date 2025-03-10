@@ -6,7 +6,6 @@ package frc.robot;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -97,14 +96,10 @@ public class RobotContainer {
     alignLeft.onTrue(swerve.setReefAlignStateCommand(ReefAlignState.leftSide));
 
     Trigger prepClimb = new Trigger(opperatorPad.b());
-    prepClimb.onTrue(
-      ClimbCommands.prepClimb(climber)
-    );
+    prepClimb.onTrue(ClimbCommands.prepClimb(climber));
 
     Trigger climb = new Trigger(opperatorPad.a());
-    climb.onTrue(
-      ClimbCommands.climb(climber)
-    );
+    climb.onTrue(ClimbCommands.climb(climber));
   }
 
   private void defualtCommands() {

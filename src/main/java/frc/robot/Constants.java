@@ -240,16 +240,17 @@ public class Constants {
 
   public static class ClimberConstants {
     public static final Angle START_POSITION = Radians.of(0);
-    public static final Angle PREP_POSITION = Radians.of(Math.PI/2);
-    public static final Angle CLIMB_POSITION = Radians.of(3*Math.PI/2);
+    public static final Angle PREP_POSITION = Radians.of(Math.PI / 2);
+    public static final Angle CLIMB_POSITION = Radians.of(3 * Math.PI / 2);
     public static final PIDGains PID = new PIDGains.Builder().build();
-    public static final FeedforwardGains FEEDFORWARD =
-        new FeedforwardGains.Builder().build();
-    
-    public static final AngularVelocity MAX_VELOCITY = AngularVelocity.ofBaseUnits(1/8, Units.RotationsPerSecond);
-    public static final AngularAcceleration MAX_ACCELERATION = AngularAcceleration.ofBaseUnits(1/8, Units.RotationsPerSecondPerSecond);
+    public static final FeedforwardGains FEEDFORWARD = new FeedforwardGains.Builder().build();
 
-    public static final double CONVERSION_FACTOR = 2*Math.PI;
+    public static final AngularVelocity MAX_VELOCITY =
+        AngularVelocity.ofBaseUnits(1 / 8, Units.RotationsPerSecond);
+    public static final AngularAcceleration MAX_ACCELERATION =
+        AngularAcceleration.ofBaseUnits(1 / 8, Units.RotationsPerSecondPerSecond);
+
+    public static final double CONVERSION_FACTOR = 2 * Math.PI;
     public static final double RPM_TO_RPS_FACTOR = 60;
 
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(60, Units.Amps);
