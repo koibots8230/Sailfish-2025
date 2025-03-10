@@ -64,7 +64,10 @@ public class RobotContainer {
 
     vision =
         new Vision(
-            swerve::getEstimatedPosition, swerve::getGyroAngle, swerve::addVisionMeasurement);
+            swerve::getEstimatedPosition,
+            swerve::getGyroAngle,
+            swerve::addVisionMeasurement,
+            swerve::getIsBlue);
 
     xboxController = new CommandXboxController(0);
 
