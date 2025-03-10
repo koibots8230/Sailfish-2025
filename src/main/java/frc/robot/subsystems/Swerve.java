@@ -36,7 +36,12 @@ import java.util.function.DoubleSupplier;
 
 @Logged
 public class Swerve extends SubsystemBase {
+  private Pose2d estimatedPosition;
   private Pose2d trajectoryToFollow = new Pose2d();
+  private Rotation2d simHeading;
+  private Rotation2d gyroAngle;
+  private SwerveModuleState[] setpointStates;
+  private final Pigeon2 gyro;
 
   private final PIDController xController = new PIDController(10.0, 0.0, 0.0);
   private final PIDController yController = new PIDController(10.0, 0.0, 0.0);
@@ -64,17 +69,10 @@ public class Swerve extends SubsystemBase {
 
   private final Modules modules;
 
-  @NotLogged private final Pigeon2 gyro;
-
   @NotLogged private final SwerveDrivePoseEstimator odometry;
 
   @NotLogged private final PIDController anglePID;
 
-  private Pose2d estimatedPosition;
-  private Rotation2d simHeading;
-  private Rotation2d gyroAngle;
-
-  private SwerveModuleState[] setpointStates;
   private SwerveModuleState[] measuredStates;
 
   private boolean isBlue;
@@ -123,6 +121,20 @@ public class Swerve extends SubsystemBase {
     headingController.enableContinuousInput(-Math.PI, Math.PI);
   }
 
+  public boolean getIsBlue() {
+    return isBlue;
+  }
+
+  public void setOdometry(Pose2d pose) {
+    System.out.println("Resetting Odometry: " + pose);
+    simHeading = pose.getRotation();
+    odometry.resetPose(pose);
+  }
+
+  public void setIsBlue(boolean colour) {
+    isBlue = colour;
+  }
+
   @Override
   public void periodic() {
 
@@ -158,22 +170,6 @@ public class Swerve extends SubsystemBase {
     modules.frontRight.simulationPeriodic();
     modules.backLeft.simulationPeriodic();
     modules.backRight.simulationPeriodic();
-  }
-
-  // ===================== Alliance Color ===================== \\
-
-  public void setIsBlue(boolean color) {
-    isBlue = color;
-  }
-
-  public boolean getIsBlue() {
-    return isBlue;
-  }
-
-  // ===================== Odometry ===================== \\
-
-  public void setOdometry(Pose2d pose) {
-    odometry.resetPose(pose);
   }
 
   public Pose2d getEstimatedPosition() {
