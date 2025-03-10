@@ -204,7 +204,7 @@ public class Constants {
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(60, Units.Amps);
 
     public static final int MAIN_MOTOR_ID = 11;
-    public static final int SECONDARY_MOTOR_ID = 61;
+    public static final int SECONDARY_MOTOR_ID = 12;
 
     public static final int HALL_EFFECTS_SENSOR = 0;
   }
