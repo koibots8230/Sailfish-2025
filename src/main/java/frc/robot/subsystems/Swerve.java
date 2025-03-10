@@ -168,7 +168,6 @@ public class Swerve extends SubsystemBase {
     modules.backRight.simulationPeriodic();
   }
 
-
   public Pose2d getEstimatedPosition() {
     return odometry.getEstimatedPosition();
   }
