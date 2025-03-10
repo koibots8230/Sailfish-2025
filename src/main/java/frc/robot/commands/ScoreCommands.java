@@ -29,4 +29,8 @@ public class ScoreCommands {
         elevator.setPositionCommand(ElevatorConstants.INTAKE_SETPOINT),
         endEffector.setVelocityCommand(0));
   }
+
+  public static Command Wait() {
+    return Commands.sequence(Commands.waitSeconds(10));
+  }
 }
