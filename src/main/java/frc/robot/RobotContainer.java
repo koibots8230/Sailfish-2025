@@ -99,9 +99,9 @@ public class RobotContainer {
   private AutoRoutine MeSATTt() {
     AutoRoutine routine = autoFactory.newRoutine("taxi");
 
-    AutoTrajectory MvST = routine.trajectory("MvST");
+    AutoTrajectory MeST = routine.trajectory("MeST");
 
-    routine.active().onTrue(Commands.sequence(MvST.resetOdometry(), MvST.cmd()));
+    routine.active().onTrue(Commands.sequence(MeST.resetOdometry(), MeST.cmd()));
 
     return routine;
   }
