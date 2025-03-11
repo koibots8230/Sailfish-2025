@@ -140,7 +140,6 @@ public class Swerve extends SubsystemBase {
 
     estimatedPosition =
         odometry.update(
-            // gyroAngle,
             isBlue ? gyroAngle : gyroAngle.minus(new Rotation2d(Math.PI)),
             this.getModulePostitions());
 
