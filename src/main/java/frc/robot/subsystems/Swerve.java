@@ -43,6 +43,10 @@ public class Swerve extends SubsystemBase {
   private SwerveModuleState[] setpointStates;
   private final Pigeon2 gyro;
 
+  private final PIDController xController = new PIDController(AutoConstants.X_CONTROLLER.kp, 0.0, 0.0);
+  private final PIDController yController = new PIDController(AutoConstants.Y_CONTROLLER.kp, 0.0, 0.0);
+  private final PIDController headingController = new PIDController(AutoConstants.HEADING_CONTROLLER.kp, 0.0, 0.0);
+
   @Logged
   public class Modules {
     final SwerveModule frontLeft;
@@ -114,7 +118,7 @@ public class Swerve extends SubsystemBase {
     reefAlignState = ReefAlignState.disabled;
     alignTarget = new Pose2d();
 
-    AutoConstants.HEADING_CONTROLLER.enableContinuousInput(-Math.PI, Math.PI);
+    headingController.enableContinuousInput(-Math.PI, Math.PI);
   }
 
   public boolean getIsBlue() {
@@ -439,10 +443,10 @@ public class Swerve extends SubsystemBase {
 
     ChassisSpeeds speeds =
         new ChassisSpeeds(
-            sample.vx + AutoConstants.X_CONTROLLER.calculate(pose.getX(), sample.x),
-            sample.vy + AutoConstants.Y_CONTROLLER.calculate(pose.getY(), sample.y),
+            sample.vx + xController.calculate(pose.getX(), sample.x),
+            sample.vy + yController.calculate(pose.getY(), sample.y),
             sample.omega
-                + AutoConstants.HEADING_CONTROLLER.calculate(
+                + headingController.calculate(
                     pose.getRotation().getRadians(), sample.heading));
 
     driveFieldRelative(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, pose.getRotation()));

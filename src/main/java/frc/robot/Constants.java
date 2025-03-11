@@ -89,9 +89,13 @@ public class Constants {
   }
 
   public static class AutoConstants {
-    public static final PIDController X_CONTROLLER = new PIDController(0.0, 0.0, 0.0);
-    public static final PIDController Y_CONTROLLER = new PIDController(0.0, 0.0, 0.0);
-    public static final PIDController HEADING_CONTROLLER = new PIDController(0.0, 0.0, 0.0);
+
+    public static final PIDGains X_CONTROLLER = new PIDGains.Builder().kp(0.0).build();
+    public static final PIDGains Y_CONTROLLER = new PIDGains.Builder().kp(0.0).build();
+    public static final PIDGains HEADING_CONTROLLER = new PIDGains.Builder().kp(0.0).build();
+
+    
+
   }
 
   public static class AlignConstants {
