@@ -31,7 +31,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.ReefAlignState;
 import frc.lib.util.VisionMeasurement;
-import frc.robot.Constants;
 import frc.robot.Constants.*;
 import java.util.function.DoubleSupplier;
 
@@ -444,7 +443,8 @@ public class Swerve extends SubsystemBase {
             sample.vx + AutoConstants.X_CONTROLLER.calculate(pose.getX(), sample.x),
             sample.vy + AutoConstants.Y_CONTROLLER.calculate(pose.getY(), sample.y),
             sample.omega
-                + AutoConstants.HEADING_CONTROLLER.calculate(pose.getRotation().getRadians(), sample.heading));
+                + AutoConstants.HEADING_CONTROLLER.calculate(
+                    pose.getRotation().getRadians(), sample.heading));
 
     driveFieldRelative(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, pose.getRotation()));
   }
