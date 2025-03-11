@@ -87,6 +87,13 @@ public class Constants {
     public static final int GYRO_ID = 9;
   }
 
+  public static class AutoConstants {
+
+    public static final PIDGains X_CONTROLLER = new PIDGains.Builder().kp(0.0).build();
+    public static final PIDGains Y_CONTROLLER = new PIDGains.Builder().kp(0.0).build();
+    public static final PIDGains HEADING_CONTROLLER = new PIDGains.Builder().kp(0.0).build();
+  }
+
   public static class AlignConstants {
     public static final Distance MIN_DISTANCE = Meters.of(2.0);
 

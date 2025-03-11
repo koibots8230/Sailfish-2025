@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
+import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.util.DriveFeedforwards;
@@ -35,6 +36,19 @@ import java.util.function.DoubleSupplier;
 
 @Logged
 public class Swerve extends SubsystemBase {
+  private Pose2d estimatedPosition;
+  private Pose2d trajectoryToFollow = new Pose2d();
+  private Rotation2d simHeading;
+  private Rotation2d gyroAngle;
+  private SwerveModuleState[] setpointStates;
+  private final Pigeon2 gyro;
+
+  private final PIDController xController =
+      new PIDController(AutoConstants.X_CONTROLLER.kp, 0.0, 0.0);
+  private final PIDController yController =
+      new PIDController(AutoConstants.Y_CONTROLLER.kp, 0.0, 0.0);
+  private final PIDController headingController =
+      new PIDController(AutoConstants.HEADING_CONTROLLER.kp, 0.0, 0.0);
 
   @Logged
   public class Modules {
@@ -58,17 +72,10 @@ public class Swerve extends SubsystemBase {
 
   private final Modules modules;
 
-  @NotLogged private final Pigeon2 gyro;
-
   @NotLogged private final SwerveDrivePoseEstimator odometry;
 
   @NotLogged private final PIDController anglePID;
 
-  private Pose2d estimatedPosition;
-  private Rotation2d simHeading;
-  private Rotation2d gyroAngle;
-
-  private SwerveModuleState[] setpointStates;
   private SwerveModuleState[] measuredStates;
 
   private boolean isBlue;
@@ -84,8 +91,9 @@ public class Swerve extends SubsystemBase {
 
     gyro = new Pigeon2(SwerveConstants.GYRO_ID);
 
-    gyroAngle = gyro.getRotation2d();
     estimatedPosition = new Pose2d();
+    gyroAngle = gyro.getRotation2d();
+    simHeading = new Rotation2d();
 
     odometry =
         new SwerveDrivePoseEstimator(
@@ -111,8 +119,22 @@ public class Swerve extends SubsystemBase {
     anglePID.enableContinuousInput(-Math.PI, Math.PI);
 
     reefAlignState = ReefAlignState.disabled;
+    alignTarget = new Pose2d();
 
-    this.isBlue = true;
+    headingController.enableContinuousInput(-Math.PI, Math.PI);
+  }
+
+  public boolean getIsBlue() {
+    return isBlue;
+  }
+
+  public void setOdometry(Pose2d pose) {
+    simHeading = pose.getRotation();
+    odometry.resetPose(pose);
+  }
+
+  public void setIsBlue(boolean colour) {
+    isBlue = colour;
   }
 
   @Override
@@ -149,22 +171,6 @@ public class Swerve extends SubsystemBase {
     modules.frontRight.simulationPeriodic();
     modules.backLeft.simulationPeriodic();
     modules.backRight.simulationPeriodic();
-  }
-
-  // ===================== Alliance Color ===================== \\
-
-  public void setIsBlue(boolean color) {
-    isBlue = color;
-  }
-
-  public boolean getIsBlue() {
-    return isBlue;
-  }
-
-  // ===================== Odometry ===================== \\
-
-  public void setOdometry(Pose2d pose) {
-    odometry.resetPose(pose);
   }
 
   public Pose2d getEstimatedPosition() {
@@ -420,6 +426,10 @@ public class Swerve extends SubsystemBase {
         ChassisSpeeds.fromFieldRelativeSpeeds(
             x.in(MetersPerSecond), y.in(MetersPerSecond), omega.in(RadiansPerSecond), gyroAngle);
 
+    driveFieldRelative(speeds);
+  }
+
+  private void driveFieldRelative(ChassisSpeeds speeds) {
     driveRobotRelative(
         speeds,
         new DriveFeedforwards(
@@ -428,6 +438,20 @@ public class Swerve extends SubsystemBase {
             new double[] {0.0},
             new double[] {0.0},
             new double[] {0.0}));
+  }
+
+  public void followTrajectory(SwerveSample sample) {
+    trajectoryToFollow = sample.getPose();
+    Pose2d pose = odometry.getEstimatedPosition();
+
+    ChassisSpeeds speeds =
+        new ChassisSpeeds(
+            sample.vx + xController.calculate(pose.getX(), sample.x),
+            sample.vy + yController.calculate(pose.getY(), sample.y),
+            sample.omega
+                + headingController.calculate(pose.getRotation().getRadians(), sample.heading));
+
+    driveFieldRelative(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, pose.getRotation()));
   }
 
   // ===================== Commands ===================== \\
