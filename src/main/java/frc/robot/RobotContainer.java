@@ -110,8 +110,12 @@ public class RobotContainer {
     // Trigger intakePivotOut = new Trigger(xboxController.b());
     // intakePivotOut.onTrue(intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION));
 
-    Trigger light = new Trigger(xboxController.a());
-    light.onTrue(LED.LEDCommand(State.S1));
+    Trigger light1 = new Trigger(xboxController.a());
+    light1.onTrue(LED.LEDCommand(State.S1));
+
+    Trigger light2 = new Trigger(xboxController.b());
+    light2.onTrue(LED.LEDCommand(State.S2));
+
   }
 
   private void defualtCommands() {
