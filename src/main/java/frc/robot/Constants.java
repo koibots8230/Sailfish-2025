@@ -4,6 +4,8 @@ import static edu.wpi.first.units.Units.*;
 
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -85,6 +87,12 @@ public class Constants {
     public static final int BACK_RIGHT_TURN_ID = 8;
 
     public static final int GYRO_ID = 9;
+  }
+
+  public static class AutoConstants {
+  public static final PIDController X_CONTROLLER = new PIDController(0.0, 0.0, 0.0);
+  public static final PIDController Y_CONTROLLER = new PIDController(0.0, 0.0, 0.0);
+  public static final PIDController HEADING_CONTROLLER = new PIDController(0.0, 0.0, 0.0);
   }
 
   public static class AlignConstants {

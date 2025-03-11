@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.ReefAlignState;
 import frc.lib.util.VisionMeasurement;
+import frc.robot.Constants;
 import frc.robot.Constants.*;
 import java.util.function.DoubleSupplier;
 
@@ -42,10 +43,6 @@ public class Swerve extends SubsystemBase {
   private Rotation2d gyroAngle;
   private SwerveModuleState[] setpointStates;
   private final Pigeon2 gyro;
-
-  private final PIDController xController = new PIDController(10.0, 0.0, 0.0);
-  private final PIDController yController = new PIDController(10.0, 0.0, 0.0);
-  private final PIDController headingController = new PIDController(7.5, 0.0, 0.0);
 
   @Logged
   public class Modules {
@@ -118,7 +115,7 @@ public class Swerve extends SubsystemBase {
     reefAlignState = ReefAlignState.disabled;
     alignTarget = new Pose2d();
 
-    headingController.enableContinuousInput(-Math.PI, Math.PI);
+    AutoConstants.HEADING_CONTROLLER.enableContinuousInput(-Math.PI, Math.PI);
   }
 
   public boolean getIsBlue() {
@@ -444,10 +441,10 @@ public class Swerve extends SubsystemBase {
 
     ChassisSpeeds speeds =
         new ChassisSpeeds(
-            sample.vx + xController.calculate(pose.getX(), sample.x),
-            sample.vy + yController.calculate(pose.getY(), sample.y),
+            sample.vx + AutoConstants.X_CONTROLLER.calculate(pose.getX(), sample.x),
+            sample.vy + AutoConstants.Y_CONTROLLER.calculate(pose.getY(), sample.y),
             sample.omega
-                + headingController.calculate(pose.getRotation().getRadians(), sample.heading));
+                + AutoConstants.HEADING_CONTROLLER.calculate(pose.getRotation().getRadians(), sample.heading));
 
     driveFieldRelative(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, pose.getRotation()));
   }
