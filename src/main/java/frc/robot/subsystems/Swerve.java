@@ -43,9 +43,12 @@ public class Swerve extends SubsystemBase {
   private SwerveModuleState[] setpointStates;
   private final Pigeon2 gyro;
 
-  private final PIDController xController = new PIDController(AutoConstants.X_CONTROLLER.kp, 0.0, 0.0);
-  private final PIDController yController = new PIDController(AutoConstants.Y_CONTROLLER.kp, 0.0, 0.0);
-  private final PIDController headingController = new PIDController(AutoConstants.HEADING_CONTROLLER.kp, 0.0, 0.0);
+  private final PIDController xController =
+      new PIDController(AutoConstants.X_CONTROLLER.kp, 0.0, 0.0);
+  private final PIDController yController =
+      new PIDController(AutoConstants.Y_CONTROLLER.kp, 0.0, 0.0);
+  private final PIDController headingController =
+      new PIDController(AutoConstants.HEADING_CONTROLLER.kp, 0.0, 0.0);
 
   @Logged
   public class Modules {
@@ -446,8 +449,7 @@ public class Swerve extends SubsystemBase {
             sample.vx + xController.calculate(pose.getX(), sample.x),
             sample.vy + yController.calculate(pose.getY(), sample.y),
             sample.omega
-                + headingController.calculate(
-                    pose.getRotation().getRadians(), sample.heading));
+                + headingController.calculate(pose.getRotation().getRadians(), sample.heading));
 
     driveFieldRelative(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, pose.getRotation()));
   }

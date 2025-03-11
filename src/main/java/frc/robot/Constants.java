@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.*;
 
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -93,9 +92,6 @@ public class Constants {
     public static final PIDGains X_CONTROLLER = new PIDGains.Builder().kp(0.0).build();
     public static final PIDGains Y_CONTROLLER = new PIDGains.Builder().kp(0.0).build();
     public static final PIDGains HEADING_CONTROLLER = new PIDGains.Builder().kp(0.0).build();
-
-    
-
   }
 
   public static class AlignConstants {
