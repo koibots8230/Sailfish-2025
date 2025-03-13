@@ -65,7 +65,7 @@ public class Elevator extends SubsystemBase {
 
     mainMotorConfig = new SparkMaxConfig();
 
-    mainMotorConfig.idleMode(IdleMode.kBrake);
+    mainMotorConfig.idleMode(IdleMode.kCoast);
 
     mainMotorConfig
         .closedLoop
@@ -82,7 +82,7 @@ public class Elevator extends SubsystemBase {
 
     secondaryMotorConfig = new SparkMaxConfig();
 
-    secondaryMotorConfig.idleMode(IdleMode.kBrake);
+    secondaryMotorConfig.idleMode(IdleMode.kCoast);
 
     secondaryMotorConfig.follow(ElevatorConstants.MAIN_MOTOR_ID);
 
@@ -105,7 +105,7 @@ public class Elevator extends SubsystemBase {
     hallEffectsSensor = new DigitalInput(ElevatorConstants.HALL_EFFECTS_SENSOR);
 
     goal = new TrapezoidProfile.State();
-    setpoint = ElevatorConstants.START_SETPOINT;
+    setpoint = ElevatorConstants.INTAKE_SETPOINT;
     motorSetpoint = new TrapezoidProfile.State();
 
     position = Distance.ofBaseUnits(0, Meters);
@@ -143,6 +143,11 @@ public class Elevator extends SubsystemBase {
             secondaryMotor.getBusVoltage() * secondaryMotor.getAppliedOutput(), Volts);
     mainCurrent = Current.ofBaseUnits(mainMotor.getOutputCurrent(), Amps);
     secondaryCurrent = Current.ofBaseUnits(secondaryMotor.getOutputCurrent(), Amps);
+  }
+
+  public boolean positionIsInRAnge(Distance desieredPostion) {
+    return (position.gte(desieredPostion.minus(Meters.of(.025)))
+        && position.lt(desieredPostion.plus(Meters.of(.025))));
   }
 
   @Override
