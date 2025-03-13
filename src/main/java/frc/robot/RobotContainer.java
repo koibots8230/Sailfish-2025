@@ -23,6 +23,9 @@ public class RobotContainer {
   // SendableChooser<Command> chooser = new SendableChooser<>();
   private final Intake intake;
   private final IntakePivot intakePivot;
+  private final Indexer indexer;
+
+  private final Vision vision;
 
   private final LED LED;
 
