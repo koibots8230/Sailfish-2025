@@ -1,13 +1,12 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
-import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -22,7 +21,6 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
@@ -36,18 +34,18 @@ import frc.robot.Constants.RobotConstants;
 public class Climber extends SubsystemBase {
   @NotLogged private final SparkMax motor;
   @NotLogged private final SparkMaxConfig config;
-  @NotLogged private final AbsoluteEncoder encoder;
+  @NotLogged private final RelativeEncoder encoder;
   @NotLogged private final SparkClosedLoopController pid;
   @NotLogged private final SimpleMotorFeedforward feedforward;
   @NotLogged private final TrapezoidProfile profile;
 
   private TrapezoidProfile.State goal;
   private TrapezoidProfile.State motorSetpoint;
-  private Angle setpoint;
+  private double setpoint;
   private AngularVelocity velocity;
   private Voltage voltage;
   private Current current;
-  private Angle position;
+  private double position;
 
   public Climber() {
     profile =
@@ -56,39 +54,42 @@ public class Climber extends SubsystemBase {
                 ClimberConstants.MAX_VELOCITY.in(RotationsPerSecond),
                 ClimberConstants.MAX_ACCELERATION.in(RotationsPerSecondPerSecond)));
 
-    motor = new SparkMax(0, MotorType.kBrushless);
+    motor = new SparkMax(ClimberConstants.MOTOR_ID, MotorType.kBrushless);
     config = new SparkMaxConfig();
 
+    config.inverted(false);
     config.idleMode(IdleMode.kBrake);
     config
         .closedLoop
-        .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+        .positionWrappingEnabled(true)
+        .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
         .pid(ClimberConstants.PID.kp, ClimberConstants.PID.ki, ClimberConstants.PID.kd);
 
     config.smartCurrentLimit((int) ClimberConstants.CURRENT_LIMIT.in(Amps));
 
-    config.absoluteEncoder.positionConversionFactor(ClimberConstants.CONVERSION_FACTOR);
-    config.absoluteEncoder.velocityConversionFactor(ClimberConstants.RPM_TO_RPS_FACTOR);
+    // config.absoluteEncoder.positionConversionFactor(ClimberConstants.CONVERSION_FACTOR);
+    //  config.absoluteEncoder.velocityConversionFactor(ClimberConstants.RPM_TO_RPS_FACTOR);
+
+    config.alternateEncoder.inverted(false);
 
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    encoder = motor.getAbsoluteEncoder();
+    encoder = motor.getAlternateEncoder();
 
     pid = motor.getClosedLoopController();
 
     feedforward =
         new SimpleMotorFeedforward(
             ClimberConstants.FEEDFORWARD.ks,
-            ClimberConstants.FEEDFORWARD.kg,
             ClimberConstants.FEEDFORWARD.kv,
-            ClimberConstants.FEEDFORWARD.ka);
+            ClimberConstants.FEEDFORWARD.ka,
+            RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds));
 
     goal = new TrapezoidProfile.State();
     setpoint = ClimberConstants.START_POSITION;
     motorSetpoint = new TrapezoidProfile.State();
 
-    position = Radians.of(0);
-    ;
+    position = encoder.getPosition();
     velocity = AngularVelocity.ofBaseUnits(encoder.getVelocity(), RotationsPerSecond);
 
     voltage = Voltage.ofBaseUnits(motor.getBusVoltage() * motor.getAppliedOutput(), Volts);
@@ -97,18 +98,20 @@ public class Climber extends SubsystemBase {
 
   @Override
   public void periodic() {
-    goal = new TrapezoidProfile.State(setpoint.in(Radians), 0);
+    goal = new TrapezoidProfile.State(setpoint, 0);
 
     motorSetpoint =
         profile.calculate(RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds), motorSetpoint, goal);
+
+    System.out.println(motorSetpoint.position);
 
     pid.setReference(
         motorSetpoint.position,
         ControlType.kPosition,
         ClosedLoopSlot.kSlot0,
-        feedforward.calculate(motorSetpoint.position, motorSetpoint.velocity));
+        feedforward.calculate(motorSetpoint.velocity));
 
-    position = Radians.of(encoder.getPosition());
+    position = encoder.getPosition();
     velocity = AngularVelocity.ofBaseUnits(encoder.getVelocity(), RotationsPerSecond);
 
     voltage = Voltage.ofBaseUnits(motor.getBusVoltage() * motor.getAppliedOutput(), Volts);
@@ -117,14 +120,14 @@ public class Climber extends SubsystemBase {
 
   @Override
   public void simulationPeriodic() {
-    position = setpoint;
+    position = motorSetpoint.position;
   }
 
-  private void setAngle(Angle angle) {
+  private void setAngle(double angle) {
     setpoint = angle;
   }
 
-  public Command setAngleCommand(Angle angle) {
+  public Command setAngleCommand(double angle) {
     return Commands.runOnce(() -> this.setAngle(angle), this);
   }
 }

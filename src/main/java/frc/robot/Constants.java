@@ -204,7 +204,7 @@ public class Constants {
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(60, Units.Amps);
 
     public static final int MAIN_MOTOR_ID = 11;
-    public static final int SECONDARY_MOTOR_ID = 61;
+    public static final int SECONDARY_MOTOR_ID = 12;
 
     public static final int HALL_EFFECTS_SENSOR = 0;
   }
@@ -239,21 +239,21 @@ public class Constants {
   }
 
   public static class ClimberConstants {
-    public static final Angle START_POSITION = Radians.of(0);
-    public static final Angle PREP_POSITION = Radians.of(Math.PI / 2);
-    public static final Angle CLIMB_POSITION = Radians.of(3 * Math.PI / 2);
+    public static final double START_POSITION = 0;
+    public static final double PREP_POSITION = 0.25;
+    public static final double CLIMB_POSITION = 0.75;
     public static final PIDGains PID = new PIDGains.Builder().build();
-    public static final FeedforwardGains FEEDFORWARD = new FeedforwardGains.Builder().build();
+    public static final FeedforwardGains FEEDFORWARD =
+        new FeedforwardGains.Builder().kv(0.5).build();
 
     public static final AngularVelocity MAX_VELOCITY =
         AngularVelocity.ofBaseUnits(1 / 8, Units.RotationsPerSecond);
     public static final AngularAcceleration MAX_ACCELERATION =
         AngularAcceleration.ofBaseUnits(1 / 8, Units.RotationsPerSecondPerSecond);
 
-    public static final double CONVERSION_FACTOR = 2 * Math.PI;
-    public static final double RPM_TO_RPS_FACTOR = 60;
-
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(60, Units.Amps);
+
+    public static final int MOTOR_ID = 51;
   }
 
   public static class RobotConstants {

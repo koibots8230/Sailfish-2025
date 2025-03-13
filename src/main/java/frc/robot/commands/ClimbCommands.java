@@ -12,4 +12,8 @@ public class ClimbCommands {
   public static Command climb(Climber climber) {
     return climber.setAngleCommand(ClimberConstants.CLIMB_POSITION);
   }
+
+  public static Command resetClimber(Climber climber) {
+    return climber.setAngleCommand(ClimberConstants.START_POSITION);
+  }
 }

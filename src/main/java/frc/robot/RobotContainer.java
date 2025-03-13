@@ -101,6 +101,9 @@ public class RobotContainer {
 
     Trigger climb = new Trigger(() -> opperatorPad.getRawButton(6));
     climb.onTrue(ClimbCommands.climb(climber));
+
+    Trigger resetClimb = new Trigger(() -> opperatorPad.getRawButton(7));
+    resetClimb.onTrue(ClimbCommands.resetClimber(climber));
   }
 
   private void defualtCommands() {
