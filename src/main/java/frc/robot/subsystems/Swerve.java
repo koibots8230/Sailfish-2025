@@ -405,8 +405,7 @@ public class Swerve extends SubsystemBase {
                 SwerveConstants.DEADBAND)),
         RadiansPerSecond.of(
             MathUtil.applyDeadband(
-                -omega + (assist.getRotation().getRadians()),
-                SwerveConstants.DEADBAND)));
+                -omega + (assist.getRotation().getRadians()), SwerveConstants.DEADBAND)));
   }
 
   public void driveRobotRelative(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {

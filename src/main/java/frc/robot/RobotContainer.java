@@ -16,8 +16,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.ReefAlignState;
-import frc.robot.Constants.IntakeConstants;
-import frc.robot.Constants.IntakePivotConstants;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 
