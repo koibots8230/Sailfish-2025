@@ -71,12 +71,25 @@ public class RobotContainer {
     autoChooser.addRoutine("move stright tune test", this::MeSATTt);
     autoChooser.addRoutine("rotate tune test", this::ReATTt);
     autoChooser.addRoutine("Score Front Right Left Reef", this::SeFRLRf);
+    autoChooser.addRoutine("Circle the reef for no rasin", this::torpedo);
     SmartDashboard.putData("auto choices", autoChooser);
 
     RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
 
     configureBindings();
     defualtCommands();
+  }
+
+  private AutoRoutine torpedo() {
+    AutoRoutine routine = autoFactory.newRoutine("taxi");
+
+    AutoTrajectory torpedoTy = routine.trajectory("torpedo");
+
+    routine.active().onTrue(Commands.sequence(torpedoTy.resetOdometry(), torpedoTy.cmd()));
+
+    torpedoTy.done().onTrue(ScoreCommands.levelTwo(elevator, endEffector));
+
+    return routine;
   }
 
   private AutoRoutine SeFLRRf() {
@@ -94,6 +107,7 @@ public class RobotContainer {
 
     return routine;
   }
+
 
   private AutoRoutine SeFRLRf(){
   AutoRoutine routine = autoFactory.newRoutine("txai");
