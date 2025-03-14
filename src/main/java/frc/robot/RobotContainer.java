@@ -65,8 +65,6 @@ public class RobotContainer {
 
     xboxController = new CommandXboxController(0);
 
-    //  chooser = AutoBuilder.buildAutoChooser();
-
     autoChooser.addRoutine("Score Front Left Right Reef", this::SeFLRRf);
     autoChooser.addRoutine("move stright tune test", this::MeSATTt);
     autoChooser.addRoutine("rotate tune test", this::ReATTt);

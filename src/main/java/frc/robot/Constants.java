@@ -176,6 +176,7 @@ public class Constants {
   public static class EndEffectorConstants {
     public static final double INTAKE_SPEED = 750;
     public static final double OUTTAKE_SPEED = 1000;
+    public static final double ALGAE_REMOVAL_SPEED = 1500;
 
     public static final PIDGains PID = new PIDGains.Builder().kp(0.0001).build();
     public static final FeedforwardGains FEEDFORWARD =
@@ -191,8 +192,12 @@ public class Constants {
 
   public static class ElevatorConstants {
     public static final Distance INTAKE_POSITION = Distance.ofBaseUnits(0.005, Units.Meters);
+
     public static final Distance L2_POSITION = Distance.ofBaseUnits(1.18, Units.Meters);
     public static final Distance L3_POSITION = Distance.ofBaseUnits(2.04, Units.Meters);
+
+    public static final Distance LOWER_ALGAE_POSITION = Distance.ofBaseUnits(0.65, Units.Meters);
+    public static final Distance UPPER_ALGAE_POSITION = Distance.ofBaseUnits(1.5, Units.Meters);
 
     public static final PIDGains PID = new PIDGains.Builder().kp(3.3).build();
     public static final FeedforwardGains FEEDFORWARD =
