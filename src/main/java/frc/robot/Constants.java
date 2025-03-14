@@ -52,6 +52,8 @@ public class Constants {
             new Translation2d(RobotConstants.LENGTH.divide(-2), RobotConstants.WIDTH.divide(2)),
             new Translation2d(RobotConstants.LENGTH.divide(-2), RobotConstants.WIDTH.divide(-2)));
 
+    public static final Rotation2d ANGLE_DEADZONE = Rotation2d.fromDegrees(2);
+
     public static final Wheel SWERVE_WHEEL = new Wheel(Inches.of(1.5));
 
     public static final double SWERVE_GEARING = 5.50;
