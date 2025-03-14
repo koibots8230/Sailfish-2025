@@ -199,8 +199,8 @@ public class Constants {
     public static final Distance L2_POSITION = Distance.ofBaseUnits(1.18, Units.Meters);
     public static final Distance L3_POSITION = Distance.ofBaseUnits(2.04, Units.Meters);
 
-    public static final Distance LOWER_ALGAE_POSITION = Distance.ofBaseUnits(0.65, Units.Meters);
-    public static final Distance UPPER_ALGAE_POSITION = Distance.ofBaseUnits(1.5, Units.Meters);
+    public static final Distance L2_ALGAE_POSITION = Distance.ofBaseUnits(0.65, Units.Meters);
+    public static final Distance L3_ALGAE_POSITION = Distance.ofBaseUnits(1.5, Units.Meters);
 
     public static final PIDGains PID = new PIDGains.Builder().kp(3.3).build();
     public static final FeedforwardGains FEEDFORWARD =

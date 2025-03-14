@@ -64,7 +64,7 @@ public class SwerveModule {
   private Angle turnSetpoint;
   private LinearVelocity driveSetpoint;
 
-  double drivePosition; // TODO: Put back to measures when fixed
+  double drivePosition;
   double turnPosition;
   double driveVelocity;
   private AngularVelocity turnVelocity;

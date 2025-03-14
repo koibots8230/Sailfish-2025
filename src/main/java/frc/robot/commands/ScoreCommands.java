@@ -33,15 +33,15 @@ public class ScoreCommands {
 
   public static Command removeL2Algae(Elevator elevator, EndEffector endEffector) {
     return Commands.sequence(
-        elevator.setPositionCommand(ElevatorConstants.LOWER_ALGAE_POSITION),
-        Commands.waitUntil(() -> elevator.atPosition(ElevatorConstants.LOWER_ALGAE_POSITION)),
+        elevator.setPositionCommand(ElevatorConstants.L2_ALGAE_POSITION),
+        Commands.waitUntil(() -> elevator.atPosition(ElevatorConstants.L2_ALGAE_POSITION)),
         endEffector.setVelocityCommand(EndEffectorConstants.ALGAE_REMOVAL_SPEED));
   }
 
   public static Command removeL3Algae(Elevator elevator, EndEffector endEffector) {
     return Commands.sequence(
-        elevator.setPositionCommand(ElevatorConstants.UPPER_ALGAE_POSITION),
-        Commands.waitUntil(() -> elevator.atPosition(ElevatorConstants.UPPER_ALGAE_POSITION)),
+        elevator.setPositionCommand(ElevatorConstants.L3_ALGAE_POSITION),
+        Commands.waitUntil(() -> elevator.atPosition(ElevatorConstants.L3_ALGAE_POSITION)),
         endEffector.setVelocityCommand(EndEffectorConstants.ALGAE_REMOVAL_SPEED));
   }
 }
