@@ -89,9 +89,9 @@ public class Constants {
 
   public static class AutoConstants {
 
-    public static final PIDGains X_CONTROLLER = new PIDGains.Builder().kp(0.0).build();
-    public static final PIDGains Y_CONTROLLER = new PIDGains.Builder().kp(0.0).build();
-    public static final PIDGains HEADING_CONTROLLER = new PIDGains.Builder().kp(0.0).build();
+    public static final PIDGains X_CONTROLLER = new PIDGains.Builder().kp(5.0).build();
+    public static final PIDGains Y_CONTROLLER = new PIDGains.Builder().kp(5.0).build();
+    public static final PIDGains HEADING_CONTROLLER = new PIDGains.Builder().kp(3.5).build();
   }
 
   public static class AlignConstants {

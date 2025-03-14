@@ -70,6 +70,7 @@ public class RobotContainer {
     autoChooser.addRoutine("Score Front Left Right Reef", this::SeFLRRf);
     autoChooser.addRoutine("move stright tune test", this::MeSATTt);
     autoChooser.addRoutine("rotate tune test", this::ReATTt);
+    autoChooser.addRoutine("Score Front Right Left Reef", this::SeFRLRf);
     SmartDashboard.putData("auto choices", autoChooser);
 
     RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
@@ -87,11 +88,23 @@ public class RobotContainer {
         .active()
         .onTrue(
             Commands.sequence(
-                driveToFrontLeftRightReef.resetOdometry(), driveToFrontLeftRightReef.cmd()));
+                driveToFrontLeftRightReef.resetOdometry(), Commands.parallel(driveToFrontLeftRightReef.cmd(), ScoreCommands.algieRemoverCommand(elevator, endEffector))));
 
     driveToFrontLeftRightReef.done().onTrue(ScoreCommands.levelTwo(elevator, endEffector));
 
     return routine;
+  }
+
+  private AutoRoutine SeFRLRf(){
+  AutoRoutine routine = autoFactory.newRoutine("txai");
+
+  AutoTrajectory SeFLRRfTy = routine.trajectory("SeFLRRf");
+
+  routine.active().onTrue(Commands.sequence(SeFLRRfTy.resetOdometry(), SeFLRRfTy.cmd()));
+
+  SeFLRRfTy.done().onTrue(ScoreCommands.levelTwo(elevator, endEffector));
+
+  return routine;
   }
 
   private AutoRoutine MeSATTt() {

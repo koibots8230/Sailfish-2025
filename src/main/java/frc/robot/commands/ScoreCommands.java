@@ -29,4 +29,8 @@ public class ScoreCommands {
         elevator.setPositionCommand(ElevatorConstants.INTAKE_POSITION),
         endEffector.setVelocityCommand(0));
   }
+
+  public static Command algieRemoverCommand(Elevator elevator, EndEffector endEffector) {
+    return Commands.sequence(endEffector.setVelocityCommand(-100), Commands.waitSeconds(.1), endEffector.setVelocityCommand(0));
+  }
 }
