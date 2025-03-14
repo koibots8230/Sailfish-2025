@@ -32,7 +32,7 @@ public class RobotContainer {
   private final Vision vision;
 
   private final CommandXboxController xboxController;
-  private final GenericHID opperatorPad;
+  private final GenericHID operatorPad;
   private boolean isBlue;
 
   public RobotContainer() {
@@ -53,7 +53,7 @@ public class RobotContainer {
 
     xboxController = new CommandXboxController(0);
 
-    opperatorPad = new GenericHID(1);
+    operatorPad = new GenericHID(1);
 
     //  chooser = AutoBuilder.buildAutoChooser();
 
@@ -96,14 +96,14 @@ public class RobotContainer {
     Trigger alignLeft = xboxController.leftBumper();
     alignLeft.onTrue(swerve.setReefAlignStateCommand(ReefAlignState.leftSide));
 
-    Trigger prepClimb = new Trigger(() -> opperatorPad.getRawButton(5));
-    prepClimb.onTrue(ClimbCommands.prepClimb(climber));
+    // Trigger prepClimb = new Trigger(() -> operatorPad.getRawButton(5));
+    // prepClimb.onTrue(ClimbCommands.prepClimb(climber));
 
-    Trigger climb = new Trigger(() -> opperatorPad.getRawButton(6));
-    climb.onTrue(ClimbCommands.climb(climber));
+    // Trigger climb = new Trigger(() -> operatorPad.getRawButton(6));
+    // climb.onTrue(ClimbCommands.climb(climber));
 
-    Trigger resetClimb = new Trigger(() -> opperatorPad.getRawButton(7));
-    resetClimb.onTrue(ClimbCommands.resetClimber(climber));
+    // Trigger resetClimb = new Trigger(() -> operatorPad.getRawButton(7));
+    // resetClimb.onTrue(ClimbCommands.resetClimber(climber));
   }
 
   private void defualtCommands() {
