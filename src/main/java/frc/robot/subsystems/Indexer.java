@@ -95,15 +95,15 @@ public class Indexer extends SubsystemBase {
     bottomVelocity = bottomSetpoint;
   }
 
-  private void setVelocity(double setVelocity) {
-    topClosedLoopController.setReference(setVelocity, ControlType.kVelocity);
-    bottomClosedLoopController.setReference(setVelocity / 2.0, ControlType.kVelocity);
+  private void setVelocity(double topVelocity, double bottomVelocity) {
+    topClosedLoopController.setReference(topVelocity, ControlType.kVelocity);
+    bottomClosedLoopController.setReference(bottomVelocity, ControlType.kVelocity);
 
-    topSetpoint = setVelocity;
-    bottomSetpoint = setVelocity / 2.0;
+    topSetpoint = topVelocity;
+    bottomSetpoint = bottomVelocity;
   }
 
-  public Command setVelocityCommand(double setVelocity) {
-    return Commands.runOnce(() -> this.setVelocity(setVelocity));
+  public Command setVelocityCommand(double topVelocity, double bottomVelocity) {
+    return Commands.runOnce(() -> this.setVelocity(topVelocity, bottomVelocity));
   }
 }

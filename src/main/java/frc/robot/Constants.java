@@ -158,8 +158,11 @@ public class Constants {
   }
 
   public static class IndexerConstants {
-    public static final double INDEX_VELOCITY = 3000;
-    public static final double REVERSE_VELOCITY = -1500;
+    public static final double TOP_INDEX_VELOCITY = 3000;
+    public static final double BOTTOM_INDEX_VELOCITY = 1500;
+    
+    public static final double TOP_REVERSE_VELOCITY = -3000;
+    public static final double BOTTOM_REVERSE_VELOCITY = -1500;
 
     public static final PIDGains TOP_PID = new PIDGains.Builder().kp(0.000032).build();
     public static final FeedforwardGains TOP_FF =
