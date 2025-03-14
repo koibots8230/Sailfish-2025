@@ -242,14 +242,12 @@ public class Constants {
     public static final double START_POSITION = 0;
     public static final double PREP_POSITION = 0.25;
     public static final double CLIMB_POSITION = 0.75;
-    public static final PIDGains PID = new PIDGains.Builder().build();
+    public static final PIDGains PID = new PIDGains.Builder().kp(0.001).build();
     public static final FeedforwardGains FEEDFORWARD =
         new FeedforwardGains.Builder().kv(0.5).build();
 
-    public static final AngularVelocity MAX_VELOCITY =
-        AngularVelocity.ofBaseUnits(1 / 8, Units.RotationsPerSecond);
-    public static final AngularAcceleration MAX_ACCELERATION =
-        AngularAcceleration.ofBaseUnits(1 / 8, Units.RotationsPerSecondPerSecond);
+    public static final double MAX_VELOCITY = 1 / 8;
+    public static final double MAX_ACCELERATION = 1 / 8;
 
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(60, Units.Amps);
 
