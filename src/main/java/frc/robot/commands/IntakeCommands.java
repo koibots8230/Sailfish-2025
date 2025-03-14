@@ -26,7 +26,8 @@ public class IntakeCommands {
         Commands.parallel(
             intake.setVeclocityCommand(IntakeConstants.INTAKE_VELOCITY),
             intakePivot.setPositionCommand(IntakePivotConstants.OUT_POSITION),
-            indexer.setVelocityCommand(IndexerConstants.TOP_INDEX_VELOCITY, IndexerConstants.BOTTOM_INDEX_VELOCITY),
+            indexer.setVelocityCommand(
+                IndexerConstants.TOP_INDEX_VELOCITY, IndexerConstants.BOTTOM_INDEX_VELOCITY),
             endEffector.intakeCommand()),
         Commands.parallel(intakeStop(intake, indexer, intakePivot, endEffector)));
   }
@@ -53,7 +54,8 @@ public class IntakeCommands {
         Commands.waitUntil(() -> intakePivot.atSetpoint()),
         Commands.parallel(
             intake.setVeclocityCommand(IntakeConstants.REVERSE_INTAKE_VELOCITY),
-            indexer.setVelocityCommand(IndexerConstants.TOP_REVERSE_VELOCITY, IndexerConstants.BOTTOM_REVERSE_VELOCITY),
+            indexer.setVelocityCommand(
+                IndexerConstants.TOP_REVERSE_VELOCITY, IndexerConstants.BOTTOM_REVERSE_VELOCITY),
             endEffector.outtakeCommand()),
         Commands.parallel(intakeStop(intake, indexer, intakePivot, endEffector)));
   }
