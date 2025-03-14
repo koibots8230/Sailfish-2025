@@ -89,9 +89,9 @@ public class Constants {
 
   public static class AutoConstants {
 
-    public static final PIDGains X_CONTROLLER = new PIDGains.Builder().kp(5.0).build();
-    public static final PIDGains Y_CONTROLLER = new PIDGains.Builder().kp(5.0).build();
-    public static final PIDGains HEADING_CONTROLLER = new PIDGains.Builder().kp(3.5).build();
+    public static final PIDGains X_CONTROLLER = new PIDGains.Builder().kp(7.0).build();
+    public static final PIDGains Y_CONTROLLER = new PIDGains.Builder().kp(7.0).build();
+    public static final PIDGains HEADING_CONTROLLER = new PIDGains.Builder().kp(3.8).build();
   }
 
   public static class AlignConstants {
@@ -109,8 +109,8 @@ public class Constants {
 
     public static final Distance RED_REEF_OFFSET = Meters.of(8.569706);
 
-    public static final PIDGains TRANSLATE_PID = new PIDGains.Builder().kp(3.75).build();
-    public static final PIDGains ANGLE_PID = new PIDGains.Builder().kp(3.0).build();
+    public static final PIDGains TRANSLATE_PID = new PIDGains.Builder().kp(4).build();
+    public static final PIDGains ANGLE_PID = new PIDGains.Builder().kp(2.5).build();
 
     public static final Angle DIRECTION_ANGLE_RANGE_CLOSE = Radians.of(Math.PI / 1.85);
 
@@ -122,7 +122,7 @@ public class Constants {
   }
 
   public static class IntakeConstants {
-    public static final double INTAKE_VELOCITY = 2500;
+    public static final double INTAKE_VELOCITY = 3000;
     public static final double REVERSE_INTAKE_VELOCITY = -2000;
 
     public static final PIDGains PID = new PIDGains.Builder().kp(0.00006).build();
@@ -135,41 +135,42 @@ public class Constants {
   }
 
   public static class IntakePivotConstants {
-    public static final Angle OUT_POSITION = Angle.ofBaseUnits(10, Radians);
-    public static final Angle IN_POSITION = Angle.ofBaseUnits(0, Radians);
+    public static final Angle OUT_POSITION = Angle.ofBaseUnits(1.8, Radians);
+    public static final Angle IN_POSITION = Angle.ofBaseUnits(0.15, Radians);
 
     public static final AngularVelocity MAX_VELOCITY =
-        AngularVelocity.ofBaseUnits(0, Units.RotationsPerSecond);
+        AngularVelocity.ofBaseUnits(14.0 * Math.PI, Units.RadiansPerSecond);
     public static final AngularAcceleration MAX_ACCELRATION =
-        AngularAcceleration.ofBaseUnits(0, Units.RotationsPerSecondPerSecond);
+        AngularAcceleration.ofBaseUnits(Math.PI * 16.0, Units.RadiansPerSecondPerSecond);
 
-    public static final PIDGains PID = new PIDGains.Builder().kp(0).build();
+    public static final PIDGains PID = new PIDGains.Builder().kp(1.8).build();
     public static final FeedforwardGains FEEDFORWARD =
-        new FeedforwardGains.Builder().kv(0).kg(0).build();
+        new FeedforwardGains.Builder().kv(1.1).build();
 
     public static final Angle TOLERANCE = Radians.of(0.025);
 
-    public static final double GEARING = 1;
+    public static final double GEARING = 19.0 / 50.0;
 
     public static final double CONVERSION_FACTOR = 2.0 * Math.PI * GEARING;
 
-    public static final int LEFT_MOTOR_ID = 31;
-    public static final int RIGHT_MOTOR_ID = 32;
-
-    public static final int LIMIT_SWITCH_CHANEL = 1;
+    public static final int LEFT_MOTOR_ID = 32;
+    public static final int RIGHT_MOTOR_ID = 31;
   }
 
   public static class IndexerConstants {
-    public static final double INDEX_VELOCITY = 1500;
-    public static final double REVERSE_VELOCITY = -1500;
+    public static final double TOP_INDEX_VELOCITY = 3000;
+    public static final double BOTTOM_INDEX_VELOCITY = 1500;
+
+    public static final double TOP_REVERSE_VELOCITY = -3000;
+    public static final double BOTTOM_REVERSE_VELOCITY = -1500;
 
     public static final PIDGains TOP_PID = new PIDGains.Builder().kp(0.000032).build();
     public static final FeedforwardGains TOP_FF =
-        new FeedforwardGains.Builder().kv(0.00022).kg(0).build();
+        new FeedforwardGains.Builder().kv(0.00018).kg(0).build();
 
     public static final PIDGains BOTTOM_PID = new PIDGains.Builder().kp(0.000034).build();
     public static final FeedforwardGains BOTTOM_FF =
-        new FeedforwardGains.Builder().kv(0.00028).kg(0).build();
+        new FeedforwardGains.Builder().kv(0.000195).kg(0).build();
 
     public static final int TOP_ID = 41;
     public static final int BOTTOM_ID = 42;
@@ -177,8 +178,8 @@ public class Constants {
 
   public static class EndEffectorConstants {
     public static final double INTAKE_SPEED = 750;
-    public static final double OUTTAKE_SPEED =
-        1000; // TODO: Turn back into units once not bugged anymore :(
+    public static final double OUTTAKE_SPEED = 1000;
+    public static final double ALGAE_REMOVAL_SPEED = 1500;
 
     public static final PIDGains PID = new PIDGains.Builder().kp(0.0001).build();
     public static final FeedforwardGains FEEDFORWARD =
@@ -194,8 +195,12 @@ public class Constants {
 
   public static class ElevatorConstants {
     public static final Distance INTAKE_POSITION = Distance.ofBaseUnits(0.005, Units.Meters);
+
     public static final Distance L2_POSITION = Distance.ofBaseUnits(1.18, Units.Meters);
     public static final Distance L3_POSITION = Distance.ofBaseUnits(2.04, Units.Meters);
+
+    public static final Distance L2_ALGAE_POSITION = Distance.ofBaseUnits(0.65, Units.Meters);
+    public static final Distance L3_ALGAE_POSITION = Distance.ofBaseUnits(1.5, Units.Meters);
 
     public static final PIDGains PID = new PIDGains.Builder().kp(3.3).build();
     public static final FeedforwardGains FEEDFORWARD =

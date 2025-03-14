@@ -65,8 +65,6 @@ public class RobotContainer {
 
     xboxController = new CommandXboxController(0);
 
-    //  chooser = AutoBuilder.buildAutoChooser();
-
     autoChooser.addRoutine("Score Front Left Right Reef", this::SeFLRRf);
     autoChooser.addRoutine("move stright tune test", this::MeSATTt);
     autoChooser.addRoutine("rotate tune test", this::ReATTt);
@@ -171,6 +169,14 @@ public class RobotContainer {
             ScoreCommands.levelTwo(elevator, endEffector),
             swerve.setReefAlignStateCommand(ReefAlignState.disabled)));
     gotoLevelTwo.onFalse(ScoreCommands.basePosition(elevator, endEffector));
+
+    Trigger removeL2Algae = xboxController.povDown();
+    removeL2Algae.onTrue(ScoreCommands.removeL2Algae(elevator, endEffector));
+    removeL2Algae.onFalse(ScoreCommands.basePosition(elevator, endEffector));
+
+    Trigger removeL3Algae = xboxController.povUp();
+    removeL3Algae.onTrue(ScoreCommands.removeL3Algae(elevator, endEffector));
+    removeL3Algae.onFalse(ScoreCommands.basePosition(elevator, endEffector));
 
     Trigger alignRight = xboxController.rightBumper();
     alignRight.onTrue(swerve.setReefAlignStateCommand(ReefAlignState.rightSide));
