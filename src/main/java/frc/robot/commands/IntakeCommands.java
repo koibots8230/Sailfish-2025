@@ -25,7 +25,7 @@ public class IntakeCommands {
         Commands.parallel(
             intake.setVeclocityCommand(IntakeConstants.INTAKE_VELOCITY),
             // intakePivot.moveIntakePivotCommand(IntakePivotConstants.OUT_POSITION),
-            indexer.setVelocityCommand(IndexerConstants.INDEX_VELOCITY),
+            indexer.setVelocityCommand(IndexerConstants.TOP_INDEX_VELOCITY, IndexerConstants.BOTTOM_INDEX_VELOCITY),
             endEffector.intakeCommand()),
         Commands.parallel(intakeStop(intake, indexer, intakePivot, endEffector)));
   }
@@ -34,7 +34,7 @@ public class IntakeCommands {
       Intake intake, Indexer indexer, IntakePivot intakePivot, EndEffector endEffector) {
     return Commands.parallel(
         intake.setVeclocityCommand(0),
-        indexer.setVelocityCommand(0),
+        indexer.setVelocityCommand(0, 0),
         // intakePivot.moveIntakePivotCommand(IntakePivotConstants.IN_POSITION),
         endEffector.setVelocityCommand(0));
   }
@@ -52,7 +52,7 @@ public class IntakeCommands {
         // Commands.waitUntil(() -> intakePivot.positionIsInRange()),
         Commands.parallel(
             intake.setVeclocityCommand(IntakeConstants.REVERSE_INTAKE_VELOCITY),
-            indexer.setVelocityCommand(IndexerConstants.REVERSE_VELOCITY),
+            indexer.setVelocityCommand(IndexerConstants.TOP_REVERSE_VELOCITY, IndexerConstants.BOTTOM_REVERSE_VELOCITY),
             endEffector.outtakeCommand()),
         Commands.parallel(intakeStop(intake, indexer, intakePivot, endEffector)));
   }
