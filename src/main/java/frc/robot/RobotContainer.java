@@ -101,24 +101,26 @@ public class RobotContainer {
         .active()
         .onTrue(
             Commands.sequence(
-                driveToFrontLeftRightReef.resetOdometry(), Commands.parallel(driveToFrontLeftRightReef.cmd(), ScoreCommands.algieRemoverCommand(elevator, endEffector))));
+                driveToFrontLeftRightReef.resetOdometry(),
+                Commands.parallel(
+                    driveToFrontLeftRightReef.cmd(),
+                    ScoreCommands.algieRemoverCommand(elevator, endEffector))));
 
     driveToFrontLeftRightReef.done().onTrue(ScoreCommands.levelTwo(elevator, endEffector));
 
     return routine;
   }
 
+  private AutoRoutine SeFRLRf() {
+    AutoRoutine routine = autoFactory.newRoutine("txai");
 
-  private AutoRoutine SeFRLRf(){
-  AutoRoutine routine = autoFactory.newRoutine("txai");
+    AutoTrajectory SeFLRRfTy = routine.trajectory("SeFLRRf");
 
-  AutoTrajectory SeFLRRfTy = routine.trajectory("SeFLRRf");
+    routine.active().onTrue(Commands.sequence(SeFLRRfTy.resetOdometry(), SeFLRRfTy.cmd()));
 
-  routine.active().onTrue(Commands.sequence(SeFLRRfTy.resetOdometry(), SeFLRRfTy.cmd()));
+    SeFLRRfTy.done().onTrue(ScoreCommands.levelTwo(elevator, endEffector));
 
-  SeFLRRfTy.done().onTrue(ScoreCommands.levelTwo(elevator, endEffector));
-
-  return routine;
+    return routine;
   }
 
   private AutoRoutine MeSATTt() {

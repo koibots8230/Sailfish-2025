@@ -31,6 +31,9 @@ public class ScoreCommands {
   }
 
   public static Command algieRemoverCommand(Elevator elevator, EndEffector endEffector) {
-    return Commands.sequence(endEffector.setVelocityCommand(-100), Commands.waitSeconds(.1), endEffector.setVelocityCommand(0));
+    return Commands.sequence(
+        endEffector.setVelocityCommand(-100),
+        Commands.waitSeconds(.1),
+        endEffector.setVelocityCommand(0));
   }
 }
