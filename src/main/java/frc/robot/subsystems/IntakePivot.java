@@ -20,6 +20,8 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -67,6 +69,7 @@ public class IntakePivot extends SubsystemBase {
 
     config = new SparkMaxConfig();
     config.closedLoop.p(IntakePivotConstants.PID.kp);
+    config.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
 
     config.absoluteEncoder.positionConversionFactor(IntakePivotConstants.CONVERSION_FACTOR);
     config.absoluteEncoder.velocityConversionFactor(IntakePivotConstants.CONVERSION_FACTOR / 60.0);
@@ -92,7 +95,7 @@ public class IntakePivot extends SubsystemBase {
             IntakePivotConstants.FEEDFORWARD.ks, IntakePivotConstants.FEEDFORWARD.kv);
 
     goal = new TrapezoidProfile.State();
-    setpoint = IntakePivotConstants.IN_POSITION;
+    setpoint = Radians.of(encoder.getPosition());
     motorSetpoint = new TrapezoidProfile.State();
   }
 
@@ -103,7 +106,7 @@ public class IntakePivot extends SubsystemBase {
     motorSetpoint =
         profile.calculate(RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds), motorSetpoint, goal);
 
-    System.out.println(motorSetpoint.velocity);
+    System.out.println(motorSetpoint.position);
 
     pid.setReference(
         motorSetpoint.position,

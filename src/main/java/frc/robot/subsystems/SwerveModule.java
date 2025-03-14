@@ -24,6 +24,7 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -158,7 +159,7 @@ public class SwerveModule {
   }
 
   public void setState(SwerveModuleState swerveModuleState) {
-    // swerveModuleState.optimize(currentAngle);
+    swerveModuleState.optimize(Rotation2d.fromRadians(MathUtil.angleModulus(turnPosition)));
     swerveModuleState.speedMetersPerSecond *=
         Math.cos(swerveModuleState.angle.getRadians() - turnPosition);
 
@@ -181,7 +182,7 @@ public class SwerveModule {
     driveVelocity = driveEncoder.getVelocity();
     turnVelocity = AngularVelocity.ofBaseUnits(turnEncoder.getVelocity(), Units.RadiansPerSecond);
 
-    turnGoalState = new TrapezoidProfile.State(turnSetpoint.in(Radians) + offset.getRadians(), 0);
+    turnGoalState = new TrapezoidProfile.State(MathUtil.angleModulus(turnSetpoint.in(Radians)) + offset.getRadians(), 0);
 
     turnSetpointState =
         turnProfile.calculate(

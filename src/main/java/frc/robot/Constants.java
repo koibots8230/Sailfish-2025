@@ -89,9 +89,9 @@ public class Constants {
 
   public static class AutoConstants {
 
-    public static final PIDGains X_CONTROLLER = new PIDGains.Builder().kp(0.0).build();
-    public static final PIDGains Y_CONTROLLER = new PIDGains.Builder().kp(0.0).build();
-    public static final PIDGains HEADING_CONTROLLER = new PIDGains.Builder().kp(0.0).build();
+    public static final PIDGains X_CONTROLLER = new PIDGains.Builder().kp(7.0).build();
+    public static final PIDGains Y_CONTROLLER = new PIDGains.Builder().kp(7.0).build();
+    public static final PIDGains HEADING_CONTROLLER = new PIDGains.Builder().kp(3.8).build();
   }
 
   public static class AlignConstants {
@@ -109,8 +109,8 @@ public class Constants {
 
     public static final Distance RED_REEF_OFFSET = Meters.of(8.569706);
 
-    public static final PIDGains TRANSLATE_PID = new PIDGains.Builder().kp(3.75).build();
-    public static final PIDGains ANGLE_PID = new PIDGains.Builder().kp(3.0).build();
+    public static final PIDGains TRANSLATE_PID = new PIDGains.Builder().kp(4).build();
+    public static final PIDGains ANGLE_PID = new PIDGains.Builder().kp(2.5).build();
 
     public static final Angle DIRECTION_ANGLE_RANGE_CLOSE = Radians.of(Math.PI / 1.85);
 
@@ -122,7 +122,7 @@ public class Constants {
   }
 
   public static class IntakeConstants {
-    public static final double INTAKE_VELOCITY = 2500;
+    public static final double INTAKE_VELOCITY = 3000;
     public static final double REVERSE_INTAKE_VELOCITY = -2000;
 
     public static final PIDGains PID = new PIDGains.Builder().kp(0.00006).build();
@@ -136,16 +136,16 @@ public class Constants {
 
   public static class IntakePivotConstants {
     public static final Angle OUT_POSITION = Angle.ofBaseUnits(1.8, Radians);
-    public static final Angle IN_POSITION = Angle.ofBaseUnits(0.12, Radians);
+    public static final Angle IN_POSITION = Angle.ofBaseUnits(0.15, Radians);
 
     public static final AngularVelocity MAX_VELOCITY =
-        AngularVelocity.ofBaseUnits(Math.PI/4, Units.RadiansPerSecond);
+        AngularVelocity.ofBaseUnits(14.0 * Math.PI, Units.RadiansPerSecond);
     public static final AngularAcceleration MAX_ACCELRATION =
-        AngularAcceleration.ofBaseUnits(Math.PI/4, Units.RadiansPerSecondPerSecond);
+        AngularAcceleration.ofBaseUnits(Math.PI * 16.0, Units.RadiansPerSecondPerSecond);
 
-    public static final PIDGains PID = new PIDGains.Builder().kp(0).build();
+    public static final PIDGains PID = new PIDGains.Builder().kp(1.8).build();
     public static final FeedforwardGains FEEDFORWARD =
-        new FeedforwardGains.Builder().kv(.1).build();
+        new FeedforwardGains.Builder().kv(1.1).build();
 
     public static final Angle TOLERANCE = Radians.of(0.025);
 
@@ -158,16 +158,16 @@ public class Constants {
   }
 
   public static class IndexerConstants {
-    public static final double INDEX_VELOCITY = 1500;
+    public static final double INDEX_VELOCITY = 3000;
     public static final double REVERSE_VELOCITY = -1500;
 
     public static final PIDGains TOP_PID = new PIDGains.Builder().kp(0.000032).build();
     public static final FeedforwardGains TOP_FF =
-        new FeedforwardGains.Builder().kv(0.00022).kg(0).build();
+        new FeedforwardGains.Builder().kv(0.00018).kg(0).build();
 
     public static final PIDGains BOTTOM_PID = new PIDGains.Builder().kp(0.000034).build();
     public static final FeedforwardGains BOTTOM_FF =
-        new FeedforwardGains.Builder().kv(0.00028).kg(0).build();
+        new FeedforwardGains.Builder().kv(0.000195).kg(0).build();
 
     public static final int TOP_ID = 41;
     public static final int BOTTOM_ID = 42;
@@ -176,7 +176,7 @@ public class Constants {
   public static class EndEffectorConstants {
     public static final double INTAKE_SPEED = 750;
     public static final double OUTTAKE_SPEED =
-        1000; // TODO: Turn back into units once not bugged anymore :(
+        1000;
 
     public static final PIDGains PID = new PIDGains.Builder().kp(0.0001).build();
     public static final FeedforwardGains FEEDFORWARD =

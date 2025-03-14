@@ -121,40 +121,43 @@ public class RobotContainer {
     // Trigger zero = xboxController.b();
     // zero.onTrue(swerve.zeroGyroCommand(isBlue));
 
-    // Trigger spinIntake = new Trigger(xboxController.rightTrigger());
-    // spinIntake.onTrue(
-    //     IntakeCommands.intakeCommand(intake, intakePivot, indexer, elevator, endEffector));
-    // spinIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector));
+    Trigger spinIntake = new Trigger(xboxController.rightTrigger());
+    spinIntake.onTrue(
+        IntakeCommands.intakeCommand(intake, intakePivot, indexer, elevator, endEffector));
+    spinIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector));
 
-    // Trigger reverseIntake = new Trigger(xboxController.leftTrigger());
-    // reverseIntake.onTrue(
-    //     IntakeCommands.reverseCommand(intake, intakePivot, indexer, elevator, endEffector));
-    // reverseIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector));
+    Trigger reverseIntake = new Trigger(xboxController.leftTrigger());
+    reverseIntake.onTrue(
+        IntakeCommands.reverseCommand(intake, intakePivot, indexer, elevator, endEffector));
+    reverseIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector));
 
-    // Trigger gotoLevelThree = new Trigger(xboxController.y());
-    // gotoLevelThree.onTrue(
-    //     Commands.sequence(
-    //         ScoreCommands.levelThree(elevator, endEffector),
-    //         swerve.setReefAlignStateCommand(ReefAlignState.disabled)));
-    // gotoLevelThree.onFalse(ScoreCommands.basePosition(elevator, endEffector));
+    Trigger gotoLevelThree = new Trigger(xboxController.y());
+    gotoLevelThree.onTrue(
+        Commands.sequence(
+            ScoreCommands.levelThree(elevator, endEffector),
+            swerve.setReefAlignStateCommand(ReefAlignState.disabled)));
+    gotoLevelThree.onFalse(ScoreCommands.basePosition(elevator, endEffector));
 
-    // Trigger gotoLevelTwo = new Trigger(xboxController.a());
-    // gotoLevelTwo.onTrue(
-    //     Commands.sequence(
-    //         ScoreCommands.levelTwo(elevator, endEffector),
-    //         swerve.setReefAlignStateCommand(ReefAlignState.disabled)));
-    // gotoLevelTwo.onFalse(ScoreCommands.basePosition(elevator, endEffector));
+    Trigger gotoLevelTwo = new Trigger(xboxController.a());
+    gotoLevelTwo.onTrue(
+        Commands.sequence(
+            ScoreCommands.levelTwo(elevator, endEffector),
+            swerve.setReefAlignStateCommand(ReefAlignState.disabled)));
+    gotoLevelTwo.onFalse(ScoreCommands.basePosition(elevator, endEffector));
 
-    // Trigger alignRight = xboxController.rightBumper();
-    // alignRight.onTrue(swerve.setReefAlignStateCommand(ReefAlignState.rightSide));
+    Trigger removeL2Algae = xboxController.povDown();
+    removeL2Algae.onTrue(ScoreCommands.removeL2Algae(elevator, endEffector));
+    removeL2Algae.onFalse(ScoreCommands.basePosition(elevator, endEffector));
 
-    // Trigger alignLeft = xboxController.leftBumper();
-    // alignLeft.onTrue(swerve.setReefAlignStateCommand(ReefAlignState.leftSide));
+    Trigger removeL3Algae = xboxController.povUp();
+    removeL3Algae.onTrue(ScoreCommands.removeL3Algae(elevator, endEffector));
+    removeL3Algae.onFalse(ScoreCommands.basePosition(elevator, endEffector));
 
-    Trigger up = xboxController.y();
-    Trigger down =  xboxController.a();
-    up.onTrue(intakePivot.setPositionCommand(IntakePivotConstants.IN_POSITION));
-    down.onTrue(intakePivot.setPositionCommand(IntakePivotConstants.OUT_POSITION));
+    Trigger alignRight = xboxController.rightBumper();
+    alignRight.onTrue(swerve.setReefAlignStateCommand(ReefAlignState.rightSide));
+
+    Trigger alignLeft = xboxController.leftBumper();
+    alignLeft.onTrue(swerve.setReefAlignStateCommand(ReefAlignState.leftSide));
   }
 
   private void defualtCommands() {
