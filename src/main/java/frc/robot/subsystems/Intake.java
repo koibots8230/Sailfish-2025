@@ -73,7 +73,7 @@ public class Intake extends SubsystemBase {
     setpoint = setVelocity;
   }
 
-  public Command setVeclocityCommand(double setVelocity) {
+  public Command setVelocityCommand(double setVelocity) {
     return Commands.runOnce(() -> this.setVelocity(setVelocity), this);
   }
 }
