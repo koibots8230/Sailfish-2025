@@ -4,11 +4,13 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -27,7 +29,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -40,11 +41,9 @@ public class IntakePivot extends SubsystemBase {
   @NotLogged private final SparkMax leftMotor;
   @NotLogged private final SparkMax rightMotor;
 
-  @NotLogged private final DigitalInput limitSwitch;
-
   @NotLogged private final SparkMaxConfig config;
 
-  @NotLogged private final RelativeEncoder encoder;
+  @NotLogged private final AbsoluteEncoder encoder;
 
   @NotLogged private final SparkClosedLoopController pid;
 
@@ -65,23 +64,20 @@ public class IntakePivot extends SubsystemBase {
   public IntakePivot() {
     leftMotor = new SparkMax(IntakePivotConstants.LEFT_MOTOR_ID, MotorType.kBrushless);
     rightMotor = new SparkMax(IntakePivotConstants.RIGHT_MOTOR_ID, MotorType.kBrushless);
-    limitSwitch = new DigitalInput(IntakePivotConstants.LIMIT_SWITCH_CHANEL);
 
     config = new SparkMaxConfig();
     config.closedLoop.p(IntakePivotConstants.PID.kp);
-    config.closedLoop.velocityFF(IntakePivotConstants.FEEDFORWARD.kv);
 
-    config.encoder.positionConversionFactor(IntakePivotConstants.CONVERSION_FACTOR);
-    config.encoder.velocityConversionFactor(IntakePivotConstants.CONVERSION_FACTOR / 60.0);
+    config.absoluteEncoder.positionConversionFactor(IntakePivotConstants.CONVERSION_FACTOR);
+    config.absoluteEncoder.velocityConversionFactor(IntakePivotConstants.CONVERSION_FACTOR / 60.0);
 
     leftMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    encoder = leftMotor.getEncoder();
+    encoder = leftMotor.getAbsoluteEncoder();
 
     pid = leftMotor.getClosedLoopController();
 
-    config.follow(leftMotor);
-    config.inverted(true);
+    config.follow(leftMotor, true);
 
     rightMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -107,22 +103,20 @@ public class IntakePivot extends SubsystemBase {
     motorSetpoint =
         profile.calculate(RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds), motorSetpoint, goal);
 
+    System.out.println(motorSetpoint.velocity);
+
     pid.setReference(
         motorSetpoint.position,
         ControlType.kPosition,
         ClosedLoopSlot.kSlot0,
         feedforward.calculate(motorSetpoint.velocity));
 
-    position = Angle.ofBaseUnits(encoder.getPosition(), Degrees);
-    velocity = AngularVelocity.ofBaseUnits(encoder.getVelocity(), DegreesPerSecond);
+    position = Angle.ofBaseUnits(encoder.getPosition(), Radians);
+    velocity = AngularVelocity.ofBaseUnits(encoder.getVelocity(), RadiansPerSecond);
     voltage = Voltage.ofBaseUnits(leftMotor.getBusVoltage() * leftMotor.getAppliedOutput(), Volts);
     leftCurrent = Current.ofBaseUnits(leftMotor.getOutputCurrent(), Amps);
     rightCurrent = Current.ofBaseUnits(rightMotor.getOutputCurrent(), Amps);
 
-    if (limitSwitch.get()) {
-      position = IntakePivotConstants.IN_POSITION;
-      encoder.setPosition(position.in(Radians));
-    }
   }
 
   public boolean atSetpoint() {

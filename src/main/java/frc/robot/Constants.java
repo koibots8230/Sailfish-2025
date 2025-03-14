@@ -135,28 +135,26 @@ public class Constants {
   }
 
   public static class IntakePivotConstants {
-    public static final Angle OUT_POSITION = Angle.ofBaseUnits(10, Radians);
-    public static final Angle IN_POSITION = Angle.ofBaseUnits(0, Radians);
+    public static final Angle OUT_POSITION = Angle.ofBaseUnits(1.8, Radians);
+    public static final Angle IN_POSITION = Angle.ofBaseUnits(0.12, Radians);
 
     public static final AngularVelocity MAX_VELOCITY =
-        AngularVelocity.ofBaseUnits(0, Units.RotationsPerSecond);
+        AngularVelocity.ofBaseUnits(Math.PI/4, Units.RadiansPerSecond);
     public static final AngularAcceleration MAX_ACCELRATION =
-        AngularAcceleration.ofBaseUnits(0, Units.RotationsPerSecondPerSecond);
+        AngularAcceleration.ofBaseUnits(Math.PI/4, Units.RadiansPerSecondPerSecond);
 
     public static final PIDGains PID = new PIDGains.Builder().kp(0).build();
     public static final FeedforwardGains FEEDFORWARD =
-        new FeedforwardGains.Builder().kv(0).kg(0).build();
+        new FeedforwardGains.Builder().kv(.1).build();
 
     public static final Angle TOLERANCE = Radians.of(0.025);
 
-    public static final double GEARING = 1;
+    public static final double GEARING = 19.0 / 50.0;
 
     public static final double CONVERSION_FACTOR = 2.0 * Math.PI * GEARING;
 
-    public static final int LEFT_MOTOR_ID = 31;
-    public static final int RIGHT_MOTOR_ID = 32;
-
-    public static final int LIMIT_SWITCH_CHANEL = 1;
+    public static final int LEFT_MOTOR_ID = 32;
+    public static final int RIGHT_MOTOR_ID = 31;
   }
 
   public static class IndexerConstants {
