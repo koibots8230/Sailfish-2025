@@ -405,7 +405,7 @@ public class Swerve extends SubsystemBase {
                 SwerveConstants.DEADBAND)),
         RadiansPerSecond.of(
             MathUtil.applyDeadband(
-                -omega + (assist.getRotation().getRadians() * Math.sqrt(Math.abs(omega))),
+                -omega + (assist.getRotation().getRadians()),
                 SwerveConstants.DEADBAND)));
   }
 
@@ -414,7 +414,7 @@ public class Swerve extends SubsystemBase {
 
     SwerveDriveKinematics.desaturateWheelSpeeds(
         setpointStates, SwerveConstants.MAX_LINEAR_VELOCITY);
-
+    
     modules.frontLeft.setState(setpointStates[0]);
     modules.frontRight.setState(setpointStates[1]);
     modules.backLeft.setState(setpointStates[2]);

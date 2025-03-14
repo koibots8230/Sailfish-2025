@@ -9,7 +9,9 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -76,42 +78,7 @@ public class RobotContainer {
 
     configureBindings();
     defualtCommands();
-  }
-
-  private AutoRoutine SeFLRRf() {
-    AutoRoutine routine = autoFactory.newRoutine("taxi");
-
-    AutoTrajectory driveToFrontLeftRightReef = routine.trajectory("SeFLRRf");
-
-    routine
-        .active()
-        .onTrue(
-            Commands.sequence(
-                driveToFrontLeftRightReef.resetOdometry(), driveToFrontLeftRightReef.cmd()));
-
-    driveToFrontLeftRightReef.done().onTrue(ScoreCommands.levelTwo(elevator, endEffector));
-
-    return routine;
-  }
-
-  private AutoRoutine MeSATTt() {
-    AutoRoutine routine = autoFactory.newRoutine("taxi");
-
-    AutoTrajectory MeST = routine.trajectory("MeST");
-
-    routine.active().onTrue(Commands.sequence(MeST.resetOdometry(), MeST.cmd()));
-
-    return routine;
-  }
-
-  private AutoRoutine ReATTt() {
-    AutoRoutine routine = autoFactory.newRoutine("taxi");
-
-    AutoTrajectory rotate = routine.trajectory("Re");
-
-    routine.active().onTrue(Commands.sequence(rotate.resetOdometry(), rotate.cmd()));
-
-    return routine;
+    setupTestMode();
   }
 
   private void configureBindings() {
@@ -164,5 +131,58 @@ public class RobotContainer {
   public void autonomousInit() {
     isBlue = (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
     swerve.setIsBlue(isBlue);
+  }
+
+  private AutoRoutine SeFLRRf() {
+    AutoRoutine routine = autoFactory.newRoutine("taxi");
+
+    AutoTrajectory driveToFrontLeftRightReef = routine.trajectory("SeFLRRf");
+
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                driveToFrontLeftRightReef.resetOdometry(), driveToFrontLeftRightReef.cmd()));
+
+    driveToFrontLeftRightReef.done().onTrue(ScoreCommands.levelTwo(elevator, endEffector));
+
+    return routine;
+  }
+
+  private AutoRoutine MeSATTt() {
+    AutoRoutine routine = autoFactory.newRoutine("taxi");
+
+    AutoTrajectory MeST = routine.trajectory("MeST");
+
+    routine.active().onTrue(Commands.sequence(MeST.resetOdometry(), MeST.cmd()));
+
+    return routine;
+  }
+
+  private AutoRoutine ReATTt() {
+    AutoRoutine routine = autoFactory.newRoutine("taxi");
+
+    AutoTrajectory rotate = routine.trajectory("Re");
+
+    routine.active().onTrue(Commands.sequence(rotate.resetOdometry(), rotate.cmd()));
+
+    return routine;
+  }
+
+  private void setupTestMode() {
+    SmartDashboard.putBoolean("TestSequence/FL Module", true);
+    SmartDashboard.putBoolean("TestSequence/FR Module", true);
+    SmartDashboard.putBoolean("TestSequence/BL Module", true);
+    SmartDashboard.putBoolean("TestSequence/BR Module", true);
+
+    SmartDashboard.putBoolean("TestSequence/Intake", true);
+    SmartDashboard.putBoolean("TestSequence/Intake Pivot", true);
+
+    SmartDashboard.putBoolean("TestSequence/Indexer Top", true);
+    SmartDashboard.putBoolean("TestSequence/Indexer Bottom", true);
+
+    SmartDashboard.putBoolean("TestSequence/Elevator", true);
+
+    SmartDashboard.putBoolean("TestSequence/End Effector", true);
   }
 }
