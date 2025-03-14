@@ -184,5 +184,7 @@ public class RobotContainer {
     SmartDashboard.putBoolean("TestSequence/Elevator", true);
 
     SmartDashboard.putBoolean("TestSequence/End Effector", true);
+
+    SmartDashboard.putData("TestSequence/SequenceCommand", TestCommands.testSequence(swerve, intake, intakePivot, indexer, elevator, endEffector));
   }
 }
