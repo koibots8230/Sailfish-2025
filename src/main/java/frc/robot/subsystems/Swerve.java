@@ -305,7 +305,7 @@ public class Swerve extends SubsystemBase {
 
     LinearVelocity assistVelocity =
         MetersPerSecond.of(
-            Math.sqrt(distancePerpToVel.in(Meters)) * AlignConstants.TRANSLATE_PID.kp);
+            Math.cbrt(distancePerpToVel.in(Meters)) * AlignConstants.TRANSLATE_PID.kp);
 
     return new Pose2d(
         assistVelocity.in(MetersPerSecond) * angleToTarget.getCos(),
@@ -405,8 +405,7 @@ public class Swerve extends SubsystemBase {
                 SwerveConstants.DEADBAND)),
         RadiansPerSecond.of(
             MathUtil.applyDeadband(
-                -omega + (assist.getRotation().getRadians() * Math.sqrt(Math.abs(omega))),
-                SwerveConstants.DEADBAND)));
+                -omega + (assist.getRotation().getRadians()), SwerveConstants.DEADBAND)));
   }
 
   public void driveRobotRelative(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
