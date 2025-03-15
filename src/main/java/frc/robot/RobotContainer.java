@@ -10,6 +10,7 @@ import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -34,9 +35,12 @@ public class RobotContainer {
 
   private final Indexer indexer;
 
+  private final Climber climber;
+
   private final Vision vision;
 
   private final CommandXboxController xboxController;
+  private final GenericHID operatorPad;
   private boolean isBlue;
 
   public RobotContainer() {
@@ -53,6 +57,7 @@ public class RobotContainer {
     intake = new Intake();
     intakePivot = new IntakePivot();
     indexer = new Indexer();
+    climber = new Climber();
 
     autoChooser = new AutoChooser();
 
@@ -64,6 +69,7 @@ public class RobotContainer {
             swerve::getIsBlue);
 
     xboxController = new CommandXboxController(0);
+    operatorPad = new GenericHID(1);
 
     autoChooser.addRoutine("Score Front Left Right Reef", this::SeFLRRf);
     autoChooser.addRoutine("move stright tune test", this::MeSATTt);
@@ -154,6 +160,15 @@ public class RobotContainer {
 
     Trigger alignLeft = xboxController.leftBumper();
     alignLeft.onTrue(swerve.setReefAlignStateCommand(ReefAlignState.leftSide));
+
+    // Trigger prepClimb = new Trigger(() -> operatorPad.getRawButton(5));
+    // prepClimb.onTrue(ClimbCommands.prepClimb(climber));
+
+    // Trigger climb = new Trigger(() -> operatorPad.getRawButton(6));
+    // climb.onTrue(ClimbCommands.climb(climber));
+
+    // Trigger resetClimb = new Trigger(() -> operatorPad.getRawButton(7));
+    // resetClimb.onTrue(ClimbCommands.resetClimber(climber));
   }
 
   private void defualtCommands() {

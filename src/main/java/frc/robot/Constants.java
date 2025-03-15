@@ -250,6 +250,22 @@ public class Constants {
     public static final double TRANSLATION_STDEV_SCALAR = 0.15;
   }
 
+  public static class ClimberConstants {
+    public static final double START_POSITION = 0;
+    public static final double PREP_POSITION = 0.25;
+    public static final double CLIMB_POSITION = 0.75;
+    public static final PIDGains PID = new PIDGains.Builder().kp(0.0).build();
+    public static final FeedforwardGains FEEDFORWARD =
+        new FeedforwardGains.Builder().kv(0.5).build();
+
+    public static final double MAX_VELOCITY = 1 / 8;
+    public static final double MAX_ACCELERATION = 1 / 8;
+
+    public static final Current CURRENT_LIMIT = Current.ofBaseUnits(60, Units.Amps);
+
+    public static final int MOTOR_ID = 51;
+  }
+
   public static class RobotConstants {
     public static final Distance WIDTH = Inches.of(23.5);
     public static final Distance LENGTH = Inches.of(23.5);
