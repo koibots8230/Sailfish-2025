@@ -24,7 +24,7 @@ public class LED extends SubsystemBase {
     uart = new SerialPort(LEDConstants.BAUD_RATE, SerialPort.Port.kMXP);
   }
 
-  private void SetLED(State state) {
+  private void setLED(State state) {
     if (state == State.teleop) {
       uart.writeString("0");// purple and orange pattern
     }
@@ -49,6 +49,6 @@ public class LED extends SubsystemBase {
   }
 
   public Command LEDCommand(State state) {
-    return Commands.runOnce(() -> this.SetLED(state), this);
+    return Commands.runOnce(() -> this.setLED(state), this);
   }
 }
