@@ -185,23 +185,6 @@ public class Swerve extends SubsystemBase {
             measurement.translationStdev, measurement.translationStdev, measurement.rotationStdev));
   }
 
-  // ===================== Module States ===================== \\
-
-  private void setModuleState(int moduleNumber, SwerveModuleState state) {
-    switch (moduleNumber) {
-      case 0:
-        modules.frontLeft.setState(state);
-      case 1:
-        modules.frontRight.setState(state);
-      case 2:
-        modules.backLeft.setState(state);
-      case 3:
-        modules.backRight.setState(state);
-      default:
-        return;
-    }
-  }
-
   // ===================== Gyro ===================== \\
 
   public void zeroGyro() {
@@ -489,9 +472,5 @@ public class Swerve extends SubsystemBase {
 
   public Command setReefAlignStateCommand(ReefAlignState state) {
     return Commands.runOnce(() -> this.setReefAlignState(state));
-  }
-
-  public Command setModuleStateCommand(int moduleNumber, SwerveModuleState state) {
-    return Commands.runOnce(() -> this.setModuleState(moduleNumber, state), this);
   }
 }
