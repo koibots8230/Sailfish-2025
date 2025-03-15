@@ -39,7 +39,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    m_robotContainer.autonomousInit();
+    m_robotContainer.setAlliance();
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
@@ -57,6 +57,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    m_robotContainer.setAlliance();
     m_robotContainer.teleopInit();
   }
 
@@ -69,6 +70,7 @@ public class Robot extends TimedRobot {
   @Override
   public void testInit() {
     CommandScheduler.getInstance().cancelAll();
+    m_robotContainer.testInit();
   }
 
   @Override

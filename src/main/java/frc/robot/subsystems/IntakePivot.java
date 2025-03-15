@@ -102,8 +102,6 @@ public class IntakePivot extends SubsystemBase {
     motorSetpoint =
         profile.calculate(RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds), motorSetpoint, goal);
 
-    System.out.println(motorSetpoint.position);
-
     pid.setReference(
         motorSetpoint.position,
         ControlType.kPosition,

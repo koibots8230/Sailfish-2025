@@ -26,6 +26,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -408,6 +409,30 @@ public class Swerve extends SubsystemBase {
                 -omega + (assist.getRotation().getRadians()), SwerveConstants.DEADBAND)));
   }
 
+  private void testModeScaler(double x, double y, double omega) {
+    double linearMagnitude = Math.pow(Math.hypot(x, y), SwerveConstants.TRANSLATION_SCALAR);
+
+    Rotation2d direction = new Rotation2d(y, x);
+
+    y =
+        linearMagnitude
+            * -direction.getCos()
+            * SwerveConstants.MAX_LINEAR_VELOCITY.in(MetersPerSecond);
+    x =
+        linearMagnitude
+            * -direction.getSin()
+            * SwerveConstants.MAX_LINEAR_VELOCITY.in(MetersPerSecond);
+
+    omega =
+        Math.pow(omega, SwerveConstants.ROTATION_SCALAR)
+            * SwerveConstants.MAX_ANGULAR_VELOCITY.in(RadiansPerSecond);
+
+    driveFieldRelativeTest(
+        MetersPerSecond.of(MathUtil.applyDeadband(x, SwerveConstants.DEADBAND)),
+        MetersPerSecond.of(MathUtil.applyDeadband(y, SwerveConstants.DEADBAND)),
+        RadiansPerSecond.of(MathUtil.applyDeadband(-omega, SwerveConstants.DEADBAND)));
+  }
+
   public void driveRobotRelative(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
     setpointStates = SwerveConstants.KINEMATICS.toSwerveModuleStates(speeds);
 
@@ -426,6 +451,34 @@ public class Swerve extends SubsystemBase {
             x.in(MetersPerSecond), y.in(MetersPerSecond), omega.in(RadiansPerSecond), gyroAngle);
 
     driveFieldRelative(speeds);
+  }
+
+  private void driveFieldRelativeTest(LinearVelocity x, LinearVelocity y, AngularVelocity omega) {
+    ChassisSpeeds speeds =
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            x.in(MetersPerSecond), y.in(MetersPerSecond), omega.in(RadiansPerSecond), gyroAngle);
+
+    driveTestMode(speeds);
+  }
+
+  private void driveTestMode(ChassisSpeeds speeds) {
+    setpointStates = SwerveConstants.KINEMATICS.toSwerveModuleStates(speeds);
+
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        setpointStates, SwerveConstants.MAX_LINEAR_VELOCITY);
+
+    if (SmartDashboard.getBoolean("SwerveTest/FL", true)) {
+      modules.frontLeft.setState(setpointStates[0]);
+    }
+    if (SmartDashboard.getBoolean("SwerveTest/FR", true)) {
+      modules.frontRight.setState(setpointStates[1]);
+    }
+    if (SmartDashboard.getBoolean("SwerveTest/BL", true)) {
+      modules.backLeft.setState(setpointStates[2]);
+    }
+    if (SmartDashboard.getBoolean("SwerveTest/BR", true)) {
+      modules.backRight.setState(setpointStates[3]);
+    }
   }
 
   private void driveFieldRelative(ChassisSpeeds speeds) {
@@ -460,6 +513,16 @@ public class Swerve extends SubsystemBase {
     return Commands.run(
         () ->
             driveFieldRelativeScaler(
+                MathUtil.applyDeadband(x.getAsDouble(), SwerveConstants.DEADBAND),
+                MathUtil.applyDeadband(y.getAsDouble(), SwerveConstants.DEADBAND),
+                MathUtil.applyDeadband(omega.getAsDouble(), SwerveConstants.DEADBAND)),
+        this);
+  }
+
+  public Command testModeDriveCommand(DoubleSupplier x, DoubleSupplier y, DoubleSupplier omega) {
+    return Commands.run(
+        () ->
+            testModeScaler(
                 MathUtil.applyDeadband(x.getAsDouble(), SwerveConstants.DEADBAND),
                 MathUtil.applyDeadband(y.getAsDouble(), SwerveConstants.DEADBAND),
                 MathUtil.applyDeadband(omega.getAsDouble(), SwerveConstants.DEADBAND)),
