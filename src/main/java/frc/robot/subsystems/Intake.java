@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.RelativeEncoder;
@@ -13,7 +12,7 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -24,13 +23,16 @@ import frc.robot.Constants.IntakeConstants;
 @Logged
 public class Intake extends SubsystemBase {
 
-  private final RelativeEncoder encoder;
-  private final SparkFlex motor;
-  private final SparkMaxConfig config;
-  private final SparkClosedLoopController closedLoopController;
+  @NotLogged private final SparkFlex motor;
 
-  private AngularVelocity setpoint;
-  private AngularVelocity velocity;
+  @NotLogged private final SparkMaxConfig config;
+
+  @NotLogged private final RelativeEncoder encoder;
+
+  @NotLogged private final SparkClosedLoopController closedLoopController;
+
+  private double setpoint;
+  private double velocity;
   private Voltage voltage;
   private Current current;
 
@@ -51,12 +53,12 @@ public class Intake extends SubsystemBase {
 
     closedLoopController = motor.getClosedLoopController();
 
-    setpoint = AngularVelocity.ofBaseUnits(0, RPM);
+    setpoint = 0;
   }
 
   @Override
   public void periodic() {
-    velocity = AngularVelocity.ofBaseUnits(encoder.getVelocity(), RPM);
+    velocity = encoder.getVelocity();
     voltage = Voltage.ofBaseUnits(motor.getBusVoltage() * motor.getAppliedOutput(), Volts);
     current = Current.ofBaseUnits(motor.getOutputCurrent(), Amps);
   }
@@ -66,12 +68,12 @@ public class Intake extends SubsystemBase {
     velocity = setpoint;
   }
 
-  private void spinIntake(AngularVelocity setVelocity) {
-    closedLoopController.setReference(setVelocity.in(RPM), ControlType.kVelocity);
+  private void setVelocity(double setVelocity) {
+    closedLoopController.setReference(setVelocity, ControlType.kVelocity);
     setpoint = setVelocity;
   }
 
-  public Command setVeclocityCommand(AngularVelocity setVelocity) {
-    return Commands.runOnce(() -> this.spinIntake(setVelocity), this);
+  public Command setVelocityCommand(double setVelocity) {
+    return Commands.runOnce(() -> this.setVelocity(setVelocity), this);
   }
 }

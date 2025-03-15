@@ -1,23 +1,25 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
-import com.revrobotics.RelativeEncoder;
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
@@ -25,7 +27,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -35,15 +36,21 @@ import frc.robot.Constants.RobotConstants;
 @Logged
 public class IntakePivot extends SubsystemBase {
 
-  private final SparkMax leftMotor;
-  private final SparkMax rightMotor;
-  private final TrapezoidProfile profile;
-  private final SimpleMotorFeedforward feedforward;
-  private final RelativeEncoder encoder;
-  private final DigitalInput limitSwitch;
+  @NotLogged private final SparkMax leftMotor;
+  @NotLogged private final SparkMax rightMotor;
+
+  @NotLogged private final SparkMaxConfig config;
+
+  @NotLogged private final AbsoluteEncoder encoder;
+
+  @NotLogged private final SparkClosedLoopController pid;
+
+  @NotLogged private final SimpleMotorFeedforward feedforward;
+
+  @NotLogged private final TrapezoidProfile profile;
+
   private TrapezoidProfile.State goal;
   private TrapezoidProfile.State motorSetpoint;
-  private final SparkMaxConfig config;
 
   private Angle setpoint;
   private AngularVelocity velocity;
@@ -55,21 +62,21 @@ public class IntakePivot extends SubsystemBase {
   public IntakePivot() {
     leftMotor = new SparkMax(IntakePivotConstants.LEFT_MOTOR_ID, MotorType.kBrushless);
     rightMotor = new SparkMax(IntakePivotConstants.RIGHT_MOTOR_ID, MotorType.kBrushless);
-    limitSwitch = new DigitalInput(IntakePivotConstants.LIMIT_SWITCH_CHANEL);
 
     config = new SparkMaxConfig();
     config.closedLoop.p(IntakePivotConstants.PID.kp);
-    config.closedLoop.velocityFF(IntakePivotConstants.FEEDFORWARD.kv);
+    config.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
 
-    config.encoder.positionConversionFactor(IntakePivotConstants.POSITION_CONVERSION_FACTOR);
-    config.encoder.velocityConversionFactor(IntakePivotConstants.VELCOITY_CONVERSION_FACTOR);
+    config.absoluteEncoder.positionConversionFactor(IntakePivotConstants.CONVERSION_FACTOR);
+    config.absoluteEncoder.velocityConversionFactor(IntakePivotConstants.CONVERSION_FACTOR / 60.0);
 
     leftMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    encoder = leftMotor.getEncoder();
+    encoder = leftMotor.getAbsoluteEncoder();
 
-    config.follow(leftMotor);
-    config.inverted(true);
+    pid = leftMotor.getClosedLoopController();
+
+    config.follow(leftMotor, true);
 
     rightMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -84,7 +91,7 @@ public class IntakePivot extends SubsystemBase {
             IntakePivotConstants.FEEDFORWARD.ks, IntakePivotConstants.FEEDFORWARD.kv);
 
     goal = new TrapezoidProfile.State();
-    setpoint = IntakePivotConstants.IN_POSITION;
+    setpoint = Radians.of(encoder.getPosition());
     motorSetpoint = new TrapezoidProfile.State();
   }
 
@@ -95,27 +102,22 @@ public class IntakePivot extends SubsystemBase {
     motorSetpoint =
         profile.calculate(RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds), motorSetpoint, goal);
 
-    leftMotor
-        .getClosedLoopController()
-        .setReference(
-            motorSetpoint.position,
-            ControlType.kPosition,
-            ClosedLoopSlot.kSlot0,
-            feedforward.calculate(motorSetpoint.velocity));
+    System.out.println(motorSetpoint.position);
 
-    position = Angle.ofBaseUnits(encoder.getPosition(), Degrees);
-    velocity = AngularVelocity.ofBaseUnits(encoder.getVelocity(), DegreesPerSecond);
+    pid.setReference(
+        motorSetpoint.position,
+        ControlType.kPosition,
+        ClosedLoopSlot.kSlot0,
+        feedforward.calculate(motorSetpoint.velocity));
+
+    position = Angle.ofBaseUnits(encoder.getPosition(), Radians);
+    velocity = AngularVelocity.ofBaseUnits(encoder.getVelocity(), RadiansPerSecond);
     voltage = Voltage.ofBaseUnits(leftMotor.getBusVoltage() * leftMotor.getAppliedOutput(), Volts);
     leftCurrent = Current.ofBaseUnits(leftMotor.getOutputCurrent(), Amps);
     rightCurrent = Current.ofBaseUnits(rightMotor.getOutputCurrent(), Amps);
-
-    if (limitSwitch.get()) {
-      position = IntakePivotConstants.IN_POSITION;
-      encoder.setPosition(position.in(Radians));
-    }
   }
 
-  public boolean positionIsInRange() {
+  public boolean atSetpoint() {
     return (position.gte(IntakePivotConstants.OUT_POSITION.minus(IntakePivotConstants.TOLERANCE))
         && position.lt(IntakePivotConstants.OUT_POSITION.plus(IntakePivotConstants.TOLERANCE)));
   }
@@ -125,12 +127,12 @@ public class IntakePivot extends SubsystemBase {
     position = setpoint;
   }
 
-  private void movePivot(Angle position) {
+  private void setPosition(Angle position) {
     goal = new TrapezoidProfile.State(position.in(Radians), 0);
     setpoint = position;
   }
 
-  public Command moveIntakePivotCommand(Angle position) {
-    return Commands.runOnce(() -> this.movePivot(position), this);
+  public Command setPositionCommand(Angle position) {
+    return Commands.runOnce(() -> this.setPosition(position), this);
   }
 }
