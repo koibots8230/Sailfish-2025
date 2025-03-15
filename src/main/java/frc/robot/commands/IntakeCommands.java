@@ -3,6 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.EndEffectorConstants;
 import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.IntakePivotConstants;
@@ -51,12 +52,12 @@ public class IntakeCommands {
         elevator.setPositionCommand(ElevatorConstants.INTAKE_POSITION),
         Commands.waitUntil(() -> elevator.atPosition(ElevatorConstants.INTAKE_POSITION)),
         intakePivot.setPositionCommand(IntakePivotConstants.OUT_POSITION),
-        Commands.waitUntil(() -> intakePivot.atSetpoint()),
+        endEffector.setVelocityCommand(EndEffectorConstants.OUTTAKE_SPEED),
+        Commands.waitUntil(() -> intakePivot.atSetpoint(IntakePivotConstants.OUT_POSITION)),
         Commands.parallel(
             intake.setVelocityCommand(IntakeConstants.REVERSE_INTAKE_VELOCITY),
             indexer.setVelocityCommand(
-                IndexerConstants.TOP_REVERSE_VELOCITY, IndexerConstants.BOTTOM_REVERSE_VELOCITY),
-            endEffector.outtakeCommand()),
+                IndexerConstants.TOP_REVERSE_VELOCITY, IndexerConstants.BOTTOM_REVERSE_VELOCITY)),
         Commands.parallel(intakeStop(intake, indexer, intakePivot, endEffector)));
   }
 }

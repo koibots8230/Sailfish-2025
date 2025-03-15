@@ -212,7 +212,7 @@ public class Swerve extends SubsystemBase {
     return SwerveConstants.KINEMATICS.toChassisSpeeds(measuredStates);
   }
 
-  // ===================== Module Positions ===================== \\
+  // ===================== Reef Align State ===================== \\
 
   private void setReefAlignState(ReefAlignState state) {
     this.reefAlignState = state;

@@ -104,6 +104,6 @@ public class Indexer extends SubsystemBase {
   }
 
   public Command setVelocityCommand(double topVelocity, double bottomVelocity) {
-    return Commands.runOnce(() -> this.setVelocity(topVelocity, bottomVelocity));
+    return Commands.runOnce(() -> this.setVelocity(topVelocity, bottomVelocity), this);
   }
 }

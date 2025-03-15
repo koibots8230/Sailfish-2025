@@ -117,9 +117,9 @@ public class IntakePivot extends SubsystemBase {
     rightCurrent = Current.ofBaseUnits(rightMotor.getOutputCurrent(), Amps);
   }
 
-  public boolean atSetpoint() {
-    return (position.gte(IntakePivotConstants.OUT_POSITION.minus(IntakePivotConstants.TOLERANCE))
-        && position.lt(IntakePivotConstants.OUT_POSITION.plus(IntakePivotConstants.TOLERANCE)));
+  public boolean atSetpoint(Angle setpoint) {
+    return (position.gte(setpoint.minus(IntakePivotConstants.TOLERANCE))
+        && position.lte(setpoint.plus(IntakePivotConstants.TOLERANCE)));
   }
 
   @Override

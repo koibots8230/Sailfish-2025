@@ -83,42 +83,7 @@ public class RobotContainer {
 
     configureBindings();
     defualtCommands();
-  }
-
-  private AutoRoutine SeFLRRf() {
-    AutoRoutine routine = autoFactory.newRoutine("taxi");
-
-    AutoTrajectory driveToFrontLeftRightReef = routine.trajectory("SeFLRRf");
-
-    routine
-        .active()
-        .onTrue(
-            Commands.sequence(
-                driveToFrontLeftRightReef.resetOdometry(), driveToFrontLeftRightReef.cmd()));
-
-    driveToFrontLeftRightReef.done().onTrue(ScoreCommands.levelTwo(elevator, endEffector));
-
-    return routine;
-  }
-
-  private AutoRoutine MeSATTt() {
-    AutoRoutine routine = autoFactory.newRoutine("taxi");
-
-    AutoTrajectory MeST = routine.trajectory("MeST");
-
-    routine.active().onTrue(Commands.sequence(MeST.resetOdometry(), MeST.cmd()));
-
-    return routine;
-  }
-
-  private AutoRoutine ReATTt() {
-    AutoRoutine routine = autoFactory.newRoutine("taxi");
-
-    AutoTrajectory rotate = routine.trajectory("Re");
-
-    routine.active().onTrue(Commands.sequence(rotate.resetOdometry(), rotate.cmd()));
-
-    return routine;
+    setupTestMode();
   }
 
   private void configureBindings() {
@@ -188,5 +153,57 @@ public class RobotContainer {
   public void autonomousInit() {
     isBlue = (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
     swerve.setIsBlue(isBlue);
+  }
+
+  private AutoRoutine SeFLRRf() {
+    AutoRoutine routine = autoFactory.newRoutine("taxi");
+
+    AutoTrajectory driveToFrontLeftRightReef = routine.trajectory("SeFLRRf");
+
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                driveToFrontLeftRightReef.resetOdometry(), driveToFrontLeftRightReef.cmd()));
+
+    driveToFrontLeftRightReef.done().onTrue(ScoreCommands.levelTwo(elevator, endEffector));
+
+    return routine;
+  }
+
+  private AutoRoutine MeSATTt() {
+    AutoRoutine routine = autoFactory.newRoutine("taxi");
+
+    AutoTrajectory MeST = routine.trajectory("MeST");
+
+    routine.active().onTrue(Commands.sequence(MeST.resetOdometry(), MeST.cmd()));
+
+    return routine;
+  }
+
+  private AutoRoutine ReATTt() {
+    AutoRoutine routine = autoFactory.newRoutine("taxi");
+
+    AutoTrajectory rotate = routine.trajectory("Re");
+
+    routine.active().onTrue(Commands.sequence(rotate.resetOdometry(), rotate.cmd()));
+
+    return routine;
+  }
+
+  private void setupTestMode() {
+    SmartDashboard.putBoolean("TestSequence/Intake", true);
+    SmartDashboard.putBoolean("TestSequence/Intake Pivot", true);
+
+    SmartDashboard.putBoolean("TestSequence/Indexer Top", true);
+    SmartDashboard.putBoolean("TestSequence/Indexer Bottom", true);
+
+    SmartDashboard.putBoolean("TestSequence/Elevator", true);
+
+    SmartDashboard.putBoolean("TestSequence/End Effector", true);
+
+    SmartDashboard.putData(
+        "TestSequence/SequenceCommand",
+        TestCommands.testSequence(swerve, intake, intakePivot, indexer, elevator, endEffector));
   }
 }
