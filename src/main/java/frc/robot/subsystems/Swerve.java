@@ -490,18 +490,4 @@ public class Swerve extends SubsystemBase {
   public Command setModuleStateCommand(int moduleNumber, SwerveModuleState state) {
     return Commands.runOnce(() -> this.setModuleState(moduleNumber, state), this);
   }
-
-  public Command rotateTurnCommand(int moduleNumber) {
-    return Commands.sequence(
-                    this.setModuleStateCommand(moduleNumber, new SwerveModuleState(0, Rotation2d.kCCW_90deg)),
-                    Commands.waitUntil(() -> (MathUtil.angleModulus(this.getModulePostitions()[moduleNumber].angle.getRadians()) > MathUtil.angleModulus(Rotation2d.kCCW_90deg.minus(SwerveConstants.ANGLE_DEADZONE).getRadians()) && MathUtil.angleModulus(this.getModulePostitions()[moduleNumber].angle.getRadians()) < MathUtil.angleModulus(Rotation2d.kCCW_90deg.plus(SwerveConstants.ANGLE_DEADZONE).getRadians()))),
-                    this.setModuleStateCommand(moduleNumber, new SwerveModuleState(0, Rotation2d.k180deg)),
-                    Commands.waitUntil(() -> (MathUtil.angleModulus(this.getModulePostitions()[moduleNumber].angle.getRadians()) > MathUtil.angleModulus(Rotation2d.k180deg.minus(SwerveConstants.ANGLE_DEADZONE).getRadians()) && MathUtil.angleModulus(this.getModulePostitions()[moduleNumber].angle.getRadians()) < MathUtil.angleModulus(Rotation2d.k180deg.plus(SwerveConstants.ANGLE_DEADZONE).getRadians()))),
-                    this.setModuleStateCommand(moduleNumber, new SwerveModuleState(0, Rotation2d.fromDegrees(270))),
-                    Commands.waitUntil(() -> (MathUtil.angleModulus(this.getModulePostitions()[moduleNumber].angle.getRadians()) > MathUtil.angleModulus(Rotation2d.fromDegrees(270).minus(SwerveConstants.ANGLE_DEADZONE).getRadians()) && MathUtil.angleModulus(this.getModulePostitions()[moduleNumber].angle.getRadians()) < MathUtil.angleModulus(Rotation2d.fromDegrees(270).plus(SwerveConstants.ANGLE_DEADZONE).getRadians()))),
-                    this.setModuleStateCommand(moduleNumber, new SwerveModuleState(0, Rotation2d.fromDegrees(360))),
-                    Commands.waitUntil(() -> (MathUtil.angleModulus(this.getModulePostitions()[moduleNumber].angle.getRadians()) > MathUtil.angleModulus(Rotation2d.fromDegrees(360).minus(SwerveConstants.ANGLE_DEADZONE).getRadians()) && MathUtil.angleModulus(this.getModulePostitions()[moduleNumber].angle.getRadians()) < MathUtil.angleModulus(Rotation2d.fromDegrees(360).plus(SwerveConstants.ANGLE_DEADZONE).getRadians())))
-    );
-                 
-  }
 }

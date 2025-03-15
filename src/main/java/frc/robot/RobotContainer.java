@@ -170,11 +170,6 @@ public class RobotContainer {
   }
 
   private void setupTestMode() {
-    SmartDashboard.putBoolean("TestSequence/FL Module", true);
-    SmartDashboard.putBoolean("TestSequence/FR Module", true);
-    SmartDashboard.putBoolean("TestSequence/BL Module", true);
-    SmartDashboard.putBoolean("TestSequence/BR Module", true);
-
     SmartDashboard.putBoolean("TestSequence/Intake", true);
     SmartDashboard.putBoolean("TestSequence/Intake Pivot", true);
 

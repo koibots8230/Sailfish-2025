@@ -15,51 +15,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.*;
 import frc.robot.subsystems.*;
 public class TestCommands {
-
     public static Command testSequence(Swerve swerve, Intake intake, IntakePivot intakePivot, Indexer indexer, Elevator elevator, EndEffector endEffector) {
         return Commands.either(
-        
         Commands.sequence(
-            Commands.either(
-                Commands.sequence(
-                    swerve.rotateTurnCommand(0),
-                    swerve.setModuleStateCommand(0, new SwerveModuleState(SwerveConstants.MAX_LINEAR_VELOCITY.in(MetersPerSecond), Rotation2d.kZero)),
-                    Commands.waitSeconds(3),
-                    swerve.setModuleStateCommand(0, new SwerveModuleState(0, Rotation2d.kZero))
-                ), 
-                Commands.none(), 
-                () -> SmartDashboard.getBoolean("TestSequence/FL Module", true)
-            ),
-            Commands.either(
-                Commands.sequence(
-                    swerve.rotateTurnCommand(1),
-                    swerve.setModuleStateCommand(1, new SwerveModuleState(SwerveConstants.MAX_LINEAR_VELOCITY.in(MetersPerSecond), Rotation2d.kZero)),
-                    Commands.waitSeconds(3),
-                    swerve.setModuleStateCommand(1, new SwerveModuleState(0, Rotation2d.kZero))
-                ), 
-                Commands.none(), 
-                () -> SmartDashboard.getBoolean("TestSequence/FR Module", true)
-            ),
-            Commands.either(
-                Commands.sequence(
-                    swerve.rotateTurnCommand(2),
-                    swerve.setModuleStateCommand(2, new SwerveModuleState(SwerveConstants.MAX_LINEAR_VELOCITY.in(MetersPerSecond), Rotation2d.kZero)),
-                    Commands.waitSeconds(3),
-                    swerve.setModuleStateCommand(2, new SwerveModuleState(0, Rotation2d.kZero))
-                ), 
-                Commands.none(), 
-                () -> SmartDashboard.getBoolean("TestSequence/BL Module", true)
-            ),
-            Commands.either(
-                Commands.sequence(
-                    swerve.rotateTurnCommand(3),
-                    swerve.setModuleStateCommand(3, new SwerveModuleState(SwerveConstants.MAX_LINEAR_VELOCITY.in(MetersPerSecond), Rotation2d.kZero)),
-                    Commands.waitSeconds(3),
-                    swerve.setModuleStateCommand(3, new SwerveModuleState(0, Rotation2d.kZero))
-                ), 
-                Commands.none(), 
-                () -> SmartDashboard.getBoolean("TestSequence/BR Module", true)
-            ),
             Commands.either(
                 Commands.sequence(
                     intake.setVeclocityCommand(IntakeConstants.INTAKE_VELOCITY),
