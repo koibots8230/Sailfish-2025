@@ -127,14 +127,19 @@ public class RobotContainer {
             xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
   }
 
-  public void teleopInit() {
+  public void setAlliance() {
     isBlue = (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
     swerve.setIsBlue(isBlue);
   }
 
-  public void autonomousInit() {
-    isBlue = (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
-    swerve.setIsBlue(isBlue);
+  public void teleopInit() {
+    this.defualtCommands();
+  }
+
+  public void testInit() {
+    swerve.setDefaultCommand(
+        swerve.testModeDriveCommand(
+            xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
   }
 
   private AutoRoutine SeFLRRf() {
@@ -174,6 +179,11 @@ public class RobotContainer {
   }
 
   private void setupTestMode() {
+    SmartDashboard.putBoolean("SwerveTest/FL", true);
+    SmartDashboard.putBoolean("SwerveTest/FR", true);
+    SmartDashboard.putBoolean("SwerveTest/BL", true);
+    SmartDashboard.putBoolean("SwerveTest/BR", true);
+
     SmartDashboard.putBoolean("TestSequence/Intake", true);
     SmartDashboard.putBoolean("TestSequence/Intake Pivot", true);
 
