@@ -272,4 +272,8 @@ public class Constants {
 
     public static final Time ROBOT_CLOCK_SPEED = Time.ofBaseUnits(0.02, Units.Seconds);
   }
+
+  public static class LEDConstants {
+    public static final int BAUD_RATE = 115200;
+  }
 }

@@ -32,15 +32,17 @@ public class RobotContainer {
 
   private final Intake intake;
   private final IntakePivot intakePivot;
-
   private final Indexer indexer;
 
   private final Climber climber;
 
   private final Vision vision;
 
+  private final LED LED;
+
   private final CommandXboxController xboxController;
   private final GenericHID operatorPad;
+
   private boolean isBlue;
 
   public RobotContainer() {
@@ -56,6 +58,7 @@ public class RobotContainer {
     endEffector = new EndEffector();
     intake = new Intake();
     intakePivot = new IntakePivot();
+    LED = new LED();
     indexer = new Indexer();
     climber = new Climber();
 
