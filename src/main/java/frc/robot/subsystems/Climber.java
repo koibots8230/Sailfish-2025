@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ClimberConstants;
+import frc.robot.Constants.IntakePivotConstants;
 import frc.robot.Constants.RobotConstants;
 
 @Logged
@@ -89,18 +90,24 @@ public class Climber extends SubsystemBase {
 
   @Override
   public void periodic() {
-    goal = new TrapezoidProfile.State(setpoint, 0);
+    // goal = new TrapezoidProfile.State(setpoint, 0);
 
-    motorSetpoint =
-        profile.calculate(RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds), motorSetpoint, goal);
+    // motorSetpoint =
+    //     profile.calculate(RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds), motorSetpoint, goal);
 
-    System.out.println(motorSetpoint.position);
+    // System.out.println(motorSetpoint.position);
 
-    pid.setReference(
-        motorSetpoint.position,
-        ControlType.kPosition,
-        ClosedLoopSlot.kSlot0,
-        feedforward.calculate(motorSetpoint.velocity));
+    // pid.setReference(
+    //     motorSetpoint.position,
+    //     ControlType.kPosition,
+    //     ClosedLoopSlot.kSlot0,
+    //     feedforward.calculate(motorSetpoint.velocity));
+
+    if (position < setpoint) {
+      motor.set(ClimberConstants.TEMP_MOTOR_SPEED);    
+    } else {
+      motor.set(0);
+    }
 
     position = encoder.getPosition();
     velocity = encoder.getVelocity();

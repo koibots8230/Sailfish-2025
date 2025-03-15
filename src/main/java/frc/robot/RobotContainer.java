@@ -77,6 +77,9 @@ public class RobotContainer {
     autoChooser.addRoutine("Score Front Left Right Reef", this::SeFLRRf);
     autoChooser.addRoutine("move stright tune test", this::MeSATTt);
     autoChooser.addRoutine("rotate tune test", this::ReATTt);
+    autoChooser.addRoutine("Leave Left", this::leaveLeft);
+    autoChooser.addRoutine("Leave Center", this::leaveCenter);
+    autoChooser.addRoutine("Leave Right", this::leaveRight);
     SmartDashboard.putData("auto choices", autoChooser);
 
     RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
@@ -154,12 +157,6 @@ public class RobotContainer {
     this.defualtCommands();
   }
 
-  public void testInit() {
-    swerve.setDefaultCommand(
-        swerve.testModeDriveCommand(
-            xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
-  }
-
   private AutoRoutine SeFLRRf() {
     AutoRoutine routine = autoFactory.newRoutine("taxi");
 
@@ -192,6 +189,66 @@ public class RobotContainer {
     AutoTrajectory rotate = routine.trajectory("Re");
 
     routine.active().onTrue(Commands.sequence(rotate.resetOdometry(), rotate.cmd()));
+
+    return routine;
+  }
+
+  private AutoRoutine leaveLeft() {
+    AutoRoutine routine = autoFactory.newRoutine("taxi");
+
+    AutoTrajectory leave = routine.trajectory("LL");
+
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                Commands.sequence(
+                    endEffector.setVelocityCommand(-300),
+                    Commands.waitSeconds(0.1),
+                    endEffector.setVelocityCommand(0)),
+                leave.resetOdometry(),
+                leave.cmd()));
+
+    return routine;
+  }
+
+  private AutoRoutine leaveCenter() {
+    AutoRoutine routine = autoFactory.newRoutine("taxi");
+
+    AutoTrajectory leave = routine.trajectory("LC");
+
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                Commands.sequence(
+                    endEffector.setVelocityCommand(-300),
+                    Commands.waitSeconds(0.1),
+                    endEffector.setVelocityCommand(0)),
+                leave.resetOdometry(),
+                leave.cmd(),
+                ScoreCommands.removeL2Algae(elevator, endEffector),
+                Commands.waitSeconds(0.75),
+                ScoreCommands.basePosition(elevator, endEffector)));
+
+    return routine;
+  }
+
+  private AutoRoutine leaveRight() {
+    AutoRoutine routine = autoFactory.newRoutine("taxi");
+
+    AutoTrajectory leave = routine.trajectory("LR");
+
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                Commands.sequence(
+                    endEffector.setVelocityCommand(-300),
+                    Commands.waitSeconds(0.1),
+                    endEffector.setVelocityCommand(0)),
+                leave.resetOdometry(),
+                leave.cmd()));
 
     return routine;
   }

@@ -54,7 +54,7 @@ public class Constants {
 
     public static final Wheel SWERVE_WHEEL = new Wheel(Inches.of(1.5));
 
-    public static final double SWERVE_GEARING = 5.50;
+    public static final double SWERVE_GEARING = 5.08;
 
     public static final double DRIVE_CONVERSION_FACTOR = (0.0381 * 2 * Math.PI) / SWERVE_GEARING;
     public static final double TURN_CONVERSION_FACTOR = 2 * Math.PI;
@@ -139,9 +139,9 @@ public class Constants {
     public static final Angle IN_POSITION = Angle.ofBaseUnits(0.15, Radians);
 
     public static final AngularVelocity MAX_VELOCITY =
-        AngularVelocity.ofBaseUnits(14.0 * Math.PI, Units.RadiansPerSecond);
+        AngularVelocity.ofBaseUnits(14 * Math.PI, Units.RadiansPerSecond);
     public static final AngularAcceleration MAX_ACCELRATION =
-        AngularAcceleration.ofBaseUnits(Math.PI * 16.0, Units.RadiansPerSecondPerSecond);
+        AngularAcceleration.ofBaseUnits(Math.PI * 16, Units.RadiansPerSecondPerSecond);
 
     public static final PIDGains PID = new PIDGains.Builder().kp(1.8).build();
     public static final FeedforwardGains FEEDFORWARD =
@@ -202,9 +202,9 @@ public class Constants {
     public static final Distance L2_ALGAE_POSITION = Distance.ofBaseUnits(0.65, Units.Meters);
     public static final Distance L3_ALGAE_POSITION = Distance.ofBaseUnits(1.5, Units.Meters);
 
-    public static final PIDGains PID = new PIDGains.Builder().kp(3.3).build();
+    public static final PIDGains PID = new PIDGains.Builder().kp(6).build(); //3.3
     public static final FeedforwardGains FEEDFORWARD =
-        new FeedforwardGains.Builder().kv(2.05).kg(0).build();
+        new FeedforwardGains.Builder().kv(2.55).kg(0.05).build(); //2.05
 
     public static final LinearVelocity MAX_VELOCITY =
         LinearVelocity.ofBaseUnits(24, Units.MetersPerSecond);
@@ -215,8 +215,7 @@ public class Constants {
 
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(60, Units.Amps);
 
-    public static final int MAIN_MOTOR_ID = 11;
-    public static final int SECONDARY_MOTOR_ID = 12;
+    public static final int MAIN_MOTOR_ID = 12;
 
     public static final int HALL_EFFECTS_SENSOR = 0;
   }
@@ -260,6 +259,8 @@ public class Constants {
 
     public static final double MAX_VELOCITY = 1 / 8;
     public static final double MAX_ACCELERATION = 1 / 8;
+
+    public static final double TEMP_MOTOR_SPEED = 0.2;
 
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(60, Units.Amps);
 
