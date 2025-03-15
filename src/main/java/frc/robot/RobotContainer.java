@@ -9,9 +9,7 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -186,6 +184,8 @@ public class RobotContainer {
 
     SmartDashboard.putBoolean("TestSequence/End Effector", true);
 
-    SmartDashboard.putData("TestSequence/SequenceCommand", TestCommands.testSequence(swerve, intake, intakePivot, indexer, elevator, endEffector));
+    SmartDashboard.putData(
+        "TestSequence/SequenceCommand",
+        TestCommands.testSequence(swerve, intake, intakePivot, indexer, elevator, endEffector));
   }
 }

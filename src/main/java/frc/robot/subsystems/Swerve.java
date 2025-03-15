@@ -188,12 +188,17 @@ public class Swerve extends SubsystemBase {
   // ===================== Module States ===================== \\
 
   private void setModuleState(int moduleNumber, SwerveModuleState state) {
-    switch(moduleNumber) {
-      case 0: modules.frontLeft.setState(state);
-      case 1: modules.frontRight.setState(state);
-      case 2: modules.backLeft.setState(state);
-      case 3: modules.backRight.setState(state);
-      default: return;
+    switch (moduleNumber) {
+      case 0:
+        modules.frontLeft.setState(state);
+      case 1:
+        modules.frontRight.setState(state);
+      case 2:
+        modules.backLeft.setState(state);
+      case 3:
+        modules.backRight.setState(state);
+      default:
+        return;
     }
   }
 
@@ -425,7 +430,7 @@ public class Swerve extends SubsystemBase {
 
     SwerveDriveKinematics.desaturateWheelSpeeds(
         setpointStates, SwerveConstants.MAX_LINEAR_VELOCITY);
-    
+
     modules.frontLeft.setState(setpointStates[0]);
     modules.frontRight.setState(setpointStates[1]);
     modules.backLeft.setState(setpointStates[2]);
