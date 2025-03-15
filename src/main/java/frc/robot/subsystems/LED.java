@@ -15,7 +15,6 @@ public class LED extends SubsystemBase {
     p2,
     p3,
     off
-    
   }
 
   public SerialPort uart;
@@ -26,25 +25,25 @@ public class LED extends SubsystemBase {
 
   private void setLED(State state) {
     if (state == State.teleop) {
-      uart.writeString("0");// purple and orange pattern
+      uart.writeString("0"); // purple and orange pattern
     }
     if (state == State.endgame) {
-      uart.writeString("1");// rainbow flash
+      uart.writeString("1"); // rainbow flash
     }
     if (state == State.auto) {
-      uart.writeString("2");// rainbow gradient
+      uart.writeString("2"); // rainbow gradient
     }
     if (state == State.p1) {
-      uart.writeString("3");// purple
+      uart.writeString("3"); // purple
     }
     if (state == State.p2) {
-      uart.writeString("4");// teal
+      uart.writeString("4"); // teal
     }
     if (state == State.p3) {
-      uart.writeString("5");// orange
+      uart.writeString("5"); // orange
     }
     if (state == State.off) {
-      uart.writeString("5");// all LEDs off
+      uart.writeString("5"); // all LEDs off
     }
   }
 

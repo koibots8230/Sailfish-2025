@@ -39,10 +39,10 @@ public class RobotContainer {
   private final Vision vision;
 
   private final LED LED;
-  
+
   private final CommandXboxController xboxController;
   private final GenericHID operatorPad;
-  
+
   private boolean isBlue;
 
   public RobotContainer() {
