@@ -8,9 +8,14 @@ import frc.robot.Constants.LEDConstants;
 
 public class LED extends SubsystemBase {
   public enum State {
-    S1,
-    S2,
-    S3
+    teleop,
+    endgame,
+    auto,
+    p1,
+    p2,
+    p3,
+    off
+    
   }
 
   public SerialPort uart;
@@ -20,14 +25,26 @@ public class LED extends SubsystemBase {
   }
 
   private void SetLED(State state) {
-    if (state == State.S1) {
-      uart.writeString("1");
+    if (state == State.teleop) {
+      uart.writeString("0");// purple and orange pattern
     }
-    if (state == State.S2) {
-      uart.writeString("2");
+    if (state == State.endgame) {
+      uart.writeString("1");// rainbow flash
     }
-    if (state == State.S3) {
-      uart.writeString("3");
+    if (state == State.auto) {
+      uart.writeString("2");// rainbow gradient
+    }
+    if (state == State.p1) {
+      uart.writeString("3");// purple
+    }
+    if (state == State.p2) {
+      uart.writeString("4");// teal
+    }
+    if (state == State.p3) {
+      uart.writeString("5");// orange
+    }
+    if (state == State.off) {
+      uart.writeString("5");// all LEDs off
     }
   }
 
