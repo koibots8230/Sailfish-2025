@@ -202,9 +202,9 @@ public class Constants {
     public static final Distance L2_ALGAE_POSITION = Distance.ofBaseUnits(0.67, Units.Meters);
     public static final Distance L3_ALGAE_POSITION = Distance.ofBaseUnits(1.5, Units.Meters);
 
-    public static final PIDGains PID = new PIDGains.Builder().kp(6).build(); //3.3
+    public static final PIDGains PID = new PIDGains.Builder().kp(6).build(); // 3.3
     public static final FeedforwardGains FEEDFORWARD =
-        new FeedforwardGains.Builder().kv(2.55).kg(0.05).build(); //2.05
+        new FeedforwardGains.Builder().kv(2.55).kg(0.05).build(); // 2.05
 
     public static final LinearVelocity MAX_VELOCITY =
         LinearVelocity.ofBaseUnits(24, Units.MetersPerSecond);

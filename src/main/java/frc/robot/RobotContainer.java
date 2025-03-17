@@ -230,10 +230,10 @@ public class RobotContainer {
                 leave.resetOdometry(),
                 leave.cmd(),
                 Commands.sequence(
-                  elevator.setPositionCommand(ElevatorConstants.L2_ALGAE_POSITION),
-                  Commands.waitUntil(() -> elevator.atPosition(ElevatorConstants.L2_ALGAE_POSITION)),
-                  endEffector.setVelocityCommand(EndEffectorConstants.ALGAE_REMOVAL_SPEED)
-                ),
+                    elevator.setPositionCommand(ElevatorConstants.L2_ALGAE_POSITION),
+                    Commands.waitUntil(
+                        () -> elevator.atPosition(ElevatorConstants.L2_ALGAE_POSITION)),
+                    endEffector.setVelocityCommand(EndEffectorConstants.ALGAE_REMOVAL_SPEED)),
                 Commands.waitSeconds(0.75),
                 ScoreCommands.basePosition(elevator, endEffector)));
 

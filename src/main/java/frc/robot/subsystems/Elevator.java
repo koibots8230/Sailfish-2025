@@ -133,7 +133,7 @@ public class Elevator extends SubsystemBase {
 
     mainVoltage =
         Voltage.ofBaseUnits(mainMotor.getBusVoltage() * mainMotor.getAppliedOutput(), Volts);
-    
+
     mainCurrent = Current.ofBaseUnits(mainMotor.getOutputCurrent(), Amps);
   }
 
