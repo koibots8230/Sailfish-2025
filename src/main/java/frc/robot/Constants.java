@@ -54,7 +54,7 @@ public class Constants {
 
     public static final Wheel SWERVE_WHEEL = new Wheel(Inches.of(1.5));
 
-    public static final double SWERVE_GEARING = 5.08;
+    public static final double SWERVE_GEARING = 5.50;
 
     public static final double DRIVE_CONVERSION_FACTOR = (0.0381 * 2 * Math.PI) / SWERVE_GEARING;
     public static final double TURN_CONVERSION_FACTOR = 2 * Math.PI;
