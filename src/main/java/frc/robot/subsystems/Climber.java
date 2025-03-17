@@ -70,7 +70,7 @@ public class Climber extends SubsystemBase {
   @Override
   public void periodic() {
     if (position < setpoint) {
-      motor.set(ClimberConstants.HIGH_SPEED);
+      motor.set(speed);
     } else {
       motor.set(0);
     }
@@ -87,8 +87,16 @@ public class Climber extends SubsystemBase {
     position = motorSetpoint.position;
   }
 
+  private void setSpeed(double setSpeed) {
+    speed = setSpeed;
+  }
+
   private void setAngle(double angle) {
     setpoint = angle;
+  }
+
+  public Command setSpeedCommand(double setSpeed) {
+    return Commands.runOnce(() -> this.setSpeed(setSpeed), this);
   }
 
   public Command setAngleCommand(double angle) {
