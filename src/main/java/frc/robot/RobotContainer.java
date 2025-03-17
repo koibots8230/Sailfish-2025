@@ -17,6 +17,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.ReefAlignState;
+import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.EndEffectorConstants;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 
@@ -132,14 +134,17 @@ public class RobotContainer {
     Trigger alignLeft = xboxController.leftBumper();
     alignLeft.onTrue(swerve.setReefAlignStateCommand(ReefAlignState.leftSide));
 
-    // Trigger prepClimb = new Trigger(() -> operatorPad.getRawButton(5));
-    // prepClimb.onTrue(ClimbCommands.prepClimb(climber));
+    Trigger prepClimb = new Trigger(() -> operatorPad.getRawButton(5));
+    prepClimb.onTrue(ClimbCommands.prepClimb(climber));
 
-    // Trigger climb = new Trigger(() -> operatorPad.getRawButton(6));
-    // climb.onTrue(ClimbCommands.climb(climber));
+    Trigger climb = new Trigger(() -> operatorPad.getRawButton(6));
+    climb.onTrue(ClimbCommands.climb(climber));
 
-    // Trigger resetClimb = new Trigger(() -> operatorPad.getRawButton(7));
-    // resetClimb.onTrue(ClimbCommands.resetClimber(climber));
+    // Trigger slowClimb = new Trigger(() -> operatorPad.getRawButton(7));
+    // slowClimb.onTrue(ClimbCommands.climb(climber));
+
+    Trigger resetClimb = new Trigger(() -> operatorPad.getRawButton(8));
+    resetClimb.onTrue(ClimbCommands.resetClimber(climber));
   }
 
   private void defualtCommands() {
@@ -222,12 +227,16 @@ public class RobotContainer {
         .onTrue(
             Commands.sequence(
                 Commands.sequence(
-                    endEffector.setVelocityCommand(-300),
-                    Commands.waitSeconds(0.1),
+                    endEffector.setVelocityCommand(-250),
+                    Commands.waitSeconds(0.3),
                     endEffector.setVelocityCommand(0)),
                 leave.resetOdometry(),
                 leave.cmd(),
-                ScoreCommands.removeL2Algae(elevator, endEffector),
+                Commands.sequence(
+                  elevator.setPositionCommand(ElevatorConstants.L2_ALGAE_POSITION),
+                  Commands.waitUntil(() -> elevator.atPosition(ElevatorConstants.L2_ALGAE_POSITION)),
+                  endEffector.setVelocityCommand(EndEffectorConstants.ALGAE_REMOVAL_SPEED)
+                ),
                 Commands.waitSeconds(0.75),
                 ScoreCommands.basePosition(elevator, endEffector)));
 

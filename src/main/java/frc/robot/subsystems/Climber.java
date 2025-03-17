@@ -44,6 +44,7 @@ public class Climber extends SubsystemBase {
   private Voltage voltage;
   private Current current;
   private double position;
+  double speed;
 
   public Climber() {
     profile =
@@ -65,6 +66,8 @@ public class Climber extends SubsystemBase {
     // config.absoluteEncoder.positionConversionFactor(ClimberConstants.CONVERSION_FACTOR);
     // config.absoluteEncoder.velocityConversionFactor(ClimberConstants.RPM_TO_RPS_FACTOR);
 
+    config.absoluteEncoder.inverted(true);
+
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     encoder = motor.getAbsoluteEncoder();
@@ -80,6 +83,8 @@ public class Climber extends SubsystemBase {
     goal = new TrapezoidProfile.State();
     setpoint = ClimberConstants.START_POSITION;
     motorSetpoint = new TrapezoidProfile.State();
+
+    speed = ClimberConstants.HIGH_SPEED;
 
     position = encoder.getPosition();
     velocity = encoder.getVelocity();
@@ -104,7 +109,7 @@ public class Climber extends SubsystemBase {
     //     feedforward.calculate(motorSetpoint.velocity));
 
     if (position < setpoint) {
-      motor.set(ClimberConstants.TEMP_MOTOR_SPEED);    
+      motor.set(ClimberConstants.HIGH_SPEED);    
     } else {
       motor.set(0);
     }
@@ -125,7 +130,15 @@ public class Climber extends SubsystemBase {
     setpoint = angle;
   }
 
+  // private void setSpeed(double setSpeed) {
+  //   speed = setSpeed;
+  // }
+
   public Command setAngleCommand(double angle) {
     return Commands.runOnce(() -> this.setAngle(angle), this);
   }
+
+  // public Command setSpeedCommand(double setSpeed) {
+  //   return Commands.runOnce(() -> this.setSpeed(setSpeed), this);
+  // }
 }

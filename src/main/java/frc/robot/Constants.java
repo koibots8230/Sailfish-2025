@@ -199,7 +199,7 @@ public class Constants {
     public static final Distance L2_POSITION = Distance.ofBaseUnits(1.18, Units.Meters);
     public static final Distance L3_POSITION = Distance.ofBaseUnits(2.04, Units.Meters);
 
-    public static final Distance L2_ALGAE_POSITION = Distance.ofBaseUnits(0.65, Units.Meters);
+    public static final Distance L2_ALGAE_POSITION = Distance.ofBaseUnits(0.67, Units.Meters);
     public static final Distance L3_ALGAE_POSITION = Distance.ofBaseUnits(1.5, Units.Meters);
 
     public static final PIDGains PID = new PIDGains.Builder().kp(6).build(); //3.3
@@ -260,7 +260,8 @@ public class Constants {
     public static final double MAX_VELOCITY = 1 / 8;
     public static final double MAX_ACCELERATION = 1 / 8;
 
-    public static final double TEMP_MOTOR_SPEED = 0.2;
+    public static final double LOW_SPEED = 0.2;
+    public static final double HIGH_SPEED = 0.4;
 
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(60, Units.Amps);
 
