@@ -17,6 +17,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.ReefAlignState;
+import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.EndEffectorConstants;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 
@@ -77,6 +79,9 @@ public class RobotContainer {
     autoChooser.addRoutine("Score Front Left Right Reef", this::SeFLRRf);
     autoChooser.addRoutine("move stright tune test", this::MeSATTt);
     autoChooser.addRoutine("rotate tune test", this::ReATTt);
+    autoChooser.addRoutine("Leave Left", this::leaveLeft);
+    autoChooser.addRoutine("Leave Center", this::leaveCenter);
+    autoChooser.addRoutine("Leave Right", this::leaveRight);
     SmartDashboard.putData("auto choices", autoChooser);
 
     RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
@@ -129,14 +134,14 @@ public class RobotContainer {
     Trigger alignLeft = xboxController.leftBumper();
     alignLeft.onTrue(swerve.setReefAlignStateCommand(ReefAlignState.leftSide));
 
-    // Trigger prepClimb = new Trigger(() -> operatorPad.getRawButton(5));
-    // prepClimb.onTrue(ClimbCommands.prepClimb(climber));
+    Trigger prepClimb = new Trigger(() -> operatorPad.getRawButton(5));
+    prepClimb.onTrue(ClimbCommands.prepClimb(climber));
 
-    // Trigger climb = new Trigger(() -> operatorPad.getRawButton(6));
-    // climb.onTrue(ClimbCommands.climb(climber));
+    Trigger climb = new Trigger(() -> operatorPad.getRawButton(6));
+    climb.onTrue(ClimbCommands.climb(climber));
 
-    // Trigger resetClimb = new Trigger(() -> operatorPad.getRawButton(7));
-    // resetClimb.onTrue(ClimbCommands.resetClimber(climber));
+    Trigger resetClimb = new Trigger(() -> operatorPad.getRawButton(8));
+    resetClimb.onTrue(ClimbCommands.resetClimber(climber));
   }
 
   private void defualtCommands() {
@@ -152,12 +157,6 @@ public class RobotContainer {
 
   public void teleopInit() {
     this.defualtCommands();
-  }
-
-  public void testInit() {
-    swerve.setDefaultCommand(
-        swerve.testModeDriveCommand(
-            xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
   }
 
   private AutoRoutine SeFLRRf() {
@@ -192,6 +191,70 @@ public class RobotContainer {
     AutoTrajectory rotate = routine.trajectory("Re");
 
     routine.active().onTrue(Commands.sequence(rotate.resetOdometry(), rotate.cmd()));
+
+    return routine;
+  }
+
+  private AutoRoutine leaveLeft() {
+    AutoRoutine routine = autoFactory.newRoutine("taxi");
+
+    AutoTrajectory leave = routine.trajectory("LL");
+
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                Commands.sequence(
+                    endEffector.setVelocityCommand(-300),
+                    Commands.waitSeconds(0.1),
+                    endEffector.setVelocityCommand(0)),
+                leave.resetOdometry(),
+                leave.cmd()));
+
+    return routine;
+  }
+
+  private AutoRoutine leaveCenter() {
+    AutoRoutine routine = autoFactory.newRoutine("taxi");
+
+    AutoTrajectory leave = routine.trajectory("LC");
+
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                Commands.sequence(
+                    endEffector.setVelocityCommand(-250),
+                    Commands.waitSeconds(0.3),
+                    endEffector.setVelocityCommand(0)),
+                leave.resetOdometry(),
+                leave.cmd(),
+                Commands.sequence(
+                    elevator.setPositionCommand(ElevatorConstants.L2_ALGAE_POSITION),
+                    Commands.waitUntil(
+                        () -> elevator.atPosition(ElevatorConstants.L2_ALGAE_POSITION)),
+                    endEffector.setVelocityCommand(EndEffectorConstants.ALGAE_REMOVAL_SPEED)),
+                Commands.waitSeconds(0.75),
+                ScoreCommands.basePosition(elevator, endEffector)));
+
+    return routine;
+  }
+
+  private AutoRoutine leaveRight() {
+    AutoRoutine routine = autoFactory.newRoutine("taxi");
+
+    AutoTrajectory leave = routine.trajectory("LR");
+
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                Commands.sequence(
+                    endEffector.setVelocityCommand(-300),
+                    Commands.waitSeconds(0.1),
+                    endEffector.setVelocityCommand(0)),
+                leave.resetOdometry(),
+                leave.cmd()));
 
     return routine;
   }
