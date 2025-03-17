@@ -33,9 +33,6 @@ public class Climber extends SubsystemBase {
   @NotLogged private final SparkMax motor;
   @NotLogged private final SparkMaxConfig config;
   @NotLogged private final AbsoluteEncoder encoder;
-  @NotLogged private final SparkClosedLoopController pid;
-  @NotLogged private final SimpleMotorFeedforward feedforward;
-  @NotLogged private final TrapezoidProfile profile;
 
   private TrapezoidProfile.State goal;
   private TrapezoidProfile.State motorSetpoint;
@@ -47,11 +44,6 @@ public class Climber extends SubsystemBase {
   double speed;
 
   public Climber() {
-    profile =
-        new TrapezoidProfile(
-            new TrapezoidProfile.Constraints(
-                ClimberConstants.MAX_VELOCITY, ClimberConstants.MAX_ACCELERATION));
-
     motor = new SparkMax(ClimberConstants.MOTOR_ID, MotorType.kBrushless);
     config = new SparkMaxConfig();
 
@@ -63,22 +55,11 @@ public class Climber extends SubsystemBase {
 
     config.smartCurrentLimit((int) ClimberConstants.CURRENT_LIMIT.in(Amps));
 
-    // config.absoluteEncoder.positionConversionFactor(ClimberConstants.CONVERSION_FACTOR);
-    // config.absoluteEncoder.velocityConversionFactor(ClimberConstants.RPM_TO_RPS_FACTOR);
-
     config.absoluteEncoder.inverted(true);
 
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     encoder = motor.getAbsoluteEncoder();
-
-    pid = motor.getClosedLoopController();
-
-    feedforward =
-        new SimpleMotorFeedforward(
-            ClimberConstants.FEEDFORWARD.ks,
-            ClimberConstants.FEEDFORWARD.kv,
-            ClimberConstants.FEEDFORWARD.ka);
 
     goal = new TrapezoidProfile.State();
     setpoint = ClimberConstants.START_POSITION;
@@ -95,19 +76,6 @@ public class Climber extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // goal = new TrapezoidProfile.State(setpoint, 0);
-
-    // motorSetpoint =
-    //     profile.calculate(RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds), motorSetpoint, goal);
-
-    // System.out.println(motorSetpoint.position);
-
-    // pid.setReference(
-    //     motorSetpoint.position,
-    //     ControlType.kPosition,
-    //     ClosedLoopSlot.kSlot0,
-    //     feedforward.calculate(motorSetpoint.velocity));
-
     if (position < setpoint) {
       motor.set(ClimberConstants.HIGH_SPEED);    
     } else {
@@ -130,15 +98,7 @@ public class Climber extends SubsystemBase {
     setpoint = angle;
   }
 
-  // private void setSpeed(double setSpeed) {
-  //   speed = setSpeed;
-  // }
-
   public Command setAngleCommand(double angle) {
     return Commands.runOnce(() -> this.setAngle(angle), this);
   }
-
-  // public Command setSpeedCommand(double setSpeed) {
-  //   return Commands.runOnce(() -> this.setSpeed(setSpeed), this);
-  // }
 }
