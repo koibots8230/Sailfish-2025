@@ -34,7 +34,8 @@ public class Climber extends SubsystemBase {
   private Voltage voltage;
   private Current current;
   private double position;
-  double speed;
+  private double speed;
+  private boolean reversing;
 
   public Climber() {
     motor = new SparkMax(ClimberConstants.MOTOR_ID, MotorType.kBrushless);
@@ -65,14 +66,25 @@ public class Climber extends SubsystemBase {
 
     voltage = Voltage.ofBaseUnits(motor.getBusVoltage() * motor.getAppliedOutput(), Volts);
     current = Current.ofBaseUnits(motor.getOutputCurrent(), Amps);
+
+    reversing = false;
   }
 
   @Override
   public void periodic() {
-    if (position < setpoint) {
-      motor.set(ClimberConstants.HIGH_SPEED);
+    if (reversing == false) {
+      if (position < setpoint) {
+        motor.set(ClimberConstants.HIGH_SPEED);
+      } else {
+        motor.set(0);
+      }
     } else {
-      motor.set(0);
+      if (position > setpoint) {
+        motor.set(ClimberConstants.REVERSE_SPEED);
+      } else {
+        motor.set(0);
+        reversing = false;
+      }
     }
 
     position = encoder.getPosition();
@@ -91,7 +103,15 @@ public class Climber extends SubsystemBase {
     setpoint = angle;
   }
 
+  private void setReverse() {
+    reversing = true;
+  }
+
   public Command setAngleCommand(double angle) {
     return Commands.runOnce(() -> this.setAngle(angle), this);
+  }
+
+  public Command setReverseCommand() {
+    return Commands.runOnce(() -> this.setReverse(), this);
   }
 }

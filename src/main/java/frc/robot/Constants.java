@@ -262,6 +262,7 @@ public class Constants {
 
     public static final double LOW_SPEED = 0.2;
     public static final double HIGH_SPEED = 0.4;
+    public static final double REVERSE_SPEED = -0.2;
 
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(60, Units.Amps);
 
