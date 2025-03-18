@@ -392,16 +392,14 @@ public class Swerve extends SubsystemBase {
 
     driveFieldRelative(
         MetersPerSecond.of(
-            MathUtil.applyDeadband(
-                x + (assist.getX() * Math.sqrt(linearMagnitude) * (isBlue ? -1 : 1)),
-                SwerveConstants.DEADBAND)),
+            MathUtil.applyDeadband(x, SwerveConstants.DEADBAND)
+                + (assist.getX() * Math.sqrt(linearMagnitude) * (isBlue ? -1 : 1))),
         MetersPerSecond.of(
-            MathUtil.applyDeadband(
-                y + (assist.getY() * Math.sqrt(linearMagnitude) * (isBlue ? -1 : 1)),
-                SwerveConstants.DEADBAND)),
+            MathUtil.applyDeadband(y, SwerveConstants.DEADBAND)
+                + (assist.getY() * Math.sqrt(linearMagnitude) * (isBlue ? -1 : 1))),
         RadiansPerSecond.of(
-            MathUtil.applyDeadband(
-                -omega + (assist.getRotation().getRadians()), SwerveConstants.DEADBAND)));
+            MathUtil.applyDeadband(-omega, SwerveConstants.DEADBAND)
+                + (assist.getRotation().getRadians())));
   }
 
   public void driveRobotRelative(ChassisSpeeds speeds) {

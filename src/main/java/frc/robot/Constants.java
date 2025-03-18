@@ -17,7 +17,6 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import frc.lib.util.FeedforwardGains;
 import frc.lib.util.PIDGains;
-import frc.lib.util.Wheel;
 
 public class Constants {
 
@@ -25,9 +24,8 @@ public class Constants {
     public static final LinearVelocity MAX_LINEAR_VELOCITY = MetersPerSecond.of(4.25);
     public static final AngularVelocity MAX_ANGULAR_VELOCITY = RadiansPerSecond.of(2 * Math.PI);
 
-    public static final AngularVelocity MAX_TURN_VECLOCITY = RadiansPerSecond.of(10 * Math.PI);
-    public static final AngularAcceleration MAX_TURN_ACCELERATION =
-        RadiansPerSecondPerSecond.of(16 * Math.PI);
+    public static final double MAX_TURN_VELOCITY = 20 * Math.PI;
+    public static final double MAX_TURN_ACCELRATION = 30 * Math.PI;
 
     public static final PIDGains TURN_PID = new PIDGains.Builder().kp(3).kd(0.0).build();
     public static final PIDGains DRIVE_PID = new PIDGains.Builder().kp(0.37).build();
@@ -37,21 +35,18 @@ public class Constants {
     public static final FeedforwardGains DRIVE_FEEDFORWARD =
         new FeedforwardGains.Builder().kv(0.24).build();
 
-    public static final double MAX_VELOCITY = 20 * Math.PI;
-    public static final double MAX_ACCELRATION = 30 * Math.PI;
-
     public static final SwerveDriveKinematics KINEMATICS =
         new SwerveDriveKinematics(
-            new Translation2d(RobotConstants.LENGTH.divide(2), RobotConstants.WIDTH.divide(2)),
-            new Translation2d(RobotConstants.LENGTH.divide(2), RobotConstants.WIDTH.divide(-2)),
-            new Translation2d(RobotConstants.LENGTH.divide(-2), RobotConstants.WIDTH.divide(2)),
-            new Translation2d(RobotConstants.LENGTH.divide(-2), RobotConstants.WIDTH.divide(-2)));
+            new Translation2d(RobotConstants.TRACK_LENGTH / 2.0, RobotConstants.TRACK_WIDTH / 2.0),
+            new Translation2d(RobotConstants.TRACK_LENGTH / 2.0, -RobotConstants.TRACK_WIDTH / 2.0),
+            new Translation2d(-RobotConstants.TRACK_LENGTH / 2.0, RobotConstants.TRACK_WIDTH / 2.0),
+            new Translation2d(
+                -RobotConstants.TRACK_LENGTH / 2.0, -RobotConstants.TRACK_WIDTH / 2.0));
 
-    public static final Wheel SWERVE_WHEEL = new Wheel(Inches.of(1.5));
+    public static final double SWERVE_GEARING = 5.50;
 
-    public static final double SWERVE_GEARING = 5.08;
-
-    public static final double DRIVE_CONVERSION_FACTOR = (0.0381 * 2 * Math.PI) / SWERVE_GEARING;
+    public static final double DRIVE_CONVERSION_FACTOR =
+        (edu.wpi.first.math.util.Units.inchesToMeters(1.5) * 2 * Math.PI) / SWERVE_GEARING;
     public static final double TURN_CONVERSION_FACTOR = 2 * Math.PI;
 
     public static final Rotation2d[] OFFSETS = {
@@ -263,8 +258,8 @@ public class Constants {
   }
 
   public static class RobotConstants {
-    public static final Distance WIDTH = Inches.of(23.5);
-    public static final Distance LENGTH = Inches.of(23.5);
+    public static final double TRACK_WIDTH = edu.wpi.first.math.util.Units.inchesToMeters(23.5);
+    public static final double TRACK_LENGTH = edu.wpi.first.math.util.Units.inchesToMeters(23.5);
 
     public static final Time ROBOT_CLOCK_SPEED = Time.ofBaseUnits(0.02, Units.Seconds);
   }
