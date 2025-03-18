@@ -12,6 +12,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,52 +23,87 @@ import frc.robot.Constants.IndexerConstants;
 @Logged
 public class Indexer extends SubsystemBase {
 
-  private final SparkMax motor;
-  private final RelativeEncoder encoder;
-  private final SparkMaxConfig config;
-  private final SparkClosedLoopController closedLoopController;
+  @NotLogged private final SparkMax topMotor;
+  @NotLogged private final SparkMax bottomMotor;
 
-  private Voltage voltage;
-  private Current current;
-  private double velocity;
-  private double setpoint;
+  @NotLogged private final SparkMaxConfig topConfig;
+  @NotLogged private final SparkMaxConfig bottomConfig;
+
+  @NotLogged private final RelativeEncoder topEncoder;
+  @NotLogged private final RelativeEncoder bottomEncoder;
+
+  @NotLogged private final SparkClosedLoopController topClosedLoopController;
+  @NotLogged private final SparkClosedLoopController bottomClosedLoopController;
+
+  private Voltage topVoltage;
+  private Current topCurrent;
+  private double topVelocity;
+  private double topSetpoint;
+
+  private Voltage bottomVoltage;
+  private Current bottomCurrent;
+  private double bottomVelocity;
+  private double bottomSetpoint;
 
   public Indexer() {
-    motor = new SparkMax(IndexerConstants.MOTOR_ID, MotorType.kBrushless);
+    topMotor = new SparkMax(IndexerConstants.TOP_ID, MotorType.kBrushless);
+    bottomMotor = new SparkMax(IndexerConstants.BOTTOM_ID, MotorType.kBrushless);
 
-    config = new SparkMaxConfig();
-    config.closedLoop.p(IndexerConstants.PID.kp);
-    config.closedLoop.velocityFF(IndexerConstants.FEEDFORWARD.kv);
-    config.inverted(true);
+    topConfig = new SparkMaxConfig();
+    topConfig.closedLoop.p(IndexerConstants.TOP_PID.kp);
+    topConfig.closedLoop.velocityFF(IndexerConstants.TOP_FF.kv);
+    topConfig.inverted(false);
+    topConfig.smartCurrentLimit(60);
 
-    motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    topMotor.configure(topConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    encoder = motor.getEncoder();
+    topEncoder = topMotor.getEncoder();
 
-    closedLoopController = motor.getClosedLoopController();
+    topClosedLoopController = topMotor.getClosedLoopController();
 
-    setpoint = 0.0;
+    bottomConfig = new SparkMaxConfig();
+    bottomConfig.closedLoop.p(IndexerConstants.BOTTOM_PID.kp);
+    bottomConfig.closedLoop.velocityFF(IndexerConstants.BOTTOM_FF.kv);
+    bottomConfig.inverted(true);
+    bottomConfig.smartCurrentLimit(60);
 
-    velocity = 0.0;
+    bottomMotor.configure(
+        bottomConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    bottomEncoder = bottomMotor.getEncoder();
+
+    bottomClosedLoopController = bottomMotor.getClosedLoopController();
+
+    topSetpoint = 0.0;
+    bottomSetpoint = 0.0;
   }
 
   @Override
   public void periodic() {
-    voltage = Voltage.ofBaseUnits(motor.getBusVoltage() * motor.getAppliedOutput(), Volts);
-    current = Current.ofBaseUnits(motor.getOutputCurrent(), Amps);
-    velocity = encoder.getVelocity();
+    topVoltage = Voltage.ofBaseUnits(topMotor.getBusVoltage() * topMotor.getAppliedOutput(), Volts);
+    topCurrent = Current.ofBaseUnits(topMotor.getOutputCurrent(), Amps);
+    topVelocity = topEncoder.getVelocity();
+
+    bottomVoltage =
+        Voltage.ofBaseUnits(bottomMotor.getBusVoltage() * bottomMotor.getAppliedOutput(), Volts);
+    bottomCurrent = Current.ofBaseUnits(bottomMotor.getOutputCurrent(), Amps);
+    bottomVelocity = bottomEncoder.getVelocity();
   }
 
   public void simulationPeriodic() {
-    // velocity = setpoint.mutableCopy();
+    topVelocity = topSetpoint;
+    bottomVelocity = bottomSetpoint;
   }
 
-  private void spinIndexer(double setVelocity) {
-    closedLoopController.setReference(setVelocity, ControlType.kVelocity);
-    setpoint = setVelocity;
+  private void setVelocity(double topVelocity, double bottomVelocity) {
+    topClosedLoopController.setReference(topVelocity, ControlType.kVelocity);
+    bottomClosedLoopController.setReference(bottomVelocity, ControlType.kVelocity);
+
+    topSetpoint = topVelocity;
+    bottomSetpoint = bottomVelocity;
   }
 
-  public Command setVelocityCommand(double setVelocity) {
-    return Commands.runOnce(() -> this.spinIndexer(setVelocity));
+  public Command setVelocityCommand(double topVelocity, double bottomVelocity) {
+    return Commands.runOnce(() -> this.setVelocity(topVelocity, bottomVelocity), this);
   }
 }

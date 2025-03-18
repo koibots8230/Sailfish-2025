@@ -13,12 +13,14 @@ import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Current;
@@ -35,23 +37,29 @@ import frc.robot.Constants.RobotConstants;
 @Logged
 public class Elevator extends SubsystemBase {
 
-  private final SparkMax mainMotor;
-  private final SparkMax secondaryMotor;
-  private final SparkMaxConfig mainMotorConfig;
-  private final SparkMaxConfig secondaryMotorConfig;
-  private final TrapezoidProfile profile;
-  private final RelativeEncoder encoder;
-  private final ElevatorFeedforward feedforward;
-  private final DigitalInput hallEffectsSensor;
+  @NotLogged private final SparkMax mainMotor;
+
+  @NotLogged private final DigitalInput hallEffectSensor;
+
+  @NotLogged private final SparkMaxConfig mainMotorConfig;
+
+  @NotLogged private final RelativeEncoder encoder;
+
+  @NotLogged private final SparkClosedLoopController pid;
+
+  @NotLogged private final ElevatorFeedforward feedforward;
+
+  @NotLogged private final TrapezoidProfile profile;
+
   private TrapezoidProfile.State goal;
   private TrapezoidProfile.State motorSetpoint;
+
   private Distance setpoint;
   private Distance position;
   private LinearVelocity velocity;
   private Voltage mainVoltage;
   private Voltage secondaryVoltage;
   private Current mainCurrent;
-  private Current secondaryCurrent;
 
   public Elevator() {
     profile =
@@ -61,7 +69,6 @@ public class Elevator extends SubsystemBase {
                 ElevatorConstants.MAX_ACCELRATION.in(MetersPerSecondPerSecond)));
 
     mainMotor = new SparkMax(ElevatorConstants.MAIN_MOTOR_ID, MotorType.kBrushless);
-    secondaryMotor = new SparkMax(ElevatorConstants.SECONDARY_MOTOR_ID, MotorType.kBrushless);
 
     mainMotorConfig = new SparkMaxConfig();
 
@@ -74,26 +81,17 @@ public class Elevator extends SubsystemBase {
 
     mainMotorConfig.smartCurrentLimit((int) ElevatorConstants.CURRENT_LIMIT.in(Amps));
 
-    mainMotorConfig.alternateEncoder.positionConversionFactor(
-        ElevatorConstants.CONVERSION_FACTOR.in(Meters));
+    mainMotorConfig.alternateEncoder.positionConversionFactor(ElevatorConstants.CONVERSION_FACTOR);
     mainMotorConfig.alternateEncoder.velocityConversionFactor(
-        ElevatorConstants.CONVERSION_FACTOR.in(Meters) / 60);
+        ElevatorConstants.CONVERSION_FACTOR / 60.0);
     mainMotorConfig.alternateEncoder.inverted(true);
-
-    secondaryMotorConfig = new SparkMaxConfig();
-
-    secondaryMotorConfig.idleMode(IdleMode.kCoast);
-
-    secondaryMotorConfig.follow(ElevatorConstants.MAIN_MOTOR_ID);
-
-    secondaryMotorConfig.smartCurrentLimit((int) ElevatorConstants.CURRENT_LIMIT.in(Amps));
 
     mainMotor.configure(
         mainMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    secondaryMotor.configure(
-        secondaryMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     encoder = mainMotor.getAlternateEncoder();
+
+    pid = mainMotor.getClosedLoopController();
 
     feedforward =
         new ElevatorFeedforward(
@@ -102,21 +100,19 @@ public class Elevator extends SubsystemBase {
             ElevatorConstants.FEEDFORWARD.kv,
             ElevatorConstants.FEEDFORWARD.ka);
 
-    hallEffectsSensor = new DigitalInput(ElevatorConstants.HALL_EFFECTS_SENSOR);
+    hallEffectSensor = new DigitalInput(ElevatorConstants.HALL_EFFECTS_SENSOR);
 
     goal = new TrapezoidProfile.State();
-    setpoint = ElevatorConstants.INTAKE_SETPOINT;
+    setpoint = ElevatorConstants.INTAKE_POSITION;
     motorSetpoint = new TrapezoidProfile.State();
 
     position = Distance.ofBaseUnits(0, Meters);
     velocity = LinearVelocity.ofBaseUnits(encoder.getVelocity(), MetersPerSecond);
+
     mainVoltage =
         Voltage.ofBaseUnits(mainMotor.getBusVoltage() * mainMotor.getAppliedOutput(), Volts);
-    secondaryVoltage =
-        Voltage.ofBaseUnits(
-            secondaryMotor.getBusVoltage() * secondaryMotor.getAppliedOutput(), Volts);
+
     mainCurrent = Current.ofBaseUnits(mainMotor.getOutputCurrent(), Amps);
-    secondaryCurrent = Current.ofBaseUnits(secondaryMotor.getOutputCurrent(), Amps);
   }
 
   @Override
@@ -126,28 +122,24 @@ public class Elevator extends SubsystemBase {
     motorSetpoint =
         profile.calculate(RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds), motorSetpoint, goal);
 
-    mainMotor
-        .getClosedLoopController()
-        .setReference(
-            motorSetpoint.position,
-            ControlType.kPosition,
-            ClosedLoopSlot.kSlot0,
-            feedforward.calculate(motorSetpoint.velocity));
+    pid.setReference(
+        motorSetpoint.position,
+        ControlType.kPosition,
+        ClosedLoopSlot.kSlot0,
+        feedforward.calculate(motorSetpoint.velocity));
 
     position = Distance.ofBaseUnits(encoder.getPosition(), Meters);
     velocity = LinearVelocity.ofBaseUnits(encoder.getVelocity(), MetersPerSecond);
+
     mainVoltage =
         Voltage.ofBaseUnits(mainMotor.getBusVoltage() * mainMotor.getAppliedOutput(), Volts);
-    secondaryVoltage =
-        Voltage.ofBaseUnits(
-            secondaryMotor.getBusVoltage() * secondaryMotor.getAppliedOutput(), Volts);
+
     mainCurrent = Current.ofBaseUnits(mainMotor.getOutputCurrent(), Amps);
-    secondaryCurrent = Current.ofBaseUnits(secondaryMotor.getOutputCurrent(), Amps);
   }
 
-  public boolean positionIsInRAnge(Distance desieredPostion) {
+  public boolean atPosition(Distance desieredPostion) {
     return (position.gte(desieredPostion.minus(Meters.of(.025)))
-        && position.lt(desieredPostion.plus(Meters.of(.025))));
+        && position.lte(desieredPostion.plus(Meters.of(.025))));
   }
 
   @Override
@@ -170,7 +162,7 @@ public class Elevator extends SubsystemBase {
                 () ->
                     setPosition(Distance.ofBaseUnits(setpoint.in(Millimeters) - 0.05, Millimeters)),
                 this),
-            Commands.waitUntil(() -> hallEffectsSensor.get() == true)),
+            Commands.waitUntil(() -> hallEffectSensor.get() == true)),
         Commands.runOnce(() -> encoder.setPosition(0), this));
   }
 }
