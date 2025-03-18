@@ -8,8 +8,6 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.MathUtil;
@@ -82,8 +80,6 @@ public class Swerve extends SubsystemBase {
 
   private ReefAlignState reefAlignState;
   private Pose2d alignTarget;
-
-  RobotConfig config;
 
   public Swerve() {
 
@@ -406,7 +402,7 @@ public class Swerve extends SubsystemBase {
                 + (assist.getRotation().getRadians())));
   }
 
-  public void driveRobotRelative(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
+  public void driveRobotRelative(ChassisSpeeds speeds) {
     setpointStates = SwerveConstants.KINEMATICS.toSwerveModuleStates(speeds);
 
     SwerveDriveKinematics.desaturateWheelSpeeds(
@@ -427,14 +423,7 @@ public class Swerve extends SubsystemBase {
   }
 
   private void driveFieldRelative(ChassisSpeeds speeds) {
-    driveRobotRelative(
-        speeds,
-        new DriveFeedforwards(
-            new double[] {0.0},
-            new double[] {0.0},
-            new double[] {0.0},
-            new double[] {0.0},
-            new double[] {0.0}));
+    driveRobotRelative(speeds);
   }
 
   public void followTrajectory(SwerveSample sample) {
