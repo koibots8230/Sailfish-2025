@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ClimberConstants;
+import frc.robot.subsystems.LED.State;
 
 @Logged
 public class Climber extends SubsystemBase {
@@ -35,6 +36,8 @@ public class Climber extends SubsystemBase {
   private Current current;
   private double position;
   double speed;
+
+  LED LED;
 
   public Climber() {
     motor = new SparkMax(ClimberConstants.MOTOR_ID, MotorType.kBrushless);
@@ -73,6 +76,22 @@ public class Climber extends SubsystemBase {
       motor.set(ClimberConstants.HIGH_SPEED);
     } else {
       motor.set(0);
+    }
+
+    if (LED.currentState == State.cDeploying
+        && position >= ClimberConstants.PREP_POSITION
+        && LED.currentState != State.cDeployed) {
+      LED.LEDCommand(State.cDeployed);
+    } else if (setpoint == ClimberConstants.PREP_POSITION && LED.currentState != State.cDeploying) {
+      LED.LEDCommand(State.cDeploying);
+    }
+
+    if (LED.currentState == State.climbing
+        && position >= ClimberConstants.CLIMB_POSITION
+        && LED.currentState != State.tada) {
+      LED.LEDCommand(State.tada);
+    } else if (setpoint == ClimberConstants.CLIMB_POSITION && LED.currentState != State.climbing) {
+      LED.LEDCommand(State.climbing);
     }
 
     position = encoder.getPosition();

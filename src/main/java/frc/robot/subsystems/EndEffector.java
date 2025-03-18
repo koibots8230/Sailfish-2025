@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.EndEffectorConstants;
+import frc.robot.subsystems.LED.State;
 
 @Logged
 public class EndEffector extends SubsystemBase {
@@ -40,6 +41,8 @@ public class EndEffector extends SubsystemBase {
   double velocity;
   Current current;
   Voltage voltage;
+
+  LED LED;
 
   Distance sensorDistance;
 
@@ -84,6 +87,13 @@ public class EndEffector extends SubsystemBase {
     if (laserCAN.getMeasurement() != null) {
       sensorDistance =
           Distance.ofBaseUnits(laserCAN.getMeasurement().distance_mm, Units.Millimeters);
+    }
+
+    if (sensorDistance.in(Units.Millimeters)
+        <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters)) {
+      LED.LEDCommand(State.hasCoral);
+    } else if (LED.currentState == State.hasCoral) {
+      LED.phaseCommand();
     }
   }
 

@@ -98,12 +98,12 @@ public class RobotContainer {
 
     Trigger spinIntake = new Trigger(xboxController.rightTrigger());
     spinIntake.onTrue(
-        IntakeCommands.intakeCommand(intake, intakePivot, indexer, elevator, endEffector));
+        IntakeCommands.intakeCommand(intake, intakePivot, indexer, elevator, endEffector, LED));
     spinIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector));
 
     Trigger reverseIntake = new Trigger(xboxController.leftTrigger());
     reverseIntake.onTrue(
-        IntakeCommands.reverseCommand(intake, intakePivot, indexer, elevator, endEffector));
+        IntakeCommands.reverseCommand(intake, intakePivot, indexer, elevator, endEffector, LED));
     reverseIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector));
 
     Trigger gotoLevelThree = new Trigger(xboxController.y());
@@ -142,6 +142,9 @@ public class RobotContainer {
 
     Trigger resetClimb = new Trigger(() -> operatorPad.getRawButton(8));
     resetClimb.onTrue(ClimbCommands.resetClimber(climber));
+
+    Trigger xanderMode = new Trigger(() -> operatorPad.getRawButton(1));
+    xanderMode.onTrue(LED.XModeCommand());
   }
 
   private void defualtCommands() {
