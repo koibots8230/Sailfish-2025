@@ -251,8 +251,8 @@ public class Constants {
 
   public static class ClimberConstants {
     public static final double START_POSITION = 0;
-    public static final double PREP_POSITION = 0.25;
-    public static final double CLIMB_POSITION = 0.75;
+    public static final double PREP_POSITION = 0.305;
+    public static final double CLIMB_POSITION = 0.7;
     public static final PIDGains PID = new PIDGains.Builder().kp(0.0).build();
     public static final FeedforwardGains FEEDFORWARD =
         new FeedforwardGains.Builder().kv(0.5).build();
@@ -260,8 +260,7 @@ public class Constants {
     public static final double MAX_VELOCITY = 1 / 8;
     public static final double MAX_ACCELERATION = 1 / 8;
 
-    public static final double LOW_SPEED = 0.2;
-    public static final double HIGH_SPEED = 0.4;
+    public static final double HIGH_SPEED = 0.9;
 
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(60, Units.Amps);
 
