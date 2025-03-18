@@ -2,8 +2,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -41,9 +39,6 @@ public class Constants {
 
     public static final double MAX_VELOCITY = 20 * Math.PI;
     public static final double MAX_ACCELRATION = 30 * Math.PI;
-
-    public static final PPHolonomicDriveController PATH_PLANNER_FF =
-        new PPHolonomicDriveController(new PIDConstants(0, 0, 0), new PIDConstants(0, 0, 0));
 
     public static final SwerveDriveKinematics KINEMATICS =
         new SwerveDriveKinematics(
