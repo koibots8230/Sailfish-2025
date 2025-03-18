@@ -180,7 +180,7 @@ public class RobotContainer {
 
     AutoTrajectory MeST = routine.trajectory("MeST");
 
-    routine.active().onTrue(Commands.sequence(MeST.resetOdometry(), MeST.cmd()));
+    routine.active().onTrue(Commands.sequence(elevator.setPositionCommand(ElevatorConstants.L2_POSITION), MeST.resetOdometry(), MeST.cmd()));
 
     return routine;
   }

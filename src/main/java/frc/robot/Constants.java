@@ -2,8 +2,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -19,7 +17,6 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import frc.lib.util.FeedforwardGains;
 import frc.lib.util.PIDGains;
-import frc.lib.util.Wheel;
 
 public class Constants {
 
@@ -43,11 +40,13 @@ public class Constants {
             new Translation2d(RobotConstants.TRACK_LENGTH / 2.0, RobotConstants.TRACK_WIDTH / 2.0),
             new Translation2d(RobotConstants.TRACK_LENGTH / 2.0, -RobotConstants.TRACK_WIDTH / 2.0),
             new Translation2d(-RobotConstants.TRACK_LENGTH / 2.0, RobotConstants.TRACK_WIDTH / 2.0),
-            new Translation2d(-RobotConstants.TRACK_LENGTH / 2.0, -RobotConstants.TRACK_WIDTH / 2.0));
+            new Translation2d(
+                -RobotConstants.TRACK_LENGTH / 2.0, -RobotConstants.TRACK_WIDTH / 2.0));
 
     public static final double SWERVE_GEARING = 5.50;
 
-    public static final double DRIVE_CONVERSION_FACTOR = (edu.wpi.first.math.util.Units.inchesToMeters(1.5) * 2 * Math.PI) / SWERVE_GEARING;
+    public static final double DRIVE_CONVERSION_FACTOR =
+        (edu.wpi.first.math.util.Units.inchesToMeters(1.5) * 2 * Math.PI) / SWERVE_GEARING;
     public static final double TURN_CONVERSION_FACTOR = 2 * Math.PI;
 
     public static final Rotation2d[] OFFSETS = {
