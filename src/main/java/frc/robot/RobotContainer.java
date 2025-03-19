@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.function.BooleanSupplier;
+
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
@@ -60,7 +62,7 @@ public class RobotContainer {
     endEffector = new EndEffector();
     intake = new Intake();
     intakePivot = new IntakePivot();
-    LED = new LED();
+    LED = new LED(endEffector::HasCoral);
     indexer = new Indexer();
     climber = new Climber();
 
@@ -98,12 +100,12 @@ public class RobotContainer {
 
     Trigger spinIntake = new Trigger(xboxController.rightTrigger());
     spinIntake.onTrue(
-        IntakeCommands.intakeCommand(intake, intakePivot, indexer, elevator, endEffector, LED));
+        IntakeCommands.intakeCommand(intake, intakePivot, indexer, elevator, endEffector));
     spinIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector));
 
     Trigger reverseIntake = new Trigger(xboxController.leftTrigger());
     reverseIntake.onTrue(
-        IntakeCommands.reverseCommand(intake, intakePivot, indexer, elevator, endEffector, LED));
+        IntakeCommands.reverseCommand(intake, intakePivot, indexer, elevator, endEffector));
     reverseIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector));
 
     Trigger gotoLevelThree = new Trigger(xboxController.y());
@@ -142,9 +144,6 @@ public class RobotContainer {
 
     Trigger resetClimb = new Trigger(() -> operatorPad.getRawButton(8));
     resetClimb.onTrue(ClimbCommands.resetClimber(climber));
-
-    Trigger xanderMode = new Trigger(() -> operatorPad.getRawButton(1));
-    xanderMode.onTrue(LED.XModeCommand());
   }
 
   private void defualtCommands() {

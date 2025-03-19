@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -8,6 +10,7 @@ import frc.robot.Constants.LEDConstants;
 
 public class LED extends SubsystemBase {
   private Phase phase;
+  private BooleanSupplier doesRobotHaveCoral;
   public State currentState;
 
   public enum State {
@@ -32,7 +35,8 @@ public class LED extends SubsystemBase {
 
   public SerialPort uart;
 
-  public LED() {
+  public LED(BooleanSupplier hasCoralFunc) {
+    doesRobotHaveCoral = hasCoralFunc;
     uart = new SerialPort(LEDConstants.BAUD_RATE, SerialPort.Port.kMXP);
   }
 
@@ -101,6 +105,15 @@ public class LED extends SubsystemBase {
     } else {
       LEDCommand(State.xanderMode);
     }
+  }
+
+  public void periodic() {
+    if (doesRobotHaveCoral.getAsBoolean()) {
+      LEDCommand(State.hasCoral);
+    } else if (currentState == State.hasCoral) {
+      phaseCommand();
+    }
+  
   }
 
   public void robotInit() {

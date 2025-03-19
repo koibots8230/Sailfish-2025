@@ -42,9 +42,7 @@ public class EndEffector extends SubsystemBase {
   Current current;
   Voltage voltage;
 
-  LED LED;
-
-  Distance sensorDistance;
+  public Distance sensorDistance;
 
   public EndEffector() {
     motor = new SparkMax(EndEffectorConstants.MOTOR_ID, MotorType.kBrushless);
@@ -89,17 +87,16 @@ public class EndEffector extends SubsystemBase {
           Distance.ofBaseUnits(laserCAN.getMeasurement().distance_mm, Units.Millimeters);
     }
 
-    if (sensorDistance.in(Units.Millimeters)
-        <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters)) {
-      LED.LEDCommand(State.hasCoral);
-    } else if (LED.currentState == State.hasCoral) {
-      LED.phaseCommand();
-    }
   }
 
   @Override
   public void simulationPeriodic() {
     velocity = setpoint;
+  }
+
+  public boolean HasCoral() {
+      return sensorDistance.in(Units.Millimeters) <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters);
+
   }
 
   private void setVelocity(double velocity) {
