@@ -106,6 +106,11 @@ public class RobotContainer {
         IntakeCommands.reverseCommand(intake, intakePivot, indexer, elevator, endEffector));
     reverseIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector));
 
+    Trigger reverseEffectorIndexer = xboxController.x();
+    reverseEffectorIndexer.onTrue(
+        IntakeCommands.reverseEffectorIndexerCommand(indexer, elevator, endEffector));
+    reverseEffectorIndexer.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector));
+
     Trigger gotoLevelThree = new Trigger(xboxController.y());
     gotoLevelThree.onTrue(
         Commands.sequence(
@@ -133,6 +138,9 @@ public class RobotContainer {
 
     Trigger alignLeft = xboxController.leftBumper();
     alignLeft.onTrue(swerve.setReefAlignStateCommand(ReefAlignState.leftSide));
+
+    Trigger cancelAlign = xboxController.b();
+    cancelAlign.onTrue(swerve.setReefAlignStateCommand(ReefAlignState.disabled));
 
     Trigger prepClimb = new Trigger(() -> operatorPad.getRawButton(5));
     prepClimb.onTrue(ClimbCommands.prepClimb(climber));
