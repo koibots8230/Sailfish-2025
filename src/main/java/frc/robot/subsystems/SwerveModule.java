@@ -4,11 +4,14 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -168,31 +171,31 @@ public class SwerveModule {
   }
 
   public void periodic() {
-    // driveCurrent = Current.ofBaseUnits(driveMotor.getOutputCurrent(), Units.Amps);
-    // turnCurrent = turnMotor.getOutputCurrent();
-    // driveVoltage =
-    //     Voltage.ofBaseUnits(driveMotor.getBusVoltage() * driveMotor.getAppliedOutput(), Volts);
-    // turnVoltage =
-    //     Voltage.ofBaseUnits(turnMotor.getBusVoltage() * turnMotor.getAppliedOutput(), Volts);
-    // drivePosition = driveEncoder.getPosition();
-    // turnPosition = turnEncoder.getPosition() - offset.getRadians();
-    // driveVelocity = driveEncoder.getVelocity();
-    // turnVelocity = AngularVelocity.ofBaseUnits(turnEncoder.getVelocity(),
-    // Units.RadiansPerSecond);
+    driveCurrent = Current.ofBaseUnits(driveMotor.getOutputCurrent(), Units.Amps);
+    turnCurrent = turnMotor.getOutputCurrent();
+    driveVoltage =
+        Voltage.ofBaseUnits(driveMotor.getBusVoltage() * driveMotor.getAppliedOutput(), Volts);
+    turnVoltage =
+        Voltage.ofBaseUnits(turnMotor.getBusVoltage() * turnMotor.getAppliedOutput(), Volts);
+    drivePosition = driveEncoder.getPosition();
+    turnPosition = turnEncoder.getPosition() - offset.getRadians();
+    driveVelocity = driveEncoder.getVelocity();
+    turnVelocity = AngularVelocity.ofBaseUnits(turnEncoder.getVelocity(),
+    Units.RadiansPerSecond);
 
-    // turnGoalState =
-    //     new TrapezoidProfile.State(
-    //         MathUtil.angleModulus(turnSetpoint.in(Radians)) + offset.getRadians(), 0);
+    turnGoalState =
+        new TrapezoidProfile.State(
+            MathUtil.angleModulus(turnSetpoint.in(Radians)) + offset.getRadians(), 0);
 
-    // turnSetpointState =
-    //     turnProfile.calculate(
-    //         RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds), turnSetpointState, turnGoalState);
+    turnSetpointState =
+        turnProfile.calculate(
+            RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds), turnSetpointState, turnGoalState);
 
-    // turnController.setReference(
-    //     turnSetpointState.position,
-    //     ControlType.kPosition,
-    //     ClosedLoopSlot.kSlot0,
-    //     turnFeedforward.calculate(turnSetpointState.velocity));
+    turnController.setReference(
+        turnSetpointState.position,
+        ControlType.kPosition,
+        ClosedLoopSlot.kSlot0,
+        turnFeedforward.calculate(turnSetpointState.velocity));
   }
 
   public void simulationPeriodic() {

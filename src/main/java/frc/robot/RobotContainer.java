@@ -83,7 +83,6 @@ public class RobotContainer {
     autoChooser.addRoutine("Leave Left", this::leaveLeft);
     autoChooser.addRoutine("Leave Center", this::leaveCenter);
     autoChooser.addRoutine("Leave Right", this::leaveRight);
-    autoChooser.addRoutine("Score Front Right Left Reef", this::SeFRLRf);
     SmartDashboard.putData("auto choices", autoChooser);
 
     RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
@@ -115,14 +114,14 @@ public class RobotContainer {
 
     Trigger gotoLevelThree = new Trigger(xboxController.y());
     gotoLevelThree.onTrue(
-        Commands.sequence(
+        Commands.parallel(
             ScoreCommands.levelThree(elevator, endEffector),
             swerve.setReefAlignStateCommand(ReefAlignState.disabled)));
     gotoLevelThree.onFalse(ScoreCommands.basePosition(elevator, endEffector));
 
     Trigger gotoLevelTwo = new Trigger(xboxController.a());
     gotoLevelTwo.onTrue(
-        Commands.sequence(
+        Commands.parallel(
             ScoreCommands.levelTwo(elevator, endEffector),
             swerve.setReefAlignStateCommand(ReefAlignState.disabled)));
     gotoLevelTwo.onFalse(ScoreCommands.basePosition(elevator, endEffector));

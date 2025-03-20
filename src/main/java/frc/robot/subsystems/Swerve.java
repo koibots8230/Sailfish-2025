@@ -152,6 +152,10 @@ public class Swerve extends SubsystemBase {
     measuredStates[1] = modules.frontRight.getModuleState();
     measuredStates[2] = modules.backLeft.getModuleState();
     measuredStates[3] = modules.backRight.getModuleState();
+
+    if (reefAlignState == null) {
+      reefAlignState = ReefAlignState.disabled;
+    }
   }
 
   @Override
