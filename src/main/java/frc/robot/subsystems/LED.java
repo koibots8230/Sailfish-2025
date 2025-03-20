@@ -1,12 +1,11 @@
 package frc.robot.subsystems;
 
-import java.util.function.BooleanSupplier;
-
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LEDConstants;
+import java.util.function.BooleanSupplier;
 
 public class LED extends SubsystemBase {
   private Phase phase;
@@ -113,7 +112,6 @@ public class LED extends SubsystemBase {
     } else if (currentState == State.hasCoral) {
       phaseCommand();
     }
-  
   }
 
   public void robotInit() {

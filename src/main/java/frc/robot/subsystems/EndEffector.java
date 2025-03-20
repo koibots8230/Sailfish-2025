@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.EndEffectorConstants;
-import frc.robot.subsystems.LED.State;
 
 @Logged
 public class EndEffector extends SubsystemBase {
@@ -86,7 +85,6 @@ public class EndEffector extends SubsystemBase {
       sensorDistance =
           Distance.ofBaseUnits(laserCAN.getMeasurement().distance_mm, Units.Millimeters);
     }
-
   }
 
   @Override
@@ -95,8 +93,8 @@ public class EndEffector extends SubsystemBase {
   }
 
   public boolean HasCoral() {
-      return sensorDistance.in(Units.Millimeters) <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters);
-
+    return sensorDistance.in(Units.Millimeters)
+        <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters);
   }
 
   private void setVelocity(double velocity) {
