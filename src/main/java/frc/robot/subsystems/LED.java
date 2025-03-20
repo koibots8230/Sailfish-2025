@@ -37,6 +37,12 @@ public class LED extends SubsystemBase {
   public LED(BooleanSupplier hasCoralFunc) {
     doesRobotHaveCoral = hasCoralFunc;
     uart = new SerialPort(LEDConstants.BAUD_RATE, SerialPort.Port.kMXP);
+
+    currentState = State.normal;
+
+    uart.writeString("1");
+    // phase = Phase.preGame;
+    // phaseCommand();
   }
 
   private void setLED(State state) {
@@ -98,11 +104,6 @@ public class LED extends SubsystemBase {
     }
   }
 
-  public void robotInit() {
-    phase = Phase.preGame;
-    phaseCommand();
-  }
-
   public void autoInit() {
     phase = Phase.auto;
     phaseCommand();
@@ -123,5 +124,9 @@ public class LED extends SubsystemBase {
 
   public Command XModeCommand() {
     return Commands.runOnce(() -> this.activateXanderMode(), this);
+  }
+
+  public Command setAutCommand() {
+    return Commands.runOnce(() -> this.autoInit(), this);
   }
 }

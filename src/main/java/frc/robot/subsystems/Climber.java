@@ -37,8 +37,6 @@ public class Climber extends SubsystemBase {
   private double position;
   double speed;
 
-  LED LED;
-
   public Climber() {
     motor = new SparkMax(ClimberConstants.MOTOR_ID, MotorType.kBrushless);
     config = new SparkMaxConfig();
@@ -76,22 +74,6 @@ public class Climber extends SubsystemBase {
       motor.set(ClimberConstants.HIGH_SPEED);
     } else {
       motor.set(0);
-    }
-
-    if (LED.currentState == State.cDeploying
-        && position >= ClimberConstants.PREP_POSITION
-        && LED.currentState != State.cDeployed) {
-      LED.LEDCommand(State.cDeployed);
-    } else if (setpoint == ClimberConstants.PREP_POSITION && LED.currentState != State.cDeploying) {
-      LED.LEDCommand(State.cDeploying);
-    }
-
-    if (LED.currentState == State.climbing
-        && position >= ClimberConstants.CLIMB_POSITION
-        && LED.currentState != State.tada) {
-      LED.LEDCommand(State.tada);
-    } else if (setpoint == ClimberConstants.CLIMB_POSITION && LED.currentState != State.climbing) {
-      LED.LEDCommand(State.climbing);
     }
 
     position = encoder.getPosition();

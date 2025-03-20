@@ -143,17 +143,26 @@ public class RobotContainer {
 
     Trigger resetClimb = new Trigger(() -> operatorPad.getRawButton(8));
     resetClimb.onTrue(ClimbCommands.resetClimber(climber));
+
+    Trigger xMode = new Trigger(() -> operatorPad.getRawButton(3));
+    xMode.onTrue(LED.XModeCommand());
   }
 
   private void defualtCommands() {
-    swerve.setDefaultCommand(
-        swerve.driveFieldRelativeCommand(
-            xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
+    // swerve.setDefaultCommand(
+    //     swerve.driveFieldRelativeCommand(
+    //         xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
   }
 
   public void setAlliance() {
     isBlue = (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
     swerve.setIsBlue(isBlue);
+  }
+
+
+  public void autoInit() {
+    LED.setAutCommand();
+  
   }
 
   public void teleopInit() {
