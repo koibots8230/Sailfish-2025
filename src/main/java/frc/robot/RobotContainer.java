@@ -168,6 +168,24 @@ public class RobotContainer {
     this.defualtCommands();
   }
 
+    private AutoRoutine centerScore() {
+    AutoRoutine routine = autoFactory.newRoutine("taxi");
+
+    AutoTrajectory leave = routine.trajectory("MiddleScore");
+
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                leave.resetOdometry(),
+                Commands.parallel(
+                    leave.cmd(),
+                    endEffector.releaseAlgaeRemover()
+                ),
+                ScoreCommands.levelTwo(elevator, endEffector)));
+
+    return routine;
+  }
 
   private AutoRoutine SeFLRRf() {
     AutoRoutine routine = autoFactory.newRoutine("taxi");
