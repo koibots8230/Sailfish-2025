@@ -39,10 +39,8 @@ public class LED extends SubsystemBase {
     uart = new SerialPort(LEDConstants.BAUD_RATE, SerialPort.Port.kMXP);
 
     currentState = State.normal;
-
     uart.writeString("1");
-    // phase = Phase.preGame;
-    // phaseCommand();
+    phase = Phase.preGame;
   }
 
   private void setLED(State state) {
@@ -126,7 +124,11 @@ public class LED extends SubsystemBase {
     return Commands.runOnce(() -> this.activateXanderMode(), this);
   }
 
-  public Command setAutCommand() {
+  public Command setAutoCommand() {
     return Commands.runOnce(() -> this.autoInit(), this);
+  }
+
+  public Command setTeleopCommand() {
+    return Commands.runOnce(() -> this.teleopInit(), this);
   }
 }

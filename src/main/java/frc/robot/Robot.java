@@ -45,7 +45,7 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.schedule();
     }
 
-    
+    m_robotContainer.autoInit();
   }
 
   @Override

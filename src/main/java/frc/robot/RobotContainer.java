@@ -159,14 +159,13 @@ public class RobotContainer {
     swerve.setIsBlue(isBlue);
   }
 
-
   public void autoInit() {
-    LED.setAutCommand();
-  
+    LED.setAutoCommand();
   }
 
   public void teleopInit() {
     this.defualtCommands();
+    LED.setTeleopCommand();
   }
 
   private AutoRoutine SeFLRRf() {
