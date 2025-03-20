@@ -60,7 +60,7 @@ public class RobotContainer {
     endEffector = new EndEffector();
     intake = new Intake();
     intakePivot = new IntakePivot();
-    LED = new LED(endEffector::HasCoral);
+    LED = new LED(endEffector::hasCoral);
     indexer = new Indexer();
     climber = new Climber();
 
@@ -98,13 +98,14 @@ public class RobotContainer {
 
     Trigger spinIntake = new Trigger(xboxController.rightTrigger());
     spinIntake.onTrue(
-        IntakeCommands.intakeCommand(intake, intakePivot, indexer, elevator, endEffector));
-    spinIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector));
+        IntakeCommands.intakeCommand(intake, intakePivot, indexer, elevator, endEffector, LED));
+    spinIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector, LED));
 
     Trigger reverseIntake = new Trigger(xboxController.leftTrigger());
     reverseIntake.onTrue(
-        IntakeCommands.reverseCommand(intake, intakePivot, indexer, elevator, endEffector));
-    reverseIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector));
+        IntakeCommands.reverseCommand(intake, intakePivot, indexer, elevator, endEffector, LED));
+    reverseIntake.onFalse(
+        IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector, LED));
 
     Trigger gotoLevelThree = new Trigger(xboxController.y());
     gotoLevelThree.onTrue(

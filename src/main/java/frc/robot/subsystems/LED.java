@@ -40,50 +40,34 @@ public class LED extends SubsystemBase {
   }
 
   private void setLED(State state) {
+    if (currentState == state) {
+      return;
+    }
+
     if (state == State.off) {
       uart.writeString("0");
-      currentState = State.off;
-    }
-    if (state == State.normal) {
+    } else if (state == State.normal) {
       uart.writeString("1");
-      currentState = State.normal;
-    }
-    if (state == State.auto) {
+    } else if (state == State.auto) {
       uart.writeString("2");
-      currentState = State.auto;
-    }
-    if (state == State.teleop) {
+    } else if (state == State.teleop) {
       uart.writeString("3");
-      currentState = State.teleop;
-    }
-    if (state == State.intake) {
+    } else if (state == State.intake) {
       uart.writeString("4");
-      currentState = State.intake;
-    }
-    if (state == State.hasCoral) {
+    } else if (state == State.hasCoral) {
       uart.writeString("5");
-      currentState = State.hasCoral;
-    }
-    if (state == State.cDeploying) {
+    } else if (state == State.cDeploying) {
       uart.writeString("6");
-      currentState = State.cDeploying;
-    }
-    if (state == State.cDeployed) {
+    } else if (state == State.cDeployed) {
       uart.writeString("7");
-      currentState = State.cDeployed;
-    }
-    if (state == State.climbing) {
+    } else if (state == State.climbing) {
       uart.writeString("8");
-      currentState = State.climbing;
-    }
-    if (state == State.tada) {
-      uart.writeString("9");
-      currentState = State.tada;
-    }
-    if (state == State.xanderMode) {
+    } else if (state == State.tada) {
       uart.writeString("a");
-      currentState = State.xanderMode;
+    } else if (state == State.xanderMode) {
+      uart.writeString("9");
     }
+    currentState = state;
   }
 
   private void resetLEDsToPhase() {
@@ -107,7 +91,7 @@ public class LED extends SubsystemBase {
   }
 
   public void periodic() {
-    if (doesRobotHaveCoral.getAsBoolean()) {
+    if (doesRobotHaveCoral.getAsBoolean() && currentState != State.hasCoral) {
       LEDCommand(State.hasCoral);
     } else if (currentState == State.hasCoral) {
       phaseCommand();

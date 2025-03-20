@@ -92,7 +92,7 @@ public class EndEffector extends SubsystemBase {
     velocity = setpoint;
   }
 
-  public boolean HasCoral() {
+  public boolean hasCoral() {
     return sensorDistance.in(Units.Millimeters)
         <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters);
   }
