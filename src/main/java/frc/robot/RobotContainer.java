@@ -10,6 +10,7 @@ import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -17,6 +18,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.ReefAlignState;
+import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.EndEffectorConstants;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 
@@ -32,12 +35,17 @@ public class RobotContainer {
 
   private final Intake intake;
   private final IntakePivot intakePivot;
-
   private final Indexer indexer;
+
+  private final Climber climber;
 
   private final Vision vision;
 
+  private final LED LED;
+
   private final CommandXboxController xboxController;
+  private final GenericHID operatorPad;
+
   private boolean isBlue;
 
   public RobotContainer() {
@@ -53,7 +61,9 @@ public class RobotContainer {
     endEffector = new EndEffector();
     intake = new Intake();
     intakePivot = new IntakePivot();
+    LED = new LED();
     indexer = new Indexer();
+    climber = new Climber();
 
     autoChooser = new AutoChooser();
 
@@ -65,10 +75,14 @@ public class RobotContainer {
             swerve::getIsBlue);
 
     xboxController = new CommandXboxController(0);
+    operatorPad = new GenericHID(1);
 
     autoChooser.addRoutine("Score Front Left Right Reef", this::SeFLRRf);
     autoChooser.addRoutine("move stright tune test", this::MeSATTt);
     autoChooser.addRoutine("rotate tune test", this::ReATTt);
+    autoChooser.addRoutine("Leave Left", this::leaveLeft);
+    autoChooser.addRoutine("Leave Center", this::leaveCenter);
+    autoChooser.addRoutine("Leave Right", this::leaveRight);
     autoChooser.addRoutine("Score Front Right Left Reef", this::SeFRLRf);
     SmartDashboard.putData("auto choices", autoChooser);
 
@@ -76,7 +90,77 @@ public class RobotContainer {
 
     configureBindings();
     defualtCommands();
+    setupTestMode();
   }
+
+  private void configureBindings() {
+
+    // Trigger zero = xboxController.b();
+    // zero.onTrue(swerve.zeroGyroCommand(isBlue));
+
+    Trigger spinIntake = new Trigger(xboxController.rightTrigger());
+    spinIntake.onTrue(
+        IntakeCommands.intakeCommand(intake, intakePivot, indexer, elevator, endEffector));
+    spinIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector));
+
+    Trigger reverseIntake = new Trigger(xboxController.leftTrigger());
+    reverseIntake.onTrue(
+        IntakeCommands.reverseCommand(intake, intakePivot, indexer, elevator, endEffector));
+    reverseIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector));
+
+    Trigger gotoLevelThree = new Trigger(xboxController.y());
+    gotoLevelThree.onTrue(
+        Commands.sequence(
+            ScoreCommands.levelThree(elevator, endEffector),
+            swerve.setReefAlignStateCommand(ReefAlignState.disabled)));
+    gotoLevelThree.onFalse(ScoreCommands.basePosition(elevator, endEffector));
+
+    Trigger gotoLevelTwo = new Trigger(xboxController.a());
+    gotoLevelTwo.onTrue(
+        Commands.sequence(
+            ScoreCommands.levelTwo(elevator, endEffector),
+            swerve.setReefAlignStateCommand(ReefAlignState.disabled)));
+    gotoLevelTwo.onFalse(ScoreCommands.basePosition(elevator, endEffector));
+
+    Trigger removeL2Algae = xboxController.povDown();
+    removeL2Algae.onTrue(ScoreCommands.removeL2Algae(elevator, endEffector));
+    removeL2Algae.onFalse(ScoreCommands.basePosition(elevator, endEffector));
+
+    Trigger removeL3Algae = xboxController.povUp();
+    removeL3Algae.onTrue(ScoreCommands.removeL3Algae(elevator, endEffector));
+    removeL3Algae.onFalse(ScoreCommands.basePosition(elevator, endEffector));
+
+    Trigger alignRight = xboxController.rightBumper();
+    alignRight.onTrue(swerve.setReefAlignStateCommand(ReefAlignState.rightSide));
+
+    Trigger alignLeft = xboxController.leftBumper();
+    alignLeft.onTrue(swerve.setReefAlignStateCommand(ReefAlignState.leftSide));
+
+    Trigger prepClimb = new Trigger(() -> operatorPad.getRawButton(5));
+    prepClimb.onTrue(ClimbCommands.prepClimb(climber));
+
+    Trigger climb = new Trigger(() -> operatorPad.getRawButton(6));
+    climb.onTrue(ClimbCommands.climb(climber));
+
+    Trigger resetClimb = new Trigger(() -> operatorPad.getRawButton(8));
+    resetClimb.onTrue(ClimbCommands.resetClimber(climber));
+  }
+
+  private void defualtCommands() {
+    swerve.setDefaultCommand(
+        swerve.driveFieldRelativeCommand(
+            xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
+  }
+
+  public void setAlliance() {
+    isBlue = (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
+    swerve.setIsBlue(isBlue);
+  }
+
+  public void teleopInit() {
+    this.defualtCommands();
+  }
+
 
   private AutoRoutine SeFLRRf() {
     AutoRoutine routine = autoFactory.newRoutine("taxi");
@@ -156,7 +240,13 @@ public class RobotContainer {
 
     AutoTrajectory MeST = routine.trajectory("MeST");
 
-    routine.active().onTrue(Commands.sequence(MeST.resetOdometry(), MeST.cmd()));
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                elevator.setPositionCommand(ElevatorConstants.L2_POSITION),
+                MeST.resetOdometry(),
+                MeST.cmd()));
 
     return routine;
   }
@@ -171,63 +261,88 @@ public class RobotContainer {
     return routine;
   }
 
-  private void configureBindings() {
+  private AutoRoutine leaveLeft() {
+    AutoRoutine routine = autoFactory.newRoutine("taxi");
 
-    // Trigger zero = xboxController.b();
-    // zero.onTrue(swerve.zeroGyroCommand(isBlue));
+    AutoTrajectory leave = routine.trajectory("LL");
 
-    Trigger spinIntake = new Trigger(xboxController.rightTrigger());
-    spinIntake.onTrue(
-        IntakeCommands.intakeCommand(intake, intakePivot, indexer, elevator, endEffector));
-    spinIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector));
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                Commands.sequence(
+                    endEffector.setVelocityCommand(-300),
+                    Commands.waitSeconds(0.1),
+                    endEffector.setVelocityCommand(0)),
+                leave.resetOdometry(),
+                leave.cmd()));
 
-    Trigger reverseIntake = new Trigger(xboxController.leftTrigger());
-    reverseIntake.onTrue(
-        IntakeCommands.reverseCommand(intake, intakePivot, indexer, elevator, endEffector));
-    reverseIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector));
-
-    Trigger gotoLevelThree = new Trigger(xboxController.y());
-    gotoLevelThree.onTrue(
-        Commands.sequence(
-            ScoreCommands.levelThree(elevator, endEffector),
-            swerve.setReefAlignStateCommand(ReefAlignState.disabled)));
-    gotoLevelThree.onFalse(ScoreCommands.basePosition(elevator, endEffector));
-
-    Trigger gotoLevelTwo = new Trigger(xboxController.a());
-    gotoLevelTwo.onTrue(
-        Commands.sequence(
-            ScoreCommands.levelTwo(elevator, endEffector),
-            swerve.setReefAlignStateCommand(ReefAlignState.disabled)));
-    gotoLevelTwo.onFalse(ScoreCommands.basePosition(elevator, endEffector));
-
-    Trigger removeL2Algae = xboxController.povDown();
-    removeL2Algae.onTrue(ScoreCommands.removeL2Algae(elevator, endEffector));
-    removeL2Algae.onFalse(ScoreCommands.basePosition(elevator, endEffector));
-
-    Trigger removeL3Algae = xboxController.povUp();
-    removeL3Algae.onTrue(ScoreCommands.removeL3Algae(elevator, endEffector));
-    removeL3Algae.onFalse(ScoreCommands.basePosition(elevator, endEffector));
-
-    Trigger alignRight = xboxController.rightBumper();
-    alignRight.onTrue(swerve.setReefAlignStateCommand(ReefAlignState.rightSide));
-
-    Trigger alignLeft = xboxController.leftBumper();
-    alignLeft.onTrue(swerve.setReefAlignStateCommand(ReefAlignState.leftSide));
+    return routine;
   }
 
-  private void defualtCommands() {
-    swerve.setDefaultCommand(
-        swerve.driveFieldRelativeCommand(
-            xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
+  private AutoRoutine leaveCenter() {
+    AutoRoutine routine = autoFactory.newRoutine("taxi");
+
+    AutoTrajectory leave = routine.trajectory("LC");
+
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                Commands.sequence(
+                    endEffector.setVelocityCommand(-250),
+                    Commands.waitSeconds(0.3),
+                    endEffector.setVelocityCommand(0)),
+                leave.resetOdometry(),
+                leave.cmd(),
+                Commands.sequence(
+                    elevator.setPositionCommand(ElevatorConstants.L2_ALGAE_POSITION),
+                    Commands.waitUntil(
+                        () -> elevator.atPosition(ElevatorConstants.L2_ALGAE_POSITION)),
+                    endEffector.setVelocityCommand(EndEffectorConstants.ALGAE_REMOVAL_SPEED)),
+                Commands.waitSeconds(0.75),
+                ScoreCommands.basePosition(elevator, endEffector)));
+
+    return routine;
   }
 
-  public void teleopInit() {
-    isBlue = (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
-    swerve.setIsBlue(isBlue);
+  private AutoRoutine leaveRight() {
+    AutoRoutine routine = autoFactory.newRoutine("taxi");
+
+    AutoTrajectory leave = routine.trajectory("LR");
+
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                Commands.sequence(
+                    endEffector.setVelocityCommand(-300),
+                    Commands.waitSeconds(0.1),
+                    endEffector.setVelocityCommand(0)),
+                leave.resetOdometry(),
+                leave.cmd()));
+
+    return routine;
   }
 
-  public void autonomousInit() {
-    isBlue = (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue);
-    swerve.setIsBlue(isBlue);
+  private void setupTestMode() {
+    SmartDashboard.putBoolean("SwerveTest/FL", true);
+    SmartDashboard.putBoolean("SwerveTest/FR", true);
+    SmartDashboard.putBoolean("SwerveTest/BL", true);
+    SmartDashboard.putBoolean("SwerveTest/BR", true);
+
+    SmartDashboard.putBoolean("TestSequence/Intake", true);
+    SmartDashboard.putBoolean("TestSequence/Intake Pivot", true);
+
+    SmartDashboard.putBoolean("TestSequence/Indexer Top", true);
+    SmartDashboard.putBoolean("TestSequence/Indexer Bottom", true);
+
+    SmartDashboard.putBoolean("TestSequence/Elevator", true);
+
+    SmartDashboard.putBoolean("TestSequence/End Effector", true);
+
+    SmartDashboard.putData(
+        "TestSequence/SequenceCommand",
+        TestCommands.testSequence(swerve, intake, intakePivot, indexer, elevator, endEffector));
   }
 }

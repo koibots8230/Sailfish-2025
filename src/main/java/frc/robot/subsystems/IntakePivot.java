@@ -41,9 +41,11 @@ public class IntakePivot extends SubsystemBase {
 
   @NotLogged private final SparkMaxConfig config;
 
-  @NotLogged private final AbsoluteEncoder encoder;
+  @NotLogged private final AbsoluteEncoder leftEncoder;
+  @NotLogged private final AbsoluteEncoder rightEncoder;
 
-  @NotLogged private final SparkClosedLoopController pid;
+  @NotLogged private final SparkClosedLoopController leftPid;
+  @NotLogged private final SparkClosedLoopController rightPid;
 
   @NotLogged private final SimpleMotorFeedforward feedforward;
 
@@ -53,11 +55,14 @@ public class IntakePivot extends SubsystemBase {
   private TrapezoidProfile.State motorSetpoint;
 
   private Angle setpoint;
-  private AngularVelocity velocity;
-  private Voltage voltage;
+  private AngularVelocity leftVelocity;
+  private Voltage leftVoltage;
+  private AngularVelocity rightVelocity;
+  private Voltage rightVoltage;
   private Current leftCurrent;
   private Current rightCurrent;
-  private Angle position;
+  private Angle leftPosition;
+  private Angle rightPosition;
 
   public IntakePivot() {
     leftMotor = new SparkMax(IntakePivotConstants.LEFT_MOTOR_ID, MotorType.kBrushless);
@@ -72,13 +77,17 @@ public class IntakePivot extends SubsystemBase {
 
     leftMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    encoder = leftMotor.getAbsoluteEncoder();
+    leftEncoder = leftMotor.getAbsoluteEncoder();
 
-    pid = leftMotor.getClosedLoopController();
+    leftPid = leftMotor.getClosedLoopController();
 
-    config.follow(leftMotor, true);
+    config.inverted(true);
 
     rightMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    rightEncoder = rightMotor.getAbsoluteEncoder();
+
+    rightPid = rightMotor.getClosedLoopController();
 
     profile =
         new TrapezoidProfile(
@@ -91,7 +100,7 @@ public class IntakePivot extends SubsystemBase {
             IntakePivotConstants.FEEDFORWARD.ks, IntakePivotConstants.FEEDFORWARD.kv);
 
     goal = new TrapezoidProfile.State();
-    setpoint = Radians.of(encoder.getPosition());
+    setpoint = IntakePivotConstants.IN_POSITION;
     motorSetpoint = new TrapezoidProfile.State();
   }
 
@@ -102,27 +111,44 @@ public class IntakePivot extends SubsystemBase {
     motorSetpoint =
         profile.calculate(RobotConstants.ROBOT_CLOCK_SPEED.in(Seconds), motorSetpoint, goal);
 
-    pid.setReference(
+    leftPid.setReference(
         motorSetpoint.position,
         ControlType.kPosition,
         ClosedLoopSlot.kSlot0,
         feedforward.calculate(motorSetpoint.velocity));
 
-    position = Angle.ofBaseUnits(encoder.getPosition(), Radians);
-    velocity = AngularVelocity.ofBaseUnits(encoder.getVelocity(), RadiansPerSecond);
-    voltage = Voltage.ofBaseUnits(leftMotor.getBusVoltage() * leftMotor.getAppliedOutput(), Volts);
+    rightPid.setReference(
+        motorSetpoint.position,
+        ControlType.kPosition,
+        ClosedLoopSlot.kSlot0,
+        feedforward.calculate(motorSetpoint.velocity));
+
+    leftPosition = Angle.ofBaseUnits(leftEncoder.getPosition(), Radians);
+    leftVelocity = AngularVelocity.ofBaseUnits(leftEncoder.getVelocity(), RadiansPerSecond);
+
+    rightPosition = Angle.ofBaseUnits(rightEncoder.getPosition(), Radians);
+    rightVelocity = AngularVelocity.ofBaseUnits(rightEncoder.getVelocity(), RadiansPerSecond);
+
+    leftVoltage =
+        Voltage.ofBaseUnits(leftMotor.getBusVoltage() * leftMotor.getAppliedOutput(), Volts);
+    rightVoltage =
+        Voltage.ofBaseUnits(rightMotor.getAppliedOutput() * rightMotor.getBusVoltage(), Volts);
+
     leftCurrent = Current.ofBaseUnits(leftMotor.getOutputCurrent(), Amps);
     rightCurrent = Current.ofBaseUnits(rightMotor.getOutputCurrent(), Amps);
   }
 
-  public boolean atSetpoint() {
-    return (position.gte(IntakePivotConstants.OUT_POSITION.minus(IntakePivotConstants.TOLERANCE))
-        && position.lt(IntakePivotConstants.OUT_POSITION.plus(IntakePivotConstants.TOLERANCE)));
+  public boolean atSetpoint(Angle setpoint) {
+    return leftPosition.gte(setpoint.minus(IntakePivotConstants.TOLERANCE))
+        && leftPosition.lte(setpoint.plus(IntakePivotConstants.TOLERANCE))
+        && rightPosition.gte(setpoint.minus(IntakePivotConstants.TOLERANCE))
+        && rightPosition.lte(setpoint.plus(IntakePivotConstants.TOLERANCE));
   }
 
   @Override
   public void simulationPeriodic() {
-    position = setpoint;
+    leftPosition = setpoint;
+    rightPosition = setpoint;
   }
 
   private void setPosition(Angle position) {

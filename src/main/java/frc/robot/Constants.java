@@ -2,8 +2,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -19,7 +17,6 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import frc.lib.util.FeedforwardGains;
 import frc.lib.util.PIDGains;
-import frc.lib.util.Wheel;
 
 public class Constants {
 
@@ -27,9 +24,8 @@ public class Constants {
     public static final LinearVelocity MAX_LINEAR_VELOCITY = MetersPerSecond.of(4.25);
     public static final AngularVelocity MAX_ANGULAR_VELOCITY = RadiansPerSecond.of(2 * Math.PI);
 
-    public static final AngularVelocity MAX_TURN_VECLOCITY = RadiansPerSecond.of(10 * Math.PI);
-    public static final AngularAcceleration MAX_TURN_ACCELERATION =
-        RadiansPerSecondPerSecond.of(16 * Math.PI);
+    public static final double MAX_TURN_VELOCITY = 20 * Math.PI;
+    public static final double MAX_TURN_ACCELRATION = 30 * Math.PI;
 
     public static final PIDGains TURN_PID = new PIDGains.Builder().kp(3).kd(0.0).build();
     public static final PIDGains DRIVE_PID = new PIDGains.Builder().kp(0.37).build();
@@ -39,24 +35,18 @@ public class Constants {
     public static final FeedforwardGains DRIVE_FEEDFORWARD =
         new FeedforwardGains.Builder().kv(0.24).build();
 
-    public static final double MAX_VELOCITY = 20 * Math.PI;
-    public static final double MAX_ACCELRATION = 30 * Math.PI;
-
-    public static final PPHolonomicDriveController PATH_PLANNER_FF =
-        new PPHolonomicDriveController(new PIDConstants(0, 0, 0), new PIDConstants(0, 0, 0));
-
     public static final SwerveDriveKinematics KINEMATICS =
         new SwerveDriveKinematics(
-            new Translation2d(RobotConstants.LENGTH.divide(2), RobotConstants.WIDTH.divide(2)),
-            new Translation2d(RobotConstants.LENGTH.divide(2), RobotConstants.WIDTH.divide(-2)),
-            new Translation2d(RobotConstants.LENGTH.divide(-2), RobotConstants.WIDTH.divide(2)),
-            new Translation2d(RobotConstants.LENGTH.divide(-2), RobotConstants.WIDTH.divide(-2)));
-
-    public static final Wheel SWERVE_WHEEL = new Wheel(Inches.of(1.5));
+            new Translation2d(RobotConstants.TRACK_LENGTH / 2.0, RobotConstants.TRACK_WIDTH / 2.0),
+            new Translation2d(RobotConstants.TRACK_LENGTH / 2.0, -RobotConstants.TRACK_WIDTH / 2.0),
+            new Translation2d(-RobotConstants.TRACK_LENGTH / 2.0, RobotConstants.TRACK_WIDTH / 2.0),
+            new Translation2d(
+                -RobotConstants.TRACK_LENGTH / 2.0, -RobotConstants.TRACK_WIDTH / 2.0));
 
     public static final double SWERVE_GEARING = 5.50;
 
-    public static final double DRIVE_CONVERSION_FACTOR = (0.0381 * 2 * Math.PI) / SWERVE_GEARING;
+    public static final double DRIVE_CONVERSION_FACTOR =
+        (edu.wpi.first.math.util.Units.inchesToMeters(1.5) * 2 * Math.PI) / SWERVE_GEARING;
     public static final double TURN_CONVERSION_FACTOR = 2 * Math.PI;
 
     public static final Rotation2d[] OFFSETS = {
@@ -139,9 +129,9 @@ public class Constants {
     public static final Angle IN_POSITION = Angle.ofBaseUnits(0.15, Radians);
 
     public static final AngularVelocity MAX_VELOCITY =
-        AngularVelocity.ofBaseUnits(14.0 * Math.PI, Units.RadiansPerSecond);
+        AngularVelocity.ofBaseUnits(40 * Math.PI, Units.RadiansPerSecond);
     public static final AngularAcceleration MAX_ACCELRATION =
-        AngularAcceleration.ofBaseUnits(Math.PI * 16.0, Units.RadiansPerSecondPerSecond);
+        AngularAcceleration.ofBaseUnits(Math.PI * 40, Units.RadiansPerSecondPerSecond);
 
     public static final PIDGains PID = new PIDGains.Builder().kp(1.8).build();
     public static final FeedforwardGains FEEDFORWARD =
@@ -199,24 +189,23 @@ public class Constants {
     public static final Distance L2_POSITION = Distance.ofBaseUnits(1.18, Units.Meters);
     public static final Distance L3_POSITION = Distance.ofBaseUnits(2.04, Units.Meters);
 
-    public static final Distance L2_ALGAE_POSITION = Distance.ofBaseUnits(0.65, Units.Meters);
+    public static final Distance L2_ALGAE_POSITION = Distance.ofBaseUnits(0.67, Units.Meters);
     public static final Distance L3_ALGAE_POSITION = Distance.ofBaseUnits(1.5, Units.Meters);
 
-    public static final PIDGains PID = new PIDGains.Builder().kp(3.3).build();
+    public static final PIDGains PID = new PIDGains.Builder().kp(6).build(); // 3.3
     public static final FeedforwardGains FEEDFORWARD =
-        new FeedforwardGains.Builder().kv(2.05).kg(0).build();
+        new FeedforwardGains.Builder().kv(2.55).kg(0.05).build(); // 2.05
 
     public static final LinearVelocity MAX_VELOCITY =
         LinearVelocity.ofBaseUnits(24, Units.MetersPerSecond);
     public static final LinearAcceleration MAX_ACCELRATION =
-        LinearAcceleration.ofBaseUnits(6, Units.MetersPerSecondPerSecond);
+        LinearAcceleration.ofBaseUnits(13, Units.MetersPerSecondPerSecond);
 
     public static final double CONVERSION_FACTOR = (0.05207 * Math.PI) * 2;
 
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(60, Units.Amps);
 
-    public static final int MAIN_MOTOR_ID = 11;
-    public static final int SECONDARY_MOTOR_ID = 12;
+    public static final int MAIN_MOTOR_ID = 12;
 
     public static final int HALL_EFFECTS_SENSOR = 0;
   }
@@ -250,10 +239,32 @@ public class Constants {
     public static final double TRANSLATION_STDEV_SCALAR = 0.15;
   }
 
+  public static class ClimberConstants {
+    public static final double START_POSITION = 0;
+    public static final double PREP_POSITION = 0.305;
+    public static final double CLIMB_POSITION = 0.7;
+    public static final PIDGains PID = new PIDGains.Builder().kp(0.0).build();
+    public static final FeedforwardGains FEEDFORWARD =
+        new FeedforwardGains.Builder().kv(0.5).build();
+
+    public static final double MAX_VELOCITY = 1 / 8;
+    public static final double MAX_ACCELERATION = 1 / 8;
+
+    public static final double HIGH_SPEED = 0.9;
+
+    public static final Current CURRENT_LIMIT = Current.ofBaseUnits(60, Units.Amps);
+
+    public static final int MOTOR_ID = 51;
+  }
+
   public static class RobotConstants {
-    public static final Distance WIDTH = Inches.of(23.5);
-    public static final Distance LENGTH = Inches.of(23.5);
+    public static final double TRACK_WIDTH = edu.wpi.first.math.util.Units.inchesToMeters(23.5);
+    public static final double TRACK_LENGTH = edu.wpi.first.math.util.Units.inchesToMeters(23.5);
 
     public static final Time ROBOT_CLOCK_SPEED = Time.ofBaseUnits(0.02, Units.Seconds);
+  }
+
+  public static class LEDConstants {
+    public static final int BAUD_RATE = 115200;
   }
 }

@@ -86,7 +86,7 @@ public class SwerveModule {
     turnProfile =
         new TrapezoidProfile(
             new TrapezoidProfile.Constraints(
-                SwerveConstants.MAX_VELOCITY, SwerveConstants.MAX_ACCELRATION));
+                SwerveConstants.MAX_TURN_VELOCITY, SwerveConstants.MAX_TURN_ACCELRATION));
 
     turnGoalState = new TrapezoidProfile.State(0, 0);
     turnSetpointState = new TrapezoidProfile.State(0, 0);

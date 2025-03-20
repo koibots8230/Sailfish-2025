@@ -8,8 +8,6 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.MathUtil;
@@ -82,8 +80,6 @@ public class Swerve extends SubsystemBase {
 
   private ReefAlignState reefAlignState;
   private Pose2d alignTarget;
-
-  RobotConfig config;
 
   public Swerve() {
 
@@ -212,7 +208,7 @@ public class Swerve extends SubsystemBase {
     return SwerveConstants.KINEMATICS.toChassisSpeeds(measuredStates);
   }
 
-  // ===================== Module Positions ===================== \\
+  // ===================== Reef Align State ===================== \\
 
   private void setReefAlignState(ReefAlignState state) {
     this.reefAlignState = state;
@@ -396,19 +392,14 @@ public class Swerve extends SubsystemBase {
 
     driveFieldRelative(
         MetersPerSecond.of(
-            MathUtil.applyDeadband(
-                x + (assist.getX() * Math.sqrt(linearMagnitude) * (isBlue ? -1 : 1)),
-                SwerveConstants.DEADBAND)),
+            MathUtil.applyDeadband(x + (assist.getX() * Math.sqrt(linearMagnitude) * (isBlue ? -1 : 1)), SwerveConstants.DEADBAND)),
         MetersPerSecond.of(
-            MathUtil.applyDeadband(
-                y + (assist.getY() * Math.sqrt(linearMagnitude) * (isBlue ? -1 : 1)),
-                SwerveConstants.DEADBAND)),
+            MathUtil.applyDeadband(y + (assist.getY() * Math.sqrt(linearMagnitude) * (isBlue ? -1 : 1)), SwerveConstants.DEADBAND)),
         RadiansPerSecond.of(
-            MathUtil.applyDeadband(
-                -omega + (assist.getRotation().getRadians()), SwerveConstants.DEADBAND)));
+            MathUtil.applyDeadband(-omega + (assist.getRotation().getRadians()), SwerveConstants.DEADBAND)));
   }
 
-  public void driveRobotRelative(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
+  public void driveRobotRelative(ChassisSpeeds speeds) {
     setpointStates = SwerveConstants.KINEMATICS.toSwerveModuleStates(speeds);
 
     SwerveDriveKinematics.desaturateWheelSpeeds(
@@ -429,14 +420,7 @@ public class Swerve extends SubsystemBase {
   }
 
   private void driveFieldRelative(ChassisSpeeds speeds) {
-    driveRobotRelative(
-        speeds,
-        new DriveFeedforwards(
-            new double[] {0.0},
-            new double[] {0.0},
-            new double[] {0.0},
-            new double[] {0.0},
-            new double[] {0.0}));
+    driveRobotRelative(speeds);
   }
 
   public void followTrajectory(SwerveSample sample) {
