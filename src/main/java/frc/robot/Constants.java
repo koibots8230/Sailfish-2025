@@ -129,9 +129,9 @@ public class Constants {
     public static final Angle IN_POSITION = Angle.ofBaseUnits(0.15, Radians);
 
     public static final AngularVelocity MAX_VELOCITY =
-        AngularVelocity.ofBaseUnits(14 * Math.PI, Units.RadiansPerSecond);
+        AngularVelocity.ofBaseUnits(40 * Math.PI, Units.RadiansPerSecond);
     public static final AngularAcceleration MAX_ACCELRATION =
-        AngularAcceleration.ofBaseUnits(Math.PI * 16, Units.RadiansPerSecondPerSecond);
+        AngularAcceleration.ofBaseUnits(Math.PI * 40, Units.RadiansPerSecondPerSecond);
 
     public static final PIDGains PID = new PIDGains.Builder().kp(1.8).build();
     public static final FeedforwardGains FEEDFORWARD =
@@ -199,7 +199,7 @@ public class Constants {
     public static final LinearVelocity MAX_VELOCITY =
         LinearVelocity.ofBaseUnits(24, Units.MetersPerSecond);
     public static final LinearAcceleration MAX_ACCELRATION =
-        LinearAcceleration.ofBaseUnits(6, Units.MetersPerSecondPerSecond);
+        LinearAcceleration.ofBaseUnits(13, Units.MetersPerSecondPerSecond);
 
     public static final double CONVERSION_FACTOR = (0.05207 * Math.PI) * 2;
 
