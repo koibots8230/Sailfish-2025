@@ -99,8 +99,8 @@ public class Constants {
 
     public static final Distance RED_REEF_OFFSET = Meters.of(8.569706);
 
-    public static final PIDGains TRANSLATE_PID = new PIDGains.Builder().kp(4.5).build();
-    public static final PIDGains ANGLE_PID = new PIDGains.Builder().kp(2.5).build();
+    public static final PIDGains TRANSLATE_PID = new PIDGains.Builder().kp(5).build();
+    public static final PIDGains ANGLE_PID = new PIDGains.Builder().kp(2.75).build();
 
     public static final Angle DIRECTION_ANGLE_RANGE_CLOSE = Radians.of(Math.PI / 1.85);
 

@@ -120,6 +120,22 @@ public class EndEffector extends SubsystemBase {
         Commands.runOnce(() -> this.setVelocity(0), this));
   }
 
+  public Command releaseAlgaeRemover() {
+    return Commands.sequence(
+      this.setVelocityCommand(-150),
+      Commands.waitUntil(
+                () ->
+                    !(sensorDistance.in(Units.Millimeters)
+                        <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters))),
+      this.setVelocityCommand(150),
+      Commands.waitUntil(
+                () ->
+                    (sensorDistance.in(Units.Millimeters)
+                        <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters))),
+      this.setVelocityCommand(0)
+    );
+  }
+
   public Command setVelocityCommand(double velocity) {
     return Commands.runOnce(() -> this.setVelocity(velocity), this);
   }

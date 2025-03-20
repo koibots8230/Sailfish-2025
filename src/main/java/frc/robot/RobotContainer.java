@@ -181,15 +181,18 @@ public class RobotContainer {
         .onTrue(
             Commands.sequence(
                 driveToFrontLeftRightReef.resetOdometry(),
-                Commands.parallel(driveToFrontLeftRightReef.cmd())));
+                Commands.parallel(
+                    endEffector.releaseAlgaeRemover(),
+                    driveToFrontLeftRightReef.cmd()
+                )));
 
     driveToFrontLeftRightReef
         .done()
         .onTrue(
             Commands.sequence(
+                ScoreCommands.levelTwo(elevator, endEffector),
                 Commands.deadline(
                     new WaitCommand(1.0), ScoreCommands.removeL3Algae(elevator, endEffector)),
-                ScoreCommands.levelThree(elevator, endEffector),
                 moveToMiddleReef.cmd()));
 
     moveToMiddleReef
@@ -203,9 +206,12 @@ public class RobotContainer {
     moveToBackReef
         .done()
         .onTrue(
+            Commands.sequence(
             Commands.deadline(
                 new WaitCommand(1),
-                ScoreCommands.removeL3Algae(elevator, endEffector))); // might be level two
+                ScoreCommands.removeL3Algae(elevator, endEffector)),
+            elevator.setPositionCommand(ElevatorConstants.INTAKE_POSITION),
+            endEffector.setVelocityCommand(0)));
 
     return routine;
   }
