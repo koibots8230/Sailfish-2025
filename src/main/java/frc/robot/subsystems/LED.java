@@ -46,7 +46,7 @@ public class LED extends SubsystemBase {
   }
 
   private void setLED(State state) {
-    System.out.println(state);
+    System.out.println("set led");
     if (currentState == state) {
       return;
     }
@@ -87,6 +87,7 @@ public class LED extends SubsystemBase {
     if (phase == Phase.teleop) {
       setLED(State.teleop);
     }
+    System.out.println("reset to phase");
   }
 
   private void activateXanderMode() {
@@ -109,6 +110,7 @@ public class LED extends SubsystemBase {
   public void autoInit() {
     phase = Phase.auto;
     phaseCommand();
+    System.out.println("led autoinit");
   }
 
   public void teleopInit() {

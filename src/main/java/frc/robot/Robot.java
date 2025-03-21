@@ -46,6 +46,7 @@ public class Robot extends TimedRobot {
     }
 
     m_robotContainer.autoInit();
+    System.out.println("robot autoinit");
   }
 
   @Override
