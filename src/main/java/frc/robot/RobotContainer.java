@@ -163,8 +163,6 @@ public class RobotContainer {
     swerve.setDefaultCommand(
         swerve.driveFieldRelativeCommand(
             xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
-
-    endEffector.setDefaultCommand(endEffector.holdCoralCommand());
   }
 
   public void setAlliance() {
@@ -174,6 +172,8 @@ public class RobotContainer {
 
   public void teleopInit() {
     this.defualtCommands();
+
+    endEffector.setDefaultCommand(endEffector.holdCoralCommand());
   }
 
     private AutoRoutine centerScore() {
@@ -207,10 +207,9 @@ public class RobotContainer {
         .onTrue(
             Commands.sequence(
                 driveToFrontLeftRightReef.resetOdometry(),
-                Commands.parallel(
-                    endEffector.releaseAlgaeRemover(),
-                    driveToFrontLeftRightReef.cmd()
-                )));
+                endEffector.releaseAlgaeRemover(),
+                Commands.print("HIIII"),
+                driveToFrontLeftRightReef.cmd()));
 
     driveToFrontLeftRightReef
         .done()
@@ -218,7 +217,8 @@ public class RobotContainer {
             Commands.sequence(
                 ScoreCommands.levelTwo(elevator, endEffector),
                 Commands.deadline(
-                    new WaitCommand(1.0), ScoreCommands.removeL3Algae(elevator, endEffector)),
+                    new WaitCommand(2), ScoreCommands.removeL3Algae(elevator, endEffector)),
+                ScoreCommands.basePosition(elevator, endEffector),
                 moveToMiddleReef.cmd()));
 
     moveToMiddleReef
@@ -226,7 +226,8 @@ public class RobotContainer {
         .onTrue(
             Commands.sequence(
                 Commands.deadline(
-                    new WaitCommand(1), ScoreCommands.removeL3Algae(elevator, endEffector)),
+                    new WaitCommand(2), ScoreCommands.removeL2Algae(elevator, endEffector)),
+                ScoreCommands.basePosition(elevator, endEffector),
                 moveToBackReef.cmd()));
 
     moveToBackReef
@@ -234,10 +235,9 @@ public class RobotContainer {
         .onTrue(
             Commands.sequence(
             Commands.deadline(
-                new WaitCommand(1),
+                new WaitCommand(2),
                 ScoreCommands.removeL3Algae(elevator, endEffector)),
-            elevator.setPositionCommand(ElevatorConstants.INTAKE_POSITION),
-            endEffector.setVelocityCommand(0)));
+            ScoreCommands.basePosition(elevator, endEffector)));
 
     return routine;
   }

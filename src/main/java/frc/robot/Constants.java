@@ -81,7 +81,7 @@ public class Constants {
 
     public static final PIDGains X_CONTROLLER = new PIDGains.Builder().kp(7.0).build();
     public static final PIDGains Y_CONTROLLER = new PIDGains.Builder().kp(7.0).build();
-    public static final PIDGains HEADING_CONTROLLER = new PIDGains.Builder().kp(3.8).build();
+    public static final PIDGains HEADING_CONTROLLER = new PIDGains.Builder().kp(3.75).build();
   }
 
   public static class AlignConstants {
@@ -192,7 +192,7 @@ public class Constants {
     public static final Distance L3_POSITION = Distance.ofBaseUnits(2.04, Units.Meters);
 
     public static final Distance L2_ALGAE_POSITION = Distance.ofBaseUnits(0.67, Units.Meters);
-    public static final Distance L3_ALGAE_POSITION = Distance.ofBaseUnits(1.5, Units.Meters);
+    public static final Distance L3_ALGAE_POSITION = Distance.ofBaseUnits(1.55, Units.Meters);
 
     public static final PIDGains PID = new PIDGains.Builder().kp(6).build(); // 3.3
     public static final FeedforwardGains FEEDFORWARD =

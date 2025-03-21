@@ -18,6 +18,7 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -91,7 +92,7 @@ public class EndEffector extends SubsystemBase {
           Distance.ofBaseUnits(laserCAN.getMeasurement().distance_mm, Units.Millimeters);
     }
 
-    if (hasCoral()) {
+    if (hasCoral() && !RobotState.isDisabled()) {
       state = EndEffectorState.hasCoral;
     }
   }
@@ -160,10 +161,7 @@ public class EndEffector extends SubsystemBase {
       this.setVelocityCommand(-EndEffectorConstants.HOLDING_SPEED),
       Commands.waitSeconds(0.3),
       this.setVelocityCommand(EndEffectorConstants.HOLDING_SPEED),
-      Commands.waitUntil(
-                () ->
-                    (sensorDistance.in(Units.Millimeters)
-                        <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters))),
+      Commands.waitUntil(this::hasCoral),
       this.setVelocityCommand(0)
     );
   }
