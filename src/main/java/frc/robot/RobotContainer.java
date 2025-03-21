@@ -157,6 +157,8 @@ public class RobotContainer {
     swerve.setDefaultCommand(
         swerve.driveFieldRelativeCommand(
             xboxController::getLeftY, xboxController::getLeftX, xboxController::getRightX));
+
+    endEffector.setDefaultCommand(endEffector.holdCoralCommand());
   }
 
   public void setAlliance() {
@@ -346,12 +348,10 @@ public class RobotContainer {
         .active()
         .onTrue(
             Commands.sequence(
-                Commands.sequence(
-                    endEffector.setVelocityCommand(-300),
-                    Commands.waitSeconds(0.1),
-                    endEffector.setVelocityCommand(0)),
                 leave.resetOdometry(),
-                leave.cmd()));
+                Commands.parallel(
+                    endEffector.releaseAlgaeRemover(),
+                    leave.cmd())));
 
     return routine;
   }

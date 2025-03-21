@@ -21,6 +21,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.util.EndEffectorState;
 import frc.robot.Constants.EndEffectorConstants;
 
 @Logged
@@ -42,6 +43,8 @@ public class EndEffector extends SubsystemBase {
   Voltage voltage;
 
   Distance sensorDistance;
+
+  EndEffectorState state;
 
   public EndEffector() {
     motor = new SparkMax(EndEffectorConstants.MOTOR_ID, MotorType.kBrushless);
@@ -73,6 +76,8 @@ public class EndEffector extends SubsystemBase {
     setpoint = 0;
 
     sensorDistance = Millimeters.of(0);
+
+    state = EndEffectorState.hasCoral;
   }
 
   @Override
@@ -97,6 +102,21 @@ public class EndEffector extends SubsystemBase {
     setpoint = velocity;
   }
 
+  private void holdCoral() {
+    if (state == EndEffectorState.hasCoral && !(sensorDistance.in(Units.Millimeters)
+                        <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters))) {
+      setpoint = 300;
+      pid.setReference(300, ControlType.kVelocity);
+    } else {
+      setpoint = 0;
+      pid.setReference(0, ControlType.kVelocity);
+    }
+  }
+
+  private void setState(EndEffectorState state) {
+    this.state = state;
+  }
+
   public Command intakeCommand() {
     return Commands.sequence(
         Commands.race(
@@ -105,7 +125,8 @@ public class EndEffector extends SubsystemBase {
                 () ->
                     sensorDistance.in(Units.Millimeters)
                         <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters))),
-        Commands.runOnce(() -> this.setVelocity(0), this));
+        Commands.runOnce(() -> this.setVelocity(0), this),
+        Commands.runOnce(() -> this.setState(EndEffectorState.hasCoral), this));
   }
 
   public Command outtakeCommand() {
@@ -117,23 +138,25 @@ public class EndEffector extends SubsystemBase {
                     !(sensorDistance.in(Units.Millimeters)
                         <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters)))),
         Commands.waitSeconds(0.5),
-        Commands.runOnce(() -> this.setVelocity(0), this));
+        Commands.runOnce(() -> this.setVelocity(0), this),
+        Commands.runOnce(() -> this.setState(EndEffectorState.noCoral), this));
   }
 
   public Command releaseAlgaeRemover() {
     return Commands.sequence(
       this.setVelocityCommand(-150),
-      Commands.waitUntil(
-                () ->
-                    !(sensorDistance.in(Units.Millimeters)
-                        <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters))),
-      this.setVelocityCommand(150),
+      Commands.waitSeconds(0.8),
+      this.setVelocityCommand(300),
       Commands.waitUntil(
                 () ->
                     (sensorDistance.in(Units.Millimeters)
                         <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters))),
       this.setVelocityCommand(0)
     );
+  }
+
+  public Command holdCoralCommand() {
+    return Commands.run(this::holdCoral, this);
   }
 
   public Command setVelocityCommand(double velocity) {
