@@ -75,9 +75,9 @@ public class EndEffector extends SubsystemBase {
 
     setpoint = 0;
 
-    sensorDistance = Millimeters.of(0);
+    sensorDistance = (laserCAN.getMeasurement() == null) ? Millimeters.of(0) : Distance.ofBaseUnits(laserCAN.getMeasurement().distance_mm, Units.Millimeters);;
 
-    state = EndEffectorState.hasCoral;
+    state = this.hasCoral() ? EndEffectorState.hasCoral : EndEffectorState.noCoral;
   }
 
   @Override
@@ -105,8 +105,8 @@ public class EndEffector extends SubsystemBase {
   private void holdCoral() {
     if (state == EndEffectorState.hasCoral && !(sensorDistance.in(Units.Millimeters)
                         <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters))) {
-      setpoint = 300;
-      pid.setReference(300, ControlType.kVelocity);
+      setpoint = EndEffectorConstants.HOLDING_SPEED;
+      pid.setReference(EndEffectorConstants.HOLDING_SPEED, ControlType.kVelocity);
     } else {
       setpoint = 0;
       pid.setReference(0, ControlType.kVelocity);
@@ -115,6 +115,11 @@ public class EndEffector extends SubsystemBase {
 
   private void setState(EndEffectorState state) {
     this.state = state;
+  }
+
+  public boolean hasCoral() {
+    return sensorDistance.in(Units.Millimeters)
+                        <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters);
   }
 
   public Command intakeCommand() {
@@ -144,9 +149,9 @@ public class EndEffector extends SubsystemBase {
 
   public Command releaseAlgaeRemover() {
     return Commands.sequence(
-      this.setVelocityCommand(-150),
+      this.setVelocityCommand(-EndEffectorConstants.HOLDING_SPEED),
       Commands.waitSeconds(0.8),
-      this.setVelocityCommand(300),
+      this.setVelocityCommand(EndEffectorConstants.HOLDING_SPEED),
       Commands.waitUntil(
                 () ->
                     (sensorDistance.in(Units.Millimeters)
@@ -161,5 +166,9 @@ public class EndEffector extends SubsystemBase {
 
   public Command setVelocityCommand(double velocity) {
     return Commands.runOnce(() -> this.setVelocity(velocity), this);
+  }
+
+  public Command setStateCommand(EndEffectorState state) {
+    return Commands.runOnce(() -> this.setState(state), this);
   }
 }

@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.EndEffectorState;
 import frc.lib.util.ReefAlignState;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.EndEffectorConstants;
@@ -105,7 +106,11 @@ public class RobotContainer {
     Trigger reverseIntake = new Trigger(xboxController.leftTrigger());
     reverseIntake.onTrue(
         IntakeCommands.reverseCommand(intake, intakePivot, indexer, elevator, endEffector));
-    reverseIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector));
+    reverseIntake.onFalse(
+        Commands.sequence(
+            IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector),
+            Commands.either(Commands.none(), endEffector.setStateCommand(EndEffectorState.noCoral), endEffector::hasCoral)
+        ));
 
     Trigger reverseEffectorIndexer = xboxController.x();
     reverseEffectorIndexer.onTrue(
