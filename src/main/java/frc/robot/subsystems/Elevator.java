@@ -58,7 +58,7 @@ public class Elevator extends SubsystemBase {
   private Distance position;
   private LinearVelocity velocity;
   private Voltage mainVoltage;
-  private Voltage secondaryVoltage;
+  //private Voltage secondaryVoltage;
   private Current mainCurrent;
 
   public Elevator() {
