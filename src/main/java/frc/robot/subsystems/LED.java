@@ -46,7 +46,6 @@ public class LED extends SubsystemBase {
   }
 
   private void setLED(State state) {
-    System.out.println("set led");
     if (currentState == state) {
       return;
     }
@@ -92,30 +91,29 @@ public class LED extends SubsystemBase {
 
   private void activateXanderMode() {
     if (currentState == State.xanderMode) {
-      phaseCommand();
+      resetLEDsToPhase();
     } else {
-      LEDCommand(State.xanderMode);
+      setLED(State.xanderMode);
     }
   }
 
   public void periodic() {
     if (doesRobotHaveCoral.getAsBoolean() && currentState != State.hasCoral) {
-      LEDCommand(State.hasCoral);
-    } else if (currentState == State.hasCoral) {
-      phaseCommand();
+      setLED(State.hasCoral);
+    } else if (!doesRobotHaveCoral.getAsBoolean() && currentState == State.hasCoral) {
+      resetLEDsToPhase();
     }
-    System.out.println(currentState);
   }
 
-  public void autoInit() {
+  private void autoInit() {
     phase = Phase.auto;
-    phaseCommand();
+    resetLEDsToPhase();
     System.out.println("led autoinit");
   }
 
-  public void teleopInit() {
+  private void teleopInit() {
     phase = Phase.teleop;
-    phaseCommand();
+    resetLEDsToPhase();
   }
 
   public Command LEDCommand(State state) {
@@ -131,6 +129,7 @@ public class LED extends SubsystemBase {
   }
 
   public Command setAutoCommand() {
+    System.out.println("auto");
     return Commands.runOnce(() -> this.autoInit(), this);
   }
 

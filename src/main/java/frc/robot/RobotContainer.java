@@ -160,13 +160,13 @@ public class RobotContainer {
   }
 
   public void autoInit() {
-    LED.setAutoCommand();
+    LED.setAutoCommand().schedule();
     System.out.println("robot container autoinit");
   }
 
   public void teleopInit() {
     this.defualtCommands();
-    LED.setTeleopCommand();
+    LED.setTeleopCommand().schedule();
   }
 
   private AutoRoutine SeFLRRf() {
