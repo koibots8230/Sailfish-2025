@@ -109,6 +109,7 @@ public class RobotContainer {
     reverseIntake.onFalse(
         Commands.sequence(
             IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector),
+            Commands.waitSeconds(0.15),
             Commands.either(Commands.none(), endEffector.setStateCommand(EndEffectorState.noCoral), endEffector::hasCoral)
         ));
 

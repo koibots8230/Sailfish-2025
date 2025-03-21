@@ -90,6 +90,10 @@ public class EndEffector extends SubsystemBase {
       sensorDistance =
           Distance.ofBaseUnits(laserCAN.getMeasurement().distance_mm, Units.Millimeters);
     }
+
+    if (hasCoral()) {
+      state = EndEffectorState.hasCoral;
+    }
   }
 
   @Override
@@ -107,6 +111,10 @@ public class EndEffector extends SubsystemBase {
                         <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters))) {
       setpoint = EndEffectorConstants.HOLDING_SPEED;
       pid.setReference(EndEffectorConstants.HOLDING_SPEED, ControlType.kVelocity);
+                        }else if (sensorDistance.in(Units.Millimeters)
+                        >= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters) && sensorDistance.in(Units.Millimeters)
+                        <= EndEffectorConstants.ALGAE_REMOVER_DISTANCE.in(Units.Millimeters)) {
+      this.releaseAlgaeRemover().schedule();
     } else {
       setpoint = 0;
       pid.setReference(0, ControlType.kVelocity);
@@ -150,7 +158,7 @@ public class EndEffector extends SubsystemBase {
   public Command releaseAlgaeRemover() {
     return Commands.sequence(
       this.setVelocityCommand(-EndEffectorConstants.HOLDING_SPEED),
-      Commands.waitSeconds(0.8),
+      Commands.waitSeconds(0.3),
       this.setVelocityCommand(EndEffectorConstants.HOLDING_SPEED),
       Commands.waitUntil(
                 () ->
@@ -162,6 +170,10 @@ public class EndEffector extends SubsystemBase {
 
   public Command holdCoralCommand() {
     return Commands.run(this::holdCoral, this);
+  }
+
+  public Command removeAlgaeCommand() {
+    return Commands.run(() -> this.setVelocity(EndEffectorConstants.ALGAE_REMOVAL_SPEED), this);
   }
 
   public Command setVelocityCommand(double velocity) {

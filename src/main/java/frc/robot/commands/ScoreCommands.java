@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.lib.util.EndEffectorState;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.EndEffectorConstants;
 import frc.robot.subsystems.Elevator;
@@ -28,20 +29,22 @@ public class ScoreCommands {
   public static Command basePosition(Elevator elevator, EndEffector endEffector) {
     return Commands.sequence(
         elevator.setPositionCommand(ElevatorConstants.INTAKE_POSITION),
-        endEffector.setVelocityCommand(0));
+        endEffector.setVelocityCommand(0),
+        Commands.waitSeconds(0.15),
+        Commands.either(Commands.none(), endEffector.setStateCommand(EndEffectorState.noCoral), endEffector::hasCoral));
   }
 
   public static Command removeL2Algae(Elevator elevator, EndEffector endEffector) {
     return Commands.sequence(
         elevator.setPositionCommand(ElevatorConstants.L2_ALGAE_POSITION),
         Commands.waitUntil(() -> elevator.atPosition(ElevatorConstants.L2_ALGAE_POSITION)),
-        endEffector.setVelocityCommand(EndEffectorConstants.ALGAE_REMOVAL_SPEED));
+        endEffector.removeAlgaeCommand());
   }
 
   public static Command removeL3Algae(Elevator elevator, EndEffector endEffector) {
     return Commands.sequence(
         elevator.setPositionCommand(ElevatorConstants.L3_ALGAE_POSITION),
         Commands.waitUntil(() -> elevator.atPosition(ElevatorConstants.L3_ALGAE_POSITION)),
-        endEffector.setVelocityCommand(EndEffectorConstants.ALGAE_REMOVAL_SPEED));
+        endEffector.removeAlgaeCommand());
   }
 }

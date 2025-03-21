@@ -112,7 +112,7 @@ public class Constants {
   }
 
   public static class IntakeConstants {
-    public static final double INTAKE_VELOCITY = 3000;
+    public static final double INTAKE_VELOCITY = 3750;
     public static final double REVERSE_INTAKE_VELOCITY = -2000;
 
     public static final PIDGains PID = new PIDGains.Builder().kp(0.00006).build();
@@ -148,8 +148,8 @@ public class Constants {
   }
 
   public static class IndexerConstants {
-    public static final double TOP_INDEX_VELOCITY = 3000;
-    public static final double BOTTOM_INDEX_VELOCITY = 1500;
+    public static final double TOP_INDEX_VELOCITY = 3500;
+    public static final double BOTTOM_INDEX_VELOCITY = 1750;
 
     public static final double TOP_REVERSE_VELOCITY = -3000;
     public static final double BOTTOM_REVERSE_VELOCITY = -1500;
@@ -167,7 +167,7 @@ public class Constants {
   }
 
   public static class EndEffectorConstants {
-    public static final double INTAKE_SPEED = 500;
+    public static final double INTAKE_SPEED = 250;
     public static final double OUTTAKE_SPEED = 750;
     public static final double HOLDING_SPEED = 200;
     public static final double ALGAE_REMOVAL_SPEED = 1500;
@@ -177,6 +177,7 @@ public class Constants {
         new FeedforwardGains.Builder().kv(0.0003).build();
 
     public static final Distance TRIGGER_DISTANCE = Distance.ofBaseUnits(85, Units.Millimeters);
+    public static final Distance ALGAE_REMOVER_DISTANCE = Distance.ofBaseUnits(175, Units.Millimeters);
 
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(40, Units.Amps);
 
