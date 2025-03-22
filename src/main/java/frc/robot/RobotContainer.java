@@ -13,9 +13,11 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.EndEffectorState;
 import frc.lib.util.ReefAlignState;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.EndEffectorConstants;
@@ -103,20 +105,32 @@ public class RobotContainer {
 
     Trigger reverseIntake = new Trigger(xboxController.leftTrigger());
     reverseIntake.onTrue(
-        IntakeCommands.reverseCommand(intake, intakePivot, indexer, elevator, endEffector, LED));
+        IntakeCommands.reverseCommand(intake, intakePivot, indexer, elevator, endEffector));
     reverseIntake.onFalse(
-        IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector, LED));
+        Commands.sequence(
+            IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector),
+            Commands.waitSeconds(0.15),
+            Commands.either(
+                Commands.none(),
+                endEffector.setStateCommand(EndEffectorState.noCoral),
+                endEffector::hasCoral)));
+
+    Trigger reverseEffectorIndexer = xboxController.x();
+    reverseEffectorIndexer.onTrue(
+        IntakeCommands.reverseEffectorIndexerCommand(indexer, elevator, endEffector));
+    reverseEffectorIndexer.onFalse(
+        IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector));
 
     Trigger gotoLevelThree = new Trigger(xboxController.y());
     gotoLevelThree.onTrue(
-        Commands.sequence(
+        Commands.parallel(
             ScoreCommands.levelThree(elevator, endEffector),
             swerve.setReefAlignStateCommand(ReefAlignState.disabled)));
     gotoLevelThree.onFalse(ScoreCommands.basePosition(elevator, endEffector));
 
     Trigger gotoLevelTwo = new Trigger(xboxController.a());
     gotoLevelTwo.onTrue(
-        Commands.sequence(
+        Commands.parallel(
             ScoreCommands.levelTwo(elevator, endEffector),
             swerve.setReefAlignStateCommand(ReefAlignState.disabled)));
     gotoLevelTwo.onFalse(ScoreCommands.basePosition(elevator, endEffector));
@@ -134,6 +148,9 @@ public class RobotContainer {
 
     Trigger alignLeft = xboxController.leftBumper();
     alignLeft.onTrue(swerve.setReefAlignStateCommand(ReefAlignState.leftSide));
+
+    Trigger cancelAlign = xboxController.b();
+    cancelAlign.onTrue(swerve.setReefAlignStateCommand(ReefAlignState.disabled));
 
     Trigger prepClimb = new Trigger(() -> operatorPad.getRawButton(5));
     prepClimb.onTrue(ClimbCommands.prepClimb(climber, LED));
@@ -166,20 +183,100 @@ public class RobotContainer {
   public void teleopInit() {
     this.defualtCommands();
     LED.setTeleopCommand().schedule();
+
+    endEffector.setDefaultCommand(endEffector.holdCoralCommand());
+  }
+
+  private AutoRoutine centerScore() {
+    AutoRoutine routine = autoFactory.newRoutine("taxi");
+
+    AutoTrajectory leave = routine.trajectory("MiddleScore");
+
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                leave.resetOdometry(),
+                Commands.parallel(leave.cmd(), endEffector.releaseAlgaeRemover()),
+                ScoreCommands.levelTwo(elevator, endEffector)));
+
+    return routine;
   }
 
   private AutoRoutine SeFLRRf() {
     AutoRoutine routine = autoFactory.newRoutine("taxi");
 
     AutoTrajectory driveToFrontLeftRightReef = routine.trajectory("SeFLRRf");
+    AutoTrajectory moveToMiddleReef = routine.trajectory("FLRRfMeBLMRf");
+    AutoTrajectory moveToBackReef = routine.trajectory("BLRfMeBMMRf");
 
     routine
         .active()
         .onTrue(
             Commands.sequence(
-                driveToFrontLeftRightReef.resetOdometry(), driveToFrontLeftRightReef.cmd()));
+                driveToFrontLeftRightReef.resetOdometry(),
+                endEffector.releaseAlgaeRemover(),
+                Commands.print("HIIII"),
+                driveToFrontLeftRightReef.cmd()));
 
-    driveToFrontLeftRightReef.done().onTrue(ScoreCommands.levelTwo(elevator, endEffector));
+    driveToFrontLeftRightReef
+        .done()
+        .onTrue(
+            Commands.sequence(
+                ScoreCommands.levelTwo(elevator, endEffector),
+                Commands.deadline(
+                    new WaitCommand(2), ScoreCommands.removeL3Algae(elevator, endEffector)),
+                ScoreCommands.basePosition(elevator, endEffector),
+                moveToMiddleReef.cmd()));
+
+    moveToMiddleReef
+        .done()
+        .onTrue(
+            Commands.sequence(
+                Commands.deadline(
+                    new WaitCommand(2), ScoreCommands.removeL2Algae(elevator, endEffector)),
+                ScoreCommands.basePosition(elevator, endEffector),
+                moveToBackReef.cmd()));
+
+    moveToBackReef
+        .done()
+        .onTrue(
+            Commands.sequence(
+                Commands.deadline(
+                    new WaitCommand(2), ScoreCommands.removeL3Algae(elevator, endEffector)),
+                ScoreCommands.basePosition(elevator, endEffector)));
+
+    return routine;
+  }
+
+  private AutoRoutine SeFRLRf() {
+    AutoRoutine routine = autoFactory.newRoutine("taxi");
+
+    AutoTrajectory SeFLRRfTy = routine.trajectory("SeFLRRf");
+    AutoTrajectory frontToBackRight = routine.trajectory("FRLRfMeBRMRf");
+    AutoTrajectory backRightToBackMiddle = routine.trajectory("BRMRfMeBMMRf");
+
+    routine.active().onTrue(Commands.sequence(SeFLRRfTy.resetOdometry(), SeFLRRfTy.cmd()));
+
+    SeFLRRfTy.done()
+        .onTrue(
+            Commands.sequence(
+                Commands.deadline(
+                    new WaitCommand(1), ScoreCommands.removeL3Algae(elevator, endEffector)),
+                ScoreCommands.levelTwo(elevator, endEffector),
+                frontToBackRight.cmd()));
+    frontToBackRight
+        .done()
+        .onFalse(
+            Commands.sequence(
+                Commands.deadline(
+                    new WaitCommand(1), ScoreCommands.removeL3Algae(elevator, endEffector)),
+                backRightToBackMiddle.cmd()));
+    backRightToBackMiddle
+        .done()
+        .onTrue(
+            Commands.deadline(
+                new WaitCommand(1), ScoreCommands.removeL3Algae(elevator, endEffector)));
 
     return routine;
   }
@@ -264,12 +361,8 @@ public class RobotContainer {
         .active()
         .onTrue(
             Commands.sequence(
-                Commands.sequence(
-                    endEffector.setVelocityCommand(-300),
-                    Commands.waitSeconds(0.1),
-                    endEffector.setVelocityCommand(0)),
                 leave.resetOdometry(),
-                leave.cmd()));
+                Commands.parallel(endEffector.releaseAlgaeRemover(), leave.cmd())));
 
     return routine;
   }

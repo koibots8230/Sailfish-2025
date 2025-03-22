@@ -18,9 +18,11 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.util.EndEffectorState;
 import frc.robot.Constants.EndEffectorConstants;
 
 @Logged
@@ -42,6 +44,8 @@ public class EndEffector extends SubsystemBase {
   Voltage voltage;
 
   public Distance sensorDistance;
+
+  EndEffectorState state;
 
   public EndEffector() {
     motor = new SparkMax(EndEffectorConstants.MOTOR_ID, MotorType.kBrushless);
@@ -72,7 +76,13 @@ public class EndEffector extends SubsystemBase {
 
     setpoint = 0;
 
-    sensorDistance = Millimeters.of(0);
+    sensorDistance =
+        (laserCAN.getMeasurement() == null)
+            ? Millimeters.of(0)
+            : Distance.ofBaseUnits(laserCAN.getMeasurement().distance_mm, Units.Millimeters);
+    ;
+
+    state = this.hasCoral() ? EndEffectorState.hasCoral : EndEffectorState.noCoral;
   }
 
   @Override
@@ -84,6 +94,10 @@ public class EndEffector extends SubsystemBase {
     if (laserCAN.getMeasurement() != null) {
       sensorDistance =
           Distance.ofBaseUnits(laserCAN.getMeasurement().distance_mm, Units.Millimeters);
+    }
+
+    if (hasCoral() && !RobotState.isDisabled()) {
+      state = EndEffectorState.hasCoral;
     }
   }
 
@@ -102,6 +116,32 @@ public class EndEffector extends SubsystemBase {
     setpoint = velocity;
   }
 
+  private void holdCoral() {
+    if (state == EndEffectorState.hasCoral
+        && !(sensorDistance.in(Units.Millimeters)
+            <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters))) {
+      setpoint = EndEffectorConstants.HOLDING_SPEED;
+      pid.setReference(EndEffectorConstants.HOLDING_SPEED, ControlType.kVelocity);
+    } else if (sensorDistance.in(Units.Millimeters)
+            >= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters)
+        && sensorDistance.in(Units.Millimeters)
+            <= EndEffectorConstants.ALGAE_REMOVER_DISTANCE.in(Units.Millimeters)) {
+      this.releaseAlgaeRemover().schedule();
+    } else {
+      setpoint = 0;
+      pid.setReference(0, ControlType.kVelocity);
+    }
+  }
+
+  private void setState(EndEffectorState state) {
+    this.state = state;
+  }
+
+  public boolean hasCoral() {
+    return sensorDistance.in(Units.Millimeters)
+        <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters);
+  }
+
   public Command intakeCommand() {
     return Commands.sequence(
         Commands.race(
@@ -110,7 +150,8 @@ public class EndEffector extends SubsystemBase {
                 () ->
                     sensorDistance.in(Units.Millimeters)
                         <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters))),
-        Commands.runOnce(() -> this.setVelocity(0), this));
+        Commands.runOnce(() -> this.setVelocity(0), this),
+        Commands.runOnce(() -> this.setState(EndEffectorState.hasCoral), this));
   }
 
   public Command outtakeCommand() {
@@ -122,10 +163,32 @@ public class EndEffector extends SubsystemBase {
                     !(sensorDistance.in(Units.Millimeters)
                         <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters)))),
         Commands.waitSeconds(0.5),
-        Commands.runOnce(() -> this.setVelocity(0), this));
+        Commands.runOnce(() -> this.setVelocity(0), this),
+        Commands.runOnce(() -> this.setState(EndEffectorState.noCoral), this));
+  }
+
+  public Command releaseAlgaeRemover() {
+    return Commands.sequence(
+        this.setVelocityCommand(-EndEffectorConstants.HOLDING_SPEED),
+        Commands.waitSeconds(0.3),
+        this.setVelocityCommand(EndEffectorConstants.HOLDING_SPEED),
+        Commands.waitUntil(this::hasCoral),
+        this.setVelocityCommand(0));
+  }
+
+  public Command holdCoralCommand() {
+    return Commands.run(this::holdCoral, this);
+  }
+
+  public Command removeAlgaeCommand() {
+    return Commands.run(() -> this.setVelocity(EndEffectorConstants.ALGAE_REMOVAL_SPEED), this);
   }
 
   public Command setVelocityCommand(double velocity) {
     return Commands.runOnce(() -> this.setVelocity(velocity), this);
+  }
+
+  public Command setStateCommand(EndEffectorState state) {
+    return Commands.runOnce(() -> this.setState(state), this);
   }
 }
