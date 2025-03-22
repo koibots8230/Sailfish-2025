@@ -81,7 +81,7 @@ public class Constants {
 
     public static final PIDGains X_CONTROLLER = new PIDGains.Builder().kp(7.0).build();
     public static final PIDGains Y_CONTROLLER = new PIDGains.Builder().kp(7.0).build();
-    public static final PIDGains HEADING_CONTROLLER = new PIDGains.Builder().kp(3.8).build();
+    public static final PIDGains HEADING_CONTROLLER = new PIDGains.Builder().kp(3.75).build();
   }
 
   public static class AlignConstants {
@@ -99,8 +99,8 @@ public class Constants {
 
     public static final Distance RED_REEF_OFFSET = Meters.of(8.569706);
 
-    public static final PIDGains TRANSLATE_PID = new PIDGains.Builder().kp(4).build();
-    public static final PIDGains ANGLE_PID = new PIDGains.Builder().kp(2.5).build();
+    public static final PIDGains TRANSLATE_PID = new PIDGains.Builder().kp(5).build();
+    public static final PIDGains ANGLE_PID = new PIDGains.Builder().kp(2.75).build();
 
     public static final Angle DIRECTION_ANGLE_RANGE_CLOSE = Radians.of(Math.PI / 1.85);
 
@@ -112,7 +112,7 @@ public class Constants {
   }
 
   public static class IntakeConstants {
-    public static final double INTAKE_VELOCITY = 3000;
+    public static final double INTAKE_VELOCITY = 3750;
     public static final double REVERSE_INTAKE_VELOCITY = -2000;
 
     public static final PIDGains PID = new PIDGains.Builder().kp(0.00006).build();
@@ -148,8 +148,8 @@ public class Constants {
   }
 
   public static class IndexerConstants {
-    public static final double TOP_INDEX_VELOCITY = 3000;
-    public static final double BOTTOM_INDEX_VELOCITY = 1500;
+    public static final double TOP_INDEX_VELOCITY = 3500;
+    public static final double BOTTOM_INDEX_VELOCITY = 1750;
 
     public static final double TOP_REVERSE_VELOCITY = -3000;
     public static final double BOTTOM_REVERSE_VELOCITY = -1500;
@@ -167,15 +167,18 @@ public class Constants {
   }
 
   public static class EndEffectorConstants {
-    public static final double INTAKE_SPEED = 750;
-    public static final double OUTTAKE_SPEED = 1000;
+    public static final double INTAKE_SPEED = 250;
+    public static final double OUTTAKE_SPEED = 750;
+    public static final double HOLDING_SPEED = 200;
     public static final double ALGAE_REMOVAL_SPEED = 1500;
 
-    public static final PIDGains PID = new PIDGains.Builder().kp(0.0001).build();
+    public static final PIDGains PID = new PIDGains.Builder().kp(0.00015).build();
     public static final FeedforwardGains FEEDFORWARD =
-        new FeedforwardGains.Builder().kv(0.0002).build();
+        new FeedforwardGains.Builder().kv(0.0003).build();
 
     public static final Distance TRIGGER_DISTANCE = Distance.ofBaseUnits(85, Units.Millimeters);
+    public static final Distance ALGAE_REMOVER_DISTANCE =
+        Distance.ofBaseUnits(175, Units.Millimeters);
 
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(40, Units.Amps);
 
@@ -190,7 +193,7 @@ public class Constants {
     public static final Distance L3_POSITION = Distance.ofBaseUnits(2.04, Units.Meters);
 
     public static final Distance L2_ALGAE_POSITION = Distance.ofBaseUnits(0.67, Units.Meters);
-    public static final Distance L3_ALGAE_POSITION = Distance.ofBaseUnits(1.5, Units.Meters);
+    public static final Distance L3_ALGAE_POSITION = Distance.ofBaseUnits(1.55, Units.Meters);
 
     public static final PIDGains PID = new PIDGains.Builder().kp(6).build(); // 3.3
     public static final FeedforwardGains FEEDFORWARD =

@@ -60,4 +60,14 @@ public class IntakeCommands {
                 IndexerConstants.TOP_REVERSE_VELOCITY, IndexerConstants.BOTTOM_REVERSE_VELOCITY)),
         Commands.parallel(intakeStop(intake, indexer, intakePivot, endEffector)));
   }
+
+  public static Command reverseEffectorIndexerCommand(
+      Indexer indexer, Elevator elevator, EndEffector endEffector) {
+    return Commands.sequence(
+        elevator.setPositionCommand(ElevatorConstants.INTAKE_POSITION),
+        Commands.waitUntil(() -> elevator.atPosition(ElevatorConstants.INTAKE_POSITION)),
+        endEffector.setVelocityCommand(-EndEffectorConstants.INTAKE_SPEED),
+        indexer.setVelocityCommand(
+            IndexerConstants.TOP_REVERSE_VELOCITY, IndexerConstants.BOTTOM_REVERSE_VELOCITY));
+  }
 }
