@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -7,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LEDConstants;
 import java.util.function.BooleanSupplier;
 
+@Logged
 public class LED extends SubsystemBase {
   private Phase phase;
   private BooleanSupplier doesRobotHaveCoral;
@@ -88,28 +90,28 @@ public class LED extends SubsystemBase {
 
   private void activateXanderMode() {
     if (currentState == State.xanderMode) {
-      phaseCommand();
+      resetLEDsToPhase();
     } else {
-      LEDCommand(State.xanderMode);
+      setLED(State.xanderMode);
     }
   }
 
   public void periodic() {
     if (doesRobotHaveCoral.getAsBoolean() && currentState != State.hasCoral) {
-      LEDCommand(State.hasCoral);
-    } else if (currentState == State.hasCoral) {
-      phaseCommand();
+      setLED(State.hasCoral);
+    } else if (!doesRobotHaveCoral.getAsBoolean() && currentState == State.hasCoral) {
+      resetLEDsToPhase();
     }
   }
 
-  public void autoInit() {
+  private void autoInit() {
     phase = Phase.auto;
     phaseCommand();
   }
 
-  public void teleopInit() {
+  private void teleopInit() {
     phase = Phase.teleop;
-    phaseCommand();
+    resetLEDsToPhase();
   }
 
   public Command LEDCommand(State state) {
@@ -125,6 +127,7 @@ public class LED extends SubsystemBase {
   }
 
   public Command setAutoCommand() {
+    System.out.println("auto");
     return Commands.runOnce(() -> this.autoInit(), this);
   }
 

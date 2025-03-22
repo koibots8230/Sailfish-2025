@@ -60,9 +60,9 @@ public class RobotContainer {
     endEffector = new EndEffector();
     intake = new Intake();
     intakePivot = new IntakePivot();
-    LED = new LED(endEffector::hasCoral);
     indexer = new Indexer();
     climber = new Climber();
+    LED = new LED(endEffector::hasCoral);
 
     autoChooser = new AutoChooser();
 
@@ -136,10 +136,10 @@ public class RobotContainer {
     alignLeft.onTrue(swerve.setReefAlignStateCommand(ReefAlignState.leftSide));
 
     Trigger prepClimb = new Trigger(() -> operatorPad.getRawButton(5));
-    prepClimb.onTrue(ClimbCommands.prepClimb(climber));
+    prepClimb.onTrue(ClimbCommands.prepClimb(climber, LED));
 
     Trigger climb = new Trigger(() -> operatorPad.getRawButton(6));
-    climb.onTrue(ClimbCommands.climb(climber));
+    climb.onTrue(ClimbCommands.climb(climber, LED));
 
     Trigger resetClimb = new Trigger(() -> operatorPad.getRawButton(8));
     resetClimb.onTrue(ClimbCommands.resetClimber(climber));
@@ -165,7 +165,7 @@ public class RobotContainer {
 
   public void teleopInit() {
     this.defualtCommands();
-    LED.setTeleopCommand();
+    LED.setTeleopCommand().schedule();
   }
 
   private AutoRoutine SeFLRRf() {
