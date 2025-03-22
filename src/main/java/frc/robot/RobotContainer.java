@@ -161,7 +161,6 @@ public class RobotContainer {
 
   public void autoInit() {
     LED.setAutoCommand();
-    System.out.println("robot container autoinit");
   }
 
   public void teleopInit() {
