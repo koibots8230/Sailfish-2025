@@ -137,11 +137,6 @@ public class EndEffector extends SubsystemBase {
     this.state = state;
   }
 
-  public boolean hasCoral() {
-    return sensorDistance.in(Units.Millimeters)
-        <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters);
-  }
-
   public Command intakeCommand() {
     return Commands.sequence(
         Commands.race(

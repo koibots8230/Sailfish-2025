@@ -105,10 +105,10 @@ public class RobotContainer {
 
     Trigger reverseIntake = new Trigger(xboxController.leftTrigger());
     reverseIntake.onTrue(
-        IntakeCommands.reverseCommand(intake, intakePivot, indexer, elevator, endEffector));
+        IntakeCommands.reverseCommand(intake, intakePivot, indexer, elevator, endEffector, LED));
     reverseIntake.onFalse(
         Commands.sequence(
-            IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector),
+            IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector, LED),
             Commands.waitSeconds(0.15),
             Commands.either(
                 Commands.none(),
@@ -119,7 +119,7 @@ public class RobotContainer {
     reverseEffectorIndexer.onTrue(
         IntakeCommands.reverseEffectorIndexerCommand(indexer, elevator, endEffector));
     reverseEffectorIndexer.onFalse(
-        IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector));
+        IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector, LED));
 
     Trigger gotoLevelThree = new Trigger(xboxController.y());
     gotoLevelThree.onTrue(
