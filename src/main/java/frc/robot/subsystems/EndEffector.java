@@ -76,7 +76,11 @@ public class EndEffector extends SubsystemBase {
 
     setpoint = 0;
 
-    sensorDistance = (laserCAN.getMeasurement() == null) ? Millimeters.of(0) : Distance.ofBaseUnits(laserCAN.getMeasurement().distance_mm, Units.Millimeters);;
+    sensorDistance =
+        (laserCAN.getMeasurement() == null)
+            ? Millimeters.of(0)
+            : Distance.ofBaseUnits(laserCAN.getMeasurement().distance_mm, Units.Millimeters);
+    ;
 
     state = this.hasCoral() ? EndEffectorState.hasCoral : EndEffectorState.noCoral;
   }
@@ -108,13 +112,15 @@ public class EndEffector extends SubsystemBase {
   }
 
   private void holdCoral() {
-    if (state == EndEffectorState.hasCoral && !(sensorDistance.in(Units.Millimeters)
-                        <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters))) {
+    if (state == EndEffectorState.hasCoral
+        && !(sensorDistance.in(Units.Millimeters)
+            <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters))) {
       setpoint = EndEffectorConstants.HOLDING_SPEED;
       pid.setReference(EndEffectorConstants.HOLDING_SPEED, ControlType.kVelocity);
-                        }else if (sensorDistance.in(Units.Millimeters)
-                        >= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters) && sensorDistance.in(Units.Millimeters)
-                        <= EndEffectorConstants.ALGAE_REMOVER_DISTANCE.in(Units.Millimeters)) {
+    } else if (sensorDistance.in(Units.Millimeters)
+            >= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters)
+        && sensorDistance.in(Units.Millimeters)
+            <= EndEffectorConstants.ALGAE_REMOVER_DISTANCE.in(Units.Millimeters)) {
       this.releaseAlgaeRemover().schedule();
     } else {
       setpoint = 0;
@@ -128,7 +134,7 @@ public class EndEffector extends SubsystemBase {
 
   public boolean hasCoral() {
     return sensorDistance.in(Units.Millimeters)
-                        <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters);
+        <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters);
   }
 
   public Command intakeCommand() {
@@ -158,12 +164,11 @@ public class EndEffector extends SubsystemBase {
 
   public Command releaseAlgaeRemover() {
     return Commands.sequence(
-      this.setVelocityCommand(-EndEffectorConstants.HOLDING_SPEED),
-      Commands.waitSeconds(0.3),
-      this.setVelocityCommand(EndEffectorConstants.HOLDING_SPEED),
-      Commands.waitUntil(this::hasCoral),
-      this.setVelocityCommand(0)
-    );
+        this.setVelocityCommand(-EndEffectorConstants.HOLDING_SPEED),
+        Commands.waitSeconds(0.3),
+        this.setVelocityCommand(EndEffectorConstants.HOLDING_SPEED),
+        Commands.waitUntil(this::hasCoral),
+        this.setVelocityCommand(0));
   }
 
   public Command holdCoralCommand() {

@@ -110,13 +110,16 @@ public class RobotContainer {
         Commands.sequence(
             IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector),
             Commands.waitSeconds(0.15),
-            Commands.either(Commands.none(), endEffector.setStateCommand(EndEffectorState.noCoral), endEffector::hasCoral)
-        ));
+            Commands.either(
+                Commands.none(),
+                endEffector.setStateCommand(EndEffectorState.noCoral),
+                endEffector::hasCoral)));
 
     Trigger reverseEffectorIndexer = xboxController.x();
     reverseEffectorIndexer.onTrue(
         IntakeCommands.reverseEffectorIndexerCommand(indexer, elevator, endEffector));
-    reverseEffectorIndexer.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector));
+    reverseEffectorIndexer.onFalse(
+        IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector));
 
     Trigger gotoLevelThree = new Trigger(xboxController.y());
     gotoLevelThree.onTrue(
@@ -176,7 +179,7 @@ public class RobotContainer {
     endEffector.setDefaultCommand(endEffector.holdCoralCommand());
   }
 
-    private AutoRoutine centerScore() {
+  private AutoRoutine centerScore() {
     AutoRoutine routine = autoFactory.newRoutine("taxi");
 
     AutoTrajectory leave = routine.trajectory("MiddleScore");
@@ -186,10 +189,7 @@ public class RobotContainer {
         .onTrue(
             Commands.sequence(
                 leave.resetOdometry(),
-                Commands.parallel(
-                    leave.cmd(),
-                    endEffector.releaseAlgaeRemover()
-                ),
+                Commands.parallel(leave.cmd(), endEffector.releaseAlgaeRemover()),
                 ScoreCommands.levelTwo(elevator, endEffector)));
 
     return routine;
@@ -234,10 +234,9 @@ public class RobotContainer {
         .done()
         .onTrue(
             Commands.sequence(
-            Commands.deadline(
-                new WaitCommand(2),
-                ScoreCommands.removeL3Algae(elevator, endEffector)),
-            ScoreCommands.basePosition(elevator, endEffector)));
+                Commands.deadline(
+                    new WaitCommand(2), ScoreCommands.removeL3Algae(elevator, endEffector)),
+                ScoreCommands.basePosition(elevator, endEffector)));
 
     return routine;
   }
@@ -355,9 +354,7 @@ public class RobotContainer {
         .onTrue(
             Commands.sequence(
                 leave.resetOdometry(),
-                Commands.parallel(
-                    endEffector.releaseAlgaeRemover(),
-                    leave.cmd())));
+                Commands.parallel(endEffector.releaseAlgaeRemover(), leave.cmd())));
 
     return routine;
   }

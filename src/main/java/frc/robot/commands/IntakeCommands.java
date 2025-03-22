@@ -62,9 +62,7 @@ public class IntakeCommands {
   }
 
   public static Command reverseEffectorIndexerCommand(
-      Indexer indexer,
-      Elevator elevator,
-      EndEffector endEffector) {
+      Indexer indexer, Elevator elevator, EndEffector endEffector) {
     return Commands.sequence(
         elevator.setPositionCommand(ElevatorConstants.INTAKE_POSITION),
         Commands.waitUntil(() -> elevator.atPosition(ElevatorConstants.INTAKE_POSITION)),

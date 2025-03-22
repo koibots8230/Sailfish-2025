@@ -177,7 +177,8 @@ public class Constants {
         new FeedforwardGains.Builder().kv(0.0003).build();
 
     public static final Distance TRIGGER_DISTANCE = Distance.ofBaseUnits(85, Units.Millimeters);
-    public static final Distance ALGAE_REMOVER_DISTANCE = Distance.ofBaseUnits(175, Units.Millimeters);
+    public static final Distance ALGAE_REMOVER_DISTANCE =
+        Distance.ofBaseUnits(175, Units.Millimeters);
 
     public static final Current CURRENT_LIMIT = Current.ofBaseUnits(40, Units.Amps);
 

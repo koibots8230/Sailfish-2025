@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.lib.util.EndEffectorState;
 import frc.robot.Constants.ElevatorConstants;
-import frc.robot.Constants.EndEffectorConstants;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.EndEffector;
 
@@ -31,7 +30,10 @@ public class ScoreCommands {
         elevator.setPositionCommand(ElevatorConstants.INTAKE_POSITION),
         endEffector.setVelocityCommand(0),
         Commands.waitSeconds(0.15),
-        Commands.either(Commands.none(), endEffector.setStateCommand(EndEffectorState.noCoral), endEffector::hasCoral));
+        Commands.either(
+            Commands.none(),
+            endEffector.setStateCommand(EndEffectorState.noCoral),
+            endEffector::hasCoral));
   }
 
   public static Command removeL2Algae(Elevator elevator, EndEffector endEffector) {
