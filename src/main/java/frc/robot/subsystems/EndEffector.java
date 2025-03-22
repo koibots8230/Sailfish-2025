@@ -43,7 +43,7 @@ public class EndEffector extends SubsystemBase {
   Current current;
   Voltage voltage;
 
-  Distance sensorDistance;
+  public Distance sensorDistance;
 
   EndEffectorState state;
 
@@ -106,6 +106,11 @@ public class EndEffector extends SubsystemBase {
     velocity = setpoint;
   }
 
+  public boolean hasCoral() {
+    return sensorDistance.in(Units.Millimeters)
+        <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters);
+  }
+
   private void setVelocity(double velocity) {
     pid.setReference(velocity, ControlType.kVelocity);
     setpoint = velocity;
@@ -130,11 +135,6 @@ public class EndEffector extends SubsystemBase {
 
   private void setState(EndEffectorState state) {
     this.state = state;
-  }
-
-  public boolean hasCoral() {
-    return sensorDistance.in(Units.Millimeters)
-        <= EndEffectorConstants.TRIGGER_DISTANCE.in(Units.Millimeters);
   }
 
   public Command intakeCommand() {
