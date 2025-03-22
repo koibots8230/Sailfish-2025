@@ -268,6 +268,6 @@ public class Constants {
   }
 
   public static class LEDConstants {
-    public static final int BAUD_RATE = 115200;
+    public static final int BAUD_RATE = 9600;
   }
 }

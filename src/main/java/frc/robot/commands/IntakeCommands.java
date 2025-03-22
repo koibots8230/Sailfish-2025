@@ -12,6 +12,8 @@ import frc.robot.subsystems.EndEffector;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakePivot;
+import frc.robot.subsystems.LED;
+import frc.robot.subsystems.LED.State;
 
 public class IntakeCommands {
 
@@ -20,8 +22,10 @@ public class IntakeCommands {
       IntakePivot intakePivot,
       Indexer indexer,
       Elevator elevator,
-      EndEffector endEffector) {
+      EndEffector endEffector,
+      LED LED) {
     return Commands.sequence(
+        LED.LEDCommand(State.intake),
         elevator.setPositionCommand(ElevatorConstants.INTAKE_POSITION),
         Commands.waitUntil(() -> elevator.atPosition(ElevatorConstants.INTAKE_POSITION)),
         Commands.parallel(
@@ -30,12 +34,13 @@ public class IntakeCommands {
             indexer.setVelocityCommand(
                 IndexerConstants.TOP_INDEX_VELOCITY, IndexerConstants.BOTTOM_INDEX_VELOCITY),
             endEffector.intakeCommand()),
-        Commands.parallel(intakeStop(intake, indexer, intakePivot, endEffector)));
+        Commands.parallel(intakeStop(intake, indexer, intakePivot, endEffector, LED)));
   }
 
   public static Command intakeStop(
-      Intake intake, Indexer indexer, IntakePivot intakePivot, EndEffector endEffector) {
+      Intake intake, Indexer indexer, IntakePivot intakePivot, EndEffector endEffector, LED LED) {
     return Commands.parallel(
+        LED.phaseCommand(),
         intake.setVelocityCommand(0),
         indexer.setVelocityCommand(0, 0),
         intakePivot.setPositionCommand(IntakePivotConstants.IN_POSITION),
@@ -47,8 +52,10 @@ public class IntakeCommands {
       IntakePivot intakePivot,
       Indexer indexer,
       Elevator elevator,
-      EndEffector endEffector) {
+      EndEffector endEffector,
+      LED LED) {
     return Commands.sequence(
+        LED.LEDCommand(State.intake),
         elevator.setPositionCommand(ElevatorConstants.INTAKE_POSITION),
         Commands.waitUntil(() -> elevator.atPosition(ElevatorConstants.INTAKE_POSITION)),
         intakePivot.setPositionCommand(IntakePivotConstants.OUT_POSITION),
@@ -58,7 +65,7 @@ public class IntakeCommands {
             intake.setVelocityCommand(IntakeConstants.REVERSE_INTAKE_VELOCITY),
             indexer.setVelocityCommand(
                 IndexerConstants.TOP_REVERSE_VELOCITY, IndexerConstants.BOTTOM_REVERSE_VELOCITY)),
-        Commands.parallel(intakeStop(intake, indexer, intakePivot, endEffector)));
+        Commands.parallel(intakeStop(intake, indexer, intakePivot, endEffector, LED)));
   }
 
   public static Command reverseEffectorIndexerCommand(

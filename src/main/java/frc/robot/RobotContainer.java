@@ -62,9 +62,9 @@ public class RobotContainer {
     endEffector = new EndEffector();
     intake = new Intake();
     intakePivot = new IntakePivot();
-    LED = new LED();
     indexer = new Indexer();
     climber = new Climber();
+    LED = new LED(endEffector::hasCoral);
 
     autoChooser = new AutoChooser();
 
@@ -100,15 +100,15 @@ public class RobotContainer {
 
     Trigger spinIntake = new Trigger(xboxController.rightTrigger());
     spinIntake.onTrue(
-        IntakeCommands.intakeCommand(intake, intakePivot, indexer, elevator, endEffector));
-    spinIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector));
+        IntakeCommands.intakeCommand(intake, intakePivot, indexer, elevator, endEffector, LED));
+    spinIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector, LED));
 
     Trigger reverseIntake = new Trigger(xboxController.leftTrigger());
     reverseIntake.onTrue(
-        IntakeCommands.reverseCommand(intake, intakePivot, indexer, elevator, endEffector));
+        IntakeCommands.reverseCommand(intake, intakePivot, indexer, elevator, endEffector, LED));
     reverseIntake.onFalse(
         Commands.sequence(
-            IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector),
+            IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector, LED),
             Commands.waitSeconds(0.15),
             Commands.either(
                 Commands.none(),
@@ -119,7 +119,7 @@ public class RobotContainer {
     reverseEffectorIndexer.onTrue(
         IntakeCommands.reverseEffectorIndexerCommand(indexer, elevator, endEffector));
     reverseEffectorIndexer.onFalse(
-        IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector));
+        IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector, LED));
 
     Trigger gotoLevelThree = new Trigger(xboxController.y());
     gotoLevelThree.onTrue(
@@ -153,13 +153,16 @@ public class RobotContainer {
     cancelAlign.onTrue(swerve.setReefAlignStateCommand(ReefAlignState.disabled));
 
     Trigger prepClimb = new Trigger(() -> operatorPad.getRawButton(5));
-    prepClimb.onTrue(ClimbCommands.prepClimb(climber));
+    prepClimb.onTrue(ClimbCommands.prepClimb(climber, LED));
 
     Trigger climb = new Trigger(() -> operatorPad.getRawButton(6));
-    climb.onTrue(ClimbCommands.climb(climber));
+    climb.onTrue(ClimbCommands.climb(climber, LED));
 
     Trigger resetClimb = new Trigger(() -> operatorPad.getRawButton(8));
     resetClimb.onTrue(ClimbCommands.resetClimber(climber));
+
+    Trigger xMode = new Trigger(() -> operatorPad.getRawButton(3));
+    xMode.onTrue(LED.XModeCommand());
   }
 
   private void defualtCommands() {
@@ -173,8 +176,13 @@ public class RobotContainer {
     swerve.setIsBlue(isBlue);
   }
 
+  public void autoInit() {
+    LED.setAutoCommand();
+  }
+
   public void teleopInit() {
     this.defualtCommands();
+    LED.setTeleopCommand().schedule();
 
     endEffector.setDefaultCommand(endEffector.holdCoralCommand());
   }
