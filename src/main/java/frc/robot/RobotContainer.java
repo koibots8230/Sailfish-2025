@@ -11,7 +11,9 @@ import choreo.auto.AutoTrajectory;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -98,12 +100,21 @@ public class RobotContainer {
     // Trigger zero = xboxController.b();
     // zero.onTrue(swerve.zeroGyroCommand(isBlue));
 
-    Trigger spinIntake = new Trigger(xboxController.rightTrigger());
+    Trigger spinIntake = new Trigger(() -> xboxController.getRightTriggerAxis() > 0.15);
     spinIntake.onTrue(
-        IntakeCommands.intakeCommand(intake, intakePivot, indexer, elevator, endEffector, LED));
+        Commands.sequence(
+            IntakeCommands.intakeCommand(intake, intakePivot, indexer, elevator, endEffector, LED),
+            Commands.runOnce(
+                () -> Commands.sequence(
+                    this.rumble(0.3),
+                Commands.waitSeconds(0.25),
+                this.rumble(0)
+            ).schedule())
+    
+        ));
     spinIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector, LED));
 
-    Trigger reverseIntake = new Trigger(xboxController.leftTrigger());
+    Trigger reverseIntake = new Trigger(() -> xboxController.getLeftTriggerAxis() > 0.15);
     reverseIntake.onTrue(
         IntakeCommands.reverseCommand(intake, intakePivot, indexer, elevator, endEffector, LED));
     reverseIntake.onFalse(
@@ -163,6 +174,9 @@ public class RobotContainer {
 
     Trigger xMode = new Trigger(() -> operatorPad.getRawButton(3));
     xMode.onTrue(LED.XModeCommand());
+
+    Trigger slowTrigger = new Trigger(() -> operatorPad.getRawButton(13));
+    slowTrigger.onTrue(swerve.toggleSpeedCommand());
   }
 
   private void defualtCommands() {
@@ -179,8 +193,15 @@ public class RobotContainer {
   public void autoInit() {
     LED.setAutoCommand();
   }
+  
+  public Command rumble(double amount) {
+    return Commands.runOnce(() -> xboxController.setRumble(RumbleType.kBothRumble, amount));
+  }
 
   public void teleopInit() {
+    elevator.resetProfileCommand().schedule();
+    ScoreCommands.basePosition(elevator, endEffector).schedule();
+    
     this.defualtCommands();
     LED.setTeleopCommand().schedule();
 
@@ -335,11 +356,8 @@ public class RobotContainer {
         .active()
         .onTrue(
             Commands.sequence(
-                Commands.sequence(
-                    endEffector.setVelocityCommand(-250),
-                    Commands.waitSeconds(0.3),
-                    endEffector.setVelocityCommand(0)),
                 leave.resetOdometry(),
+                endEffector.releaseAlgaeRemover(),
                 leave.cmd(),
                 Commands.sequence(
                     elevator.setPositionCommand(ElevatorConstants.L2_ALGAE_POSITION),
