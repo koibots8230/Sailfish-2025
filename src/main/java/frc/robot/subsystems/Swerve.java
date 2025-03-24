@@ -41,6 +41,8 @@ public class Swerve extends SubsystemBase {
   private SwerveModuleState[] setpointStates;
   private final Pigeon2 gyro;
 
+  private double speedScalar;
+
   private final PIDController xController =
       new PIDController(AutoConstants.X_CONTROLLER.kp, 0.0, 0.0);
   private final PIDController yController =
@@ -118,6 +120,8 @@ public class Swerve extends SubsystemBase {
     alignTarget = new Pose2d();
 
     headingController.enableContinuousInput(-Math.PI, Math.PI);
+
+    speedScalar = 1;
   }
 
   public boolean getIsBlue() {
@@ -386,11 +390,13 @@ public class Swerve extends SubsystemBase {
     x =
         linearMagnitude
             * -direction.getSin()
-            * SwerveConstants.MAX_LINEAR_VELOCITY.in(MetersPerSecond);
+            * SwerveConstants.MAX_LINEAR_VELOCITY.in(MetersPerSecond)
+            * speedScalar;
 
     omega =
         Math.pow(omega, SwerveConstants.ROTATION_SCALAR)
-            * SwerveConstants.MAX_ANGULAR_VELOCITY.in(RadiansPerSecond);
+            * SwerveConstants.MAX_ANGULAR_VELOCITY.in(RadiansPerSecond)
+            * speedScalar;
 
     Pose2d assist = reefAlignAssist(-x, y, omega);
 
@@ -446,6 +452,10 @@ public class Swerve extends SubsystemBase {
     driveFieldRelative(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, pose.getRotation()));
   }
 
+  private void toggleSpeed() {
+    speedScalar = (speedScalar == 1) ? 0.5 : 1;
+  }
+
   // ===================== Commands ===================== \\
 
   public Command driveFieldRelativeCommand(
@@ -465,5 +475,9 @@ public class Swerve extends SubsystemBase {
 
   public Command setReefAlignStateCommand(ReefAlignState state) {
     return Commands.runOnce(() -> this.setReefAlignState(state));
+  }
+
+  public Command toggleSpeedCommand() {
+    return Commands.runOnce(() -> this.toggleSpeed());
   }
 }

@@ -106,9 +106,10 @@ public class Constants {
 
     public static final double DISTANCE_ANGLE_RANGE_SCALAR = 0.85;
 
-    public static final Distance POLE_SPACING = Meters.of(0.1651);
+    public static final Distance POLE_SPACING =
+        Meters.of(edu.wpi.first.math.util.Units.inchesToMeters(6.5));
 
-    public static final Distance EFFECTOR_OFFSET = Meters.of(0.013);
+    public static final Distance EFFECTOR_OFFSET = Meters.of(0.013); // 0.013
   }
 
   public static class IntakeConstants {
@@ -190,10 +191,10 @@ public class Constants {
     public static final Distance INTAKE_POSITION = Distance.ofBaseUnits(0.005, Units.Meters);
 
     public static final Distance L2_POSITION = Distance.ofBaseUnits(1.18, Units.Meters);
-    public static final Distance L3_POSITION = Distance.ofBaseUnits(2.04, Units.Meters);
+    public static final Distance L3_POSITION = Distance.ofBaseUnits(2.08, Units.Meters);
 
     public static final Distance L2_ALGAE_POSITION = Distance.ofBaseUnits(0.67, Units.Meters);
-    public static final Distance L3_ALGAE_POSITION = Distance.ofBaseUnits(1.55, Units.Meters);
+    public static final Distance L3_ALGAE_POSITION = Distance.ofBaseUnits(1.48, Units.Meters);
 
     public static final PIDGains PID = new PIDGains.Builder().kp(6).build(); // 3.3
     public static final FeedforwardGains FEEDFORWARD =
@@ -218,8 +219,14 @@ public class Constants {
 
     public static final Pose2d[] CAMERA_POSITIONS = {
       new Pose2d(-0.3429 + 0.0241808, -0.1655, Rotation2d.fromDegrees(180)),
-      new Pose2d(-0.3429 + 0.0241808, 0.1525, Rotation2d.fromDegrees(180)),
-      new Pose2d(-0.3429 + 0.0241808, 0.0895, Rotation2d.fromDegrees(180)),
+      new Pose2d(
+          -0.3429 + 0.0241808,
+          edu.wpi.first.math.util.Units.inchesToMeters(5.75),
+          Rotation2d.fromDegrees(180)),
+      new Pose2d(
+          -0.3429 + 0.0241808,
+          edu.wpi.first.math.util.Units.inchesToMeters(3.5),
+          Rotation2d.fromDegrees(180)),
       // new Pose2d(-0.0, 0.0, Rotation2d.fromDegrees(180)),
       // new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0))
     }; // x is forward, y is left, counterclockwise on rotation
@@ -234,12 +241,12 @@ public class Constants {
     public static final double[] VECTOR_DEFAULT_VALUE = {0};
     public static final int ID_DEFAULT_VALUE = 0;
 
-    public static final Distance MAX_MEASUREMENT_DIFFERENCE = Meters.of(1.5);
+    public static final Distance MAX_MEASUREMENT_DIFFERENCE = Meters.of(99);
     public static final Rotation2d MAX_ANGLE_DIFFERENCE = Rotation2d.fromDegrees(10);
 
     public static final double ROTATION_STDEV = 50 * Math.PI;
-    public static final double TRANSLATION_STDEV_ORDER = 1.25;
-    public static final double TRANSLATION_STDEV_SCALAR = 0.15;
+    public static final double TRANSLATION_STDEV_ORDER = 1.2;
+    public static final double TRANSLATION_STDEV_SCALAR = 0.1;
   }
 
   public static class ClimberConstants {
