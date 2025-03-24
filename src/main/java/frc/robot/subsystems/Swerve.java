@@ -340,6 +340,9 @@ public class Swerve extends SubsystemBase {
                 getPoleTranslation(closestSide, false).plus(getEffectorOffset(closestSide)),
                 closestSide.getRotation());
         break;
+      case algae:
+        pose = closestSide;
+        break;
       case disabled:
         alignTarget = Pose2d.kZero;
         return Pose2d.kZero;
