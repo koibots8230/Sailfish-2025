@@ -105,13 +105,9 @@ public class RobotContainer {
         Commands.sequence(
             IntakeCommands.intakeCommand(intake, intakePivot, indexer, elevator, endEffector, LED),
             Commands.runOnce(
-                () -> Commands.sequence(
-                    this.rumble(0.3),
-                Commands.waitSeconds(0.25),
-                this.rumble(0)
-            ).schedule())
-    
-        ));
+                () ->
+                    Commands.sequence(this.rumble(0.3), Commands.waitSeconds(0.25), this.rumble(0))
+                        .schedule())));
     spinIntake.onFalse(IntakeCommands.intakeStop(intake, indexer, intakePivot, endEffector, LED));
 
     Trigger reverseIntake = new Trigger(() -> xboxController.getLeftTriggerAxis() > 0.15);
@@ -193,7 +189,7 @@ public class RobotContainer {
   public void autoInit() {
     LED.setAutoCommand();
   }
-  
+
   public Command rumble(double amount) {
     return Commands.runOnce(() -> xboxController.setRumble(RumbleType.kBothRumble, amount));
   }
@@ -201,7 +197,7 @@ public class RobotContainer {
   public void teleopInit() {
     elevator.resetProfileCommand().schedule();
     ScoreCommands.basePosition(elevator, endEffector).schedule();
-    
+
     this.defualtCommands();
     LED.setTeleopCommand().schedule();
 

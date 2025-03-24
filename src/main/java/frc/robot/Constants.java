@@ -106,9 +106,10 @@ public class Constants {
 
     public static final double DISTANCE_ANGLE_RANGE_SCALAR = 0.85;
 
-    public static final Distance POLE_SPACING = Meters.of(edu.wpi.first.math.util.Units.inchesToMeters(6.5));
+    public static final Distance POLE_SPACING =
+        Meters.of(edu.wpi.first.math.util.Units.inchesToMeters(6.5));
 
-    public static final Distance EFFECTOR_OFFSET = Meters.of(0.013); //0.013
+    public static final Distance EFFECTOR_OFFSET = Meters.of(0.013); // 0.013
   }
 
   public static class IntakeConstants {
@@ -218,8 +219,14 @@ public class Constants {
 
     public static final Pose2d[] CAMERA_POSITIONS = {
       new Pose2d(-0.3429 + 0.0241808, -0.1655, Rotation2d.fromDegrees(180)),
-      new Pose2d(-0.3429 + 0.0241808, edu.wpi.first.math.util.Units.inchesToMeters(5.75), Rotation2d.fromDegrees(180)),
-      new Pose2d(-0.3429 + 0.0241808, edu.wpi.first.math.util.Units.inchesToMeters(3.5), Rotation2d.fromDegrees(180)),
+      new Pose2d(
+          -0.3429 + 0.0241808,
+          edu.wpi.first.math.util.Units.inchesToMeters(5.75),
+          Rotation2d.fromDegrees(180)),
+      new Pose2d(
+          -0.3429 + 0.0241808,
+          edu.wpi.first.math.util.Units.inchesToMeters(3.5),
+          Rotation2d.fromDegrees(180)),
       // new Pose2d(-0.0, 0.0, Rotation2d.fromDegrees(180)),
       // new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0))
     }; // x is forward, y is left, counterclockwise on rotation
