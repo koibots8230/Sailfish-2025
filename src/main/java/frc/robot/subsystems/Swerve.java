@@ -309,7 +309,7 @@ public class Swerve extends SubsystemBase {
 
     LinearVelocity assistVelocity =
         MetersPerSecond.of(
-            Math.cbrt(distancePerpToVel.in(Meters)) * AlignConstants.TRANSLATE_PID.kp);
+            Math.sqrt(distancePerpToVel.in(Meters)) * AlignConstants.TRANSLATE_PID.kp);
 
     return new Pose2d(
         assistVelocity.in(MetersPerSecond) * angleToTarget.getCos(),
@@ -406,11 +406,11 @@ public class Swerve extends SubsystemBase {
     driveFieldRelative(
         MetersPerSecond.of(
             MathUtil.applyDeadband(
-                x + (assist.getX() * Math.sqrt(linearMagnitude) * (isBlue ? -1 : 1)),
+                x + (assist.getX() * linearMagnitude * (isBlue ? -1 : 1)),
                 SwerveConstants.DEADBAND)),
         MetersPerSecond.of(
             MathUtil.applyDeadband(
-                y + (assist.getY() * Math.sqrt(linearMagnitude) * (isBlue ? -1 : 1)),
+                y + (assist.getY() * linearMagnitude * (isBlue ? -1 : 1)),
                 SwerveConstants.DEADBAND)),
         RadiansPerSecond.of(
             MathUtil.applyDeadband(
