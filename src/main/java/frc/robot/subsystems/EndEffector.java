@@ -179,6 +179,10 @@ public class EndEffector extends SubsystemBase {
     return Commands.run(() -> this.setVelocity(EndEffectorConstants.ALGAE_REMOVAL_SPEED), this);
   }
 
+  public Command scoreL1Command() {
+    return Commands.run(() -> this.setVelocity(EndEffectorConstants.L1_SPEED), this);
+  }
+
   public Command setVelocityCommand(double velocity) {
     return Commands.runOnce(() -> this.setVelocity(velocity), this);
   }
