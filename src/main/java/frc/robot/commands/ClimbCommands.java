@@ -27,8 +27,6 @@ public class ClimbCommands {
 
   public static Command resetClimber(Climber climber) {
     return new SequentialCommandGroup(
-      climber.setReverseCommand(),
-      climber.setAngleCommand(ClimberConstants.START_POSITION));
-
+        climber.setReverseCommand(), climber.setAngleCommand(ClimberConstants.START_POSITION));
   }
 }
