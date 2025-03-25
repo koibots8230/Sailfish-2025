@@ -162,7 +162,7 @@ public class RobotContainer {
     Trigger prepClimb = new Trigger(() -> operatorPad.getRawButton(5));
     prepClimb.onTrue(ClimbCommands.prepClimb(climber, LED));
 
-    Trigger climb = new Trigger(() -> operatorPad.getRawButton(6));
+    Trigger climb = new Trigger(() -> operatorPad.getRawButton(7));
     climb.onTrue(ClimbCommands.climb(climber, LED));
 
     Trigger resetClimb = new Trigger(() -> operatorPad.getRawButton(8));
