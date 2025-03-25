@@ -99,6 +99,10 @@ public class Climber extends SubsystemBase {
     position = motorSetpoint.position;
   }
 
+  public boolean atSetpoint() {
+    return position >= setpoint;
+  }
+
   private void setAngle(double angle) {
     setpoint = angle;
   }

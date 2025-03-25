@@ -58,7 +58,6 @@ public class Elevator extends SubsystemBase {
   private Distance position;
   private LinearVelocity velocity;
   private Voltage mainVoltage;
-  private Voltage secondaryVoltage;
   private Current mainCurrent;
 
   public Elevator() {
@@ -151,6 +150,10 @@ public class Elevator extends SubsystemBase {
     setpoint = position;
   }
 
+  private void resetProfile() {
+    motorSetpoint = new TrapezoidProfile.State(encoder.getPosition(), 0);
+  }
+
   public Command setPositionCommand(Distance position) {
     return Commands.runOnce(() -> this.setPosition(position), this);
   }
@@ -164,5 +167,9 @@ public class Elevator extends SubsystemBase {
                 this),
             Commands.waitUntil(() -> hallEffectSensor.get() == true)),
         Commands.runOnce(() -> encoder.setPosition(0), this));
+  }
+
+  public Command resetProfileCommand() {
+    return Commands.runOnce(this::resetProfile, this);
   }
 }

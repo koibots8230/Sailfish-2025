@@ -8,8 +8,6 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.MathUtil;
@@ -42,6 +40,8 @@ public class Swerve extends SubsystemBase {
   private Rotation2d gyroAngle;
   private SwerveModuleState[] setpointStates;
   private final Pigeon2 gyro;
+
+  private double speedScalar;
 
   private final PIDController xController =
       new PIDController(AutoConstants.X_CONTROLLER.kp, 0.0, 0.0);
@@ -83,8 +83,6 @@ public class Swerve extends SubsystemBase {
   private ReefAlignState reefAlignState;
   private Pose2d alignTarget;
 
-  RobotConfig config;
-
   public Swerve() {
 
     modules = new Modules();
@@ -122,6 +120,8 @@ public class Swerve extends SubsystemBase {
     alignTarget = new Pose2d();
 
     headingController.enableContinuousInput(-Math.PI, Math.PI);
+
+    speedScalar = 1;
   }
 
   public boolean getIsBlue() {
@@ -156,6 +156,10 @@ public class Swerve extends SubsystemBase {
     measuredStates[1] = modules.frontRight.getModuleState();
     measuredStates[2] = modules.backLeft.getModuleState();
     measuredStates[3] = modules.backRight.getModuleState();
+
+    if (reefAlignState == null) {
+      reefAlignState = ReefAlignState.disabled;
+    }
   }
 
   @Override
@@ -386,11 +390,13 @@ public class Swerve extends SubsystemBase {
     x =
         linearMagnitude
             * -direction.getSin()
-            * SwerveConstants.MAX_LINEAR_VELOCITY.in(MetersPerSecond);
+            * SwerveConstants.MAX_LINEAR_VELOCITY.in(MetersPerSecond)
+            * speedScalar;
 
     omega =
         Math.pow(omega, SwerveConstants.ROTATION_SCALAR)
-            * SwerveConstants.MAX_ANGULAR_VELOCITY.in(RadiansPerSecond);
+            * SwerveConstants.MAX_ANGULAR_VELOCITY.in(RadiansPerSecond)
+            * speedScalar;
 
     Pose2d assist = reefAlignAssist(-x, y, omega);
 
@@ -408,7 +414,7 @@ public class Swerve extends SubsystemBase {
                 -omega + (assist.getRotation().getRadians()), SwerveConstants.DEADBAND)));
   }
 
-  public void driveRobotRelative(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
+  public void driveRobotRelative(ChassisSpeeds speeds) {
     setpointStates = SwerveConstants.KINEMATICS.toSwerveModuleStates(speeds);
 
     SwerveDriveKinematics.desaturateWheelSpeeds(
@@ -429,14 +435,7 @@ public class Swerve extends SubsystemBase {
   }
 
   private void driveFieldRelative(ChassisSpeeds speeds) {
-    driveRobotRelative(
-        speeds,
-        new DriveFeedforwards(
-            new double[] {0.0},
-            new double[] {0.0},
-            new double[] {0.0},
-            new double[] {0.0},
-            new double[] {0.0}));
+    driveRobotRelative(speeds);
   }
 
   public void followTrajectory(SwerveSample sample) {
@@ -451,6 +450,10 @@ public class Swerve extends SubsystemBase {
                 + headingController.calculate(pose.getRotation().getRadians(), sample.heading));
 
     driveFieldRelative(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, pose.getRotation()));
+  }
+
+  private void toggleSpeed() {
+    speedScalar = (speedScalar == 1) ? 0.5 : 1;
   }
 
   // ===================== Commands ===================== \\
@@ -472,5 +475,9 @@ public class Swerve extends SubsystemBase {
 
   public Command setReefAlignStateCommand(ReefAlignState state) {
     return Commands.runOnce(() -> this.setReefAlignState(state));
+  }
+
+  public Command toggleSpeedCommand() {
+    return Commands.runOnce(() -> this.toggleSpeed());
   }
 }
