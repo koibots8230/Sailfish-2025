@@ -172,8 +172,6 @@ public class Constants {
     public static final double HOLDING_SPEED = 200;
     public static final double ALGAE_REMOVAL_SPEED = 1500;
 
-    public static final double L1_DURATION = 1;
-
     public static final PIDGains PID = new PIDGains.Builder().kp(0.00015).build();
     public static final FeedforwardGains FEEDFORWARD =
         new FeedforwardGains.Builder().kv(0.0003).build();
