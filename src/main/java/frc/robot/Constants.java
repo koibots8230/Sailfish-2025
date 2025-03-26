@@ -259,8 +259,7 @@ public class Constants {
 
     public static final double MAX_VELOCITY = 1 / 8;
     public static final double MAX_ACCELERATION = 1 / 8;
-
-    public static final double LOW_SPEED = 0.2;
+    
     public static final double HIGH_SPEED = 0.9;
     public static final double REVERSE_SPEED = -0.2;
 
