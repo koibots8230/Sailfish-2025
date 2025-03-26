@@ -345,9 +345,11 @@ public class Swerve extends SubsystemBase {
         break;
       case disabled:
         alignTarget = Pose2d.kZero;
+        speedScalar = 1;
         return Pose2d.kZero;
       default:
         alignTarget = Pose2d.kZero;
+        speedScalar = 1;
         return Pose2d.kZero;
     }
 
@@ -375,6 +377,8 @@ public class Swerve extends SubsystemBase {
     }
 
     alignTarget = pose;
+
+    speedScalar = ((0.5 / AlignConstants.MIN_DISTANCE.in(Meters)) * distanceToPose(pose).in(Meters)) + 0.5;
 
     return getAssistVelocity(pose.getTranslation(), pose.getRotation(), xInput, yInput);
   }
