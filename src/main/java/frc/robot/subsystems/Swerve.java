@@ -249,14 +249,16 @@ public class Swerve extends SubsystemBase {
     return new Translation2d(
         (Math.sin(2 * side.getRotation().getRadians())
             * AlignConstants.EFFECTOR_OFFSET.in(Meters)
-            * (side.getRotation().getRadians() >= Math.PI / 3.0
-                    && side.getRotation().getRadians() <= (2 * Math.PI) / 3.0
+            * ((side.getRotation().getRadians() == 0
+                    || side.getRotation().getRadians() == (2 * Math.PI) / 3.0
+                    || side.getRotation().getRadians() == (4 * Math.PI) / 3.0)
                 ? 1
                 : -1)),
         (Math.cos(2 * side.getRotation().getRadians())
             * AlignConstants.EFFECTOR_OFFSET.in(Meters)
-            * (side.getRotation().getRadians() >= Math.PI / 3.0
-                    && side.getRotation().getRadians() <= (2 * Math.PI) / 3.0
+            * ((side.getRotation().getRadians() == 0
+                    || side.getRotation().getRadians() == (2 * Math.PI) / 3.0
+                    || side.getRotation().getRadians() == (4 * Math.PI) / 3.0)
                 ? 1
                 : -1)));
   }
@@ -268,13 +270,15 @@ public class Swerve extends SubsystemBase {
                 * AlignConstants.POLE_SPACING.in(Meters)
                 * (rightPole ? 1 : -1)
                 * (isBlue ? 1 : -1)
-                * (side.getRotation().getRadians() == Math.PI ? -1 : 1)),
+                * (side.getRotation().getRadians() == Math.PI ? -1 : 1)
+                * (side.getRotation().getRadians() == 0 ? -1 : 1)),
         side.getY()
             + (Math.cos(2 * side.getRotation().getRadians())
                 * AlignConstants.POLE_SPACING.in(Meters)
                 * (rightPole ? 1 : -1)
                 * (isBlue ? 1 : -1)
-                * (side.getRotation().getRadians() == Math.PI ? -1 : 1)));
+                * (side.getRotation().getRadians() == Math.PI ? -1 : 1)
+                * (side.getRotation().getRadians() == 0 ? -1 : 1)));
   }
 
   // ===================== Align Assist ===================== \\
@@ -355,6 +359,7 @@ public class Swerve extends SubsystemBase {
 
     if (distanceToPose(pose).gte(AlignConstants.MIN_DISTANCE)) {
       alignTarget = Pose2d.kZero;
+      speedScalar = 1;
       return Pose2d.kZero;
     }
 
@@ -373,6 +378,7 @@ public class Swerve extends SubsystemBase {
                 - Math.PI)
         > angleRange.getRadians()) {
       alignTarget = Pose2d.kZero;
+      speedScalar = 1;
       return Pose2d.kZero;
     }
 
