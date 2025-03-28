@@ -126,23 +126,21 @@ public class Constants {
   }
 
   public static class IntakePivotConstants {
-    public static final Angle OUT_POSITION = Angle.ofBaseUnits(1.8, Radians);
-    public static final Angle IN_POSITION = Angle.ofBaseUnits(0.15, Radians);
+    public static final Angle OUT_POSITION = Angle.ofBaseUnits(1.984, Radians);
+    public static final Angle IN_POSITION = Angle.ofBaseUnits(0.25, Radians);
 
     public static final AngularVelocity MAX_VELOCITY =
         AngularVelocity.ofBaseUnits(40 * Math.PI, Units.RadiansPerSecond);
     public static final AngularAcceleration MAX_ACCELRATION =
         AngularAcceleration.ofBaseUnits(Math.PI * 40, Units.RadiansPerSecondPerSecond);
 
-    public static final PIDGains PID = new PIDGains.Builder().kp(1.8).build();
+    public static final PIDGains PID = new PIDGains.Builder().kp(0.28).build();
     public static final FeedforwardGains FEEDFORWARD =
         new FeedforwardGains.Builder().kv(1.1).build();
 
     public static final Angle TOLERANCE = Radians.of(0.025);
 
-    public static final double GEARING = 19.0 / 50.0;
-
-    public static final double CONVERSION_FACTOR = 2.0 * Math.PI * GEARING;
+    public static final double CONVERSION_FACTOR = 2.0 * Math.PI;
 
     public static final int LEFT_MOTOR_ID = 32;
     public static final int RIGHT_MOTOR_ID = 31;

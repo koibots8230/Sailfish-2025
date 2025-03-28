@@ -71,16 +71,19 @@ public class IntakePivot extends SubsystemBase {
     config = new SparkMaxConfig();
     config.closedLoop.p(IntakePivotConstants.PID.kp);
     config.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
-
+    
     config.absoluteEncoder.positionConversionFactor(IntakePivotConstants.CONVERSION_FACTOR);
     config.absoluteEncoder.velocityConversionFactor(IntakePivotConstants.CONVERSION_FACTOR / 60.0);
 
+    config.absoluteEncoder.inverted(true);
+    
     leftMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     leftEncoder = leftMotor.getAbsoluteEncoder();
 
     leftPid = leftMotor.getClosedLoopController();
 
+    config.absoluteEncoder.inverted(false);
     config.inverted(true);
 
     rightMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
