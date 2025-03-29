@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.LED;
@@ -25,6 +26,7 @@ public class ClimbCommands {
   }
 
   public static Command resetClimber(Climber climber) {
-    return climber.setAngleCommand(ClimberConstants.START_POSITION);
+    return new SequentialCommandGroup(
+        climber.setReverseCommand(), climber.setAngleCommand(ClimberConstants.START_POSITION));
   }
 }

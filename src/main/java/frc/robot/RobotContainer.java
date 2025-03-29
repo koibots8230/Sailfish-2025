@@ -174,11 +174,8 @@ public class RobotContainer {
     Trigger prepClimb = new Trigger(() -> operatorPad.getRawButton(5));
     prepClimb.onTrue(ClimbCommands.prepClimb(climber, LED));
 
-    Trigger climb = new Trigger(() -> operatorPad.getRawButton(6));
+    Trigger climb = new Trigger(() -> operatorPad.getRawButton(7));
     climb.onTrue(ClimbCommands.climb(climber, LED));
-
-    Trigger resetClimb = new Trigger(() -> operatorPad.getRawButton(8));
-    resetClimb.onTrue(ClimbCommands.resetClimber(climber));
 
     Trigger xMode = new Trigger(() -> operatorPad.getRawButton(3));
     xMode.onTrue(LED.XModeCommand());
@@ -412,5 +409,7 @@ public class RobotContainer {
     SmartDashboard.putData(
         "TestSequence/SequenceCommand",
         TestCommands.testSequence(swerve, intake, intakePivot, indexer, elevator, endEffector));
+
+    SmartDashboard.putData("Reset Climb", ClimbCommands.resetClimber(climber));
   }
 }
