@@ -15,7 +15,6 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.util.FeedforwardGains;
 import frc.lib.util.PIDGains;
 
@@ -29,12 +28,12 @@ public class Constants {
     public static final double MAX_TURN_ACCELRATION = 30 * Math.PI;
 
     public static final PIDGains TURN_PID = new PIDGains.Builder().kp(3).kd(0.0).build();
-    public static final PIDGains DRIVE_PID = new PIDGains.Builder().kp(0.37).build();
+    public static final PIDGains DRIVE_PID = new PIDGains.Builder().kp(0.38).build();
 
     public static final FeedforwardGains TURN_FEEDFORWARD =
-        new FeedforwardGains.Builder().kv(0.55).build();
+        new FeedforwardGains.Builder().kv(0.50).build();
     public static final FeedforwardGains DRIVE_FEEDFORWARD =
-        new FeedforwardGains.Builder().kv(0.24).build();
+        new FeedforwardGains.Builder().kv(0.225).build();
 
     public static final SwerveDriveKinematics KINEMATICS =
         new SwerveDriveKinematics(
@@ -100,10 +99,10 @@ public class Constants {
 
     public static final Distance RED_REEF_OFFSET = Meters.of(8.569706);
 
-    public static final PIDGains TRANSLATE_PID = new PIDGains.Builder().kp(5).build();
+    public static final PIDGains TRANSLATE_PID = new PIDGains.Builder().kp(4.5).build();
     public static final PIDGains ANGLE_PID = new PIDGains.Builder().kp(2.75).build();
 
-    public static final Angle DIRECTION_ANGLE_RANGE_CLOSE = Radians.of(Math.PI / 1.85);
+    public static final Angle DIRECTION_ANGLE_RANGE_CLOSE = Radians.of(Math.PI / 1.75);
 
     public static final double DISTANCE_ANGLE_RANGE_SCALAR = 0.85;
 
@@ -127,7 +126,7 @@ public class Constants {
   }
 
   public static class IntakePivotConstants {
-    public static final Angle OUT_POSITION = Angle.ofBaseUnits(1.984, Radians);
+    public static final Angle OUT_POSITION = Angle.ofBaseUnits(2, Radians);
     public static final Angle IN_POSITION = Angle.ofBaseUnits(0.25, Radians);
 
     public static final AngularVelocity MAX_VELOCITY =
@@ -135,7 +134,7 @@ public class Constants {
     public static final AngularAcceleration MAX_ACCELRATION =
         AngularAcceleration.ofBaseUnits(Math.PI * 40, Units.RadiansPerSecondPerSecond);
 
-    public static final PIDGains PID = new PIDGains.Builder().kp(0.28).build();
+    public static final PIDGains PID = new PIDGains.Builder().kp(0.25).build();
     public static final FeedforwardGains FEEDFORWARD =
         new FeedforwardGains.Builder().kv(1.1).build();
 
@@ -217,17 +216,21 @@ public class Constants {
     public static final int ACTIVE_CAMERAS = 3;
 
     public static final Pose2d[] CAMERA_POSITIONS = {
-      new Pose2d(-0.3429 + 0.0241808, -0.1655, Rotation2d.fromDegrees(180)),
       new Pose2d(
-          -0.3429 + 0.0241808,
-          edu.wpi.first.math.util.Units.inchesToMeters(5.75),
+          -edu.wpi.first.math.util.Units.inchesToMeters(13.5)
+              + edu.wpi.first.math.util.Units.inchesToMeters(1.5),
+          edu.wpi.first.math.util.Units.inchesToMeters(5),
           Rotation2d.fromDegrees(180)),
       new Pose2d(
-          -0.3429 + 0.0241808,
+          -edu.wpi.first.math.util.Units.inchesToMeters(13.5)
+              + edu.wpi.first.math.util.Units.inchesToMeters(1.5),
+          -edu.wpi.first.math.util.Units.inchesToMeters(5.5),
+          Rotation2d.fromDegrees(180)),
+      new Pose2d(
+          -edu.wpi.first.math.util.Units.inchesToMeters(13.5)
+              + edu.wpi.first.math.util.Units.inchesToMeters(0.875),
           edu.wpi.first.math.util.Units.inchesToMeters(3.5),
-          Rotation2d.fromDegrees(180)),
-      // new Pose2d(-0.0, 0.0, Rotation2d.fromDegrees(180)),
-      // new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0))
+          Rotation2d.fromDegrees(180))
     }; // x is forward, y is left, counterclockwise on rotation
 
     public static final String[][] TOPIC_NAMES = {
@@ -245,7 +248,7 @@ public class Constants {
 
     public static final double ROTATION_STDEV = 50 * Math.PI;
     public static final double TRANSLATION_STDEV_ORDER = 1.2;
-    public static final double TRANSLATION_STDEV_SCALAR = 0.1;
+    public static final double TRANSLATION_STDEV_SCALAR = 0.05;
   }
 
   public static class ClimberConstants {

@@ -160,7 +160,7 @@ public class SwerveModule {
 
   public void setState(SwerveModuleState swerveModuleState) {
     swerveModuleState.optimize(Rotation2d.fromRadians(MathUtil.angleModulus(turnPosition)));
-    
+
     swerveModuleState.speedMetersPerSecond *=
         Math.cos(swerveModuleState.angle.getRadians() - turnPosition);
 
@@ -178,9 +178,9 @@ public class SwerveModule {
         Voltage.ofBaseUnits(driveMotor.getBusVoltage() * driveMotor.getAppliedOutput(), Volts);
     turnVoltage =
         Voltage.ofBaseUnits(turnMotor.getBusVoltage() * turnMotor.getAppliedOutput(), Volts);
-    // drivePosition = driveEncoder.getPosition();
-    // turnPosition = turnEncoder.getPosition() - offset.getRadians();
-    // driveVelocity = driveEncoder.getVelocity();
+    drivePosition = driveEncoder.getPosition();
+    turnPosition = turnEncoder.getPosition() - offset.getRadians();
+    driveVelocity = driveEncoder.getVelocity();
     turnVelocity = AngularVelocity.ofBaseUnits(turnEncoder.getVelocity(), Units.RadiansPerSecond);
 
     turnGoalState =
