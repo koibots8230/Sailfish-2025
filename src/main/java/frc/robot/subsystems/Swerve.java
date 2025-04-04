@@ -387,8 +387,7 @@ public class Swerve extends SubsystemBase {
       return Pose2d.kZero;
     }
 
-    speedScalar =
-        (0.15 * distanceToPose(pose).in(Meters)) + 0.05;
+    speedScalar = (0.15 * distanceToPose(pose).in(Meters)) + 0.05;
 
     if (distanceToPose(pose).gte(AlignConstants.MIN_DISTANCE)) {
       System.out.println("failed distance");
