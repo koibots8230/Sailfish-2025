@@ -143,12 +143,24 @@ public class RobotContainer {
     gotoLevelTwo.onFalse(ScoreCommands.basePosition(elevator, endEffector));
 
     Trigger removeL2Algae = xboxController.povDown();
-    removeL2Algae.onTrue(ScoreCommands.removeL2Algae(elevator, endEffector));
-    removeL2Algae.onFalse(ScoreCommands.basePosition(elevator, endEffector));
+    removeL2Algae.onTrue(
+        Commands.parallel(
+            ScoreCommands.removeL2Algae(elevator, endEffector),
+            swerve.setReefAlignStateCommand(ReefAlignState.algae)));
+    removeL2Algae.onFalse(
+        Commands.parallel(
+            ScoreCommands.basePosition(elevator, endEffector),
+            swerve.setReefAlignStateCommand(ReefAlignState.disabled)));
 
     Trigger removeL3Algae = xboxController.povUp();
-    removeL3Algae.onTrue(ScoreCommands.removeL3Algae(elevator, endEffector));
-    removeL3Algae.onFalse(ScoreCommands.basePosition(elevator, endEffector));
+    removeL3Algae.onTrue(
+        Commands.parallel(
+            ScoreCommands.removeL3Algae(elevator, endEffector),
+            swerve.setReefAlignStateCommand(ReefAlignState.algae)));
+    removeL3Algae.onFalse(
+        Commands.parallel(
+            ScoreCommands.basePosition(elevator, endEffector),
+            swerve.setReefAlignStateCommand(ReefAlignState.disabled)));
 
     Trigger alignRight = xboxController.rightBumper();
     alignRight.onTrue(swerve.setReefAlignStateCommand(ReefAlignState.rightSide));

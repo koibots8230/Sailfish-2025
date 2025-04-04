@@ -43,6 +43,8 @@ public class Swerve extends SubsystemBase {
 
   private double speedScalar;
 
+  private int periodicsSinceNone;
+
   private final PIDController xController =
       new PIDController(AutoConstants.X_CONTROLLER.kp, 0.0, 0.0);
   private final PIDController yController =
@@ -160,6 +162,16 @@ public class Swerve extends SubsystemBase {
     if (reefAlignState == null) {
       reefAlignState = ReefAlignState.disabled;
     }
+
+    if (alignTarget.getX() == 0) {
+      periodicsSinceNone++;
+    } else {
+      periodicsSinceNone = 0;
+    }
+
+    if (periodicsSinceNone > 5) {
+      speedScalar = 1;
+    }
   }
 
   @Override
@@ -249,14 +261,16 @@ public class Swerve extends SubsystemBase {
     return new Translation2d(
         (Math.sin(2 * side.getRotation().getRadians())
             * AlignConstants.EFFECTOR_OFFSET.in(Meters)
-            * (side.getRotation().getRadians() >= Math.PI / 3.0
-                    && side.getRotation().getRadians() <= (2 * Math.PI) / 3.0
+            * ((side.getRotation().getRadians() == 0
+                    || side.getRotation().getRadians() == (2 * Math.PI) / 3.0
+                    || side.getRotation().getRadians() == (4 * Math.PI) / 3.0)
                 ? 1
                 : -1)),
         (Math.cos(2 * side.getRotation().getRadians())
             * AlignConstants.EFFECTOR_OFFSET.in(Meters)
-            * (side.getRotation().getRadians() >= Math.PI / 3.0
-                    && side.getRotation().getRadians() <= (2 * Math.PI) / 3.0
+            * ((side.getRotation().getRadians() == 0
+                    || side.getRotation().getRadians() == (2 * Math.PI) / 3.0
+                    || side.getRotation().getRadians() == (4 * Math.PI) / 3.0)
                 ? 1
                 : -1)));
   }
@@ -268,13 +282,15 @@ public class Swerve extends SubsystemBase {
                 * AlignConstants.POLE_SPACING.in(Meters)
                 * (rightPole ? 1 : -1)
                 * (isBlue ? 1 : -1)
-                * (side.getRotation().getRadians() == Math.PI ? -1 : 1)),
+                * (side.getRotation().getRadians() == Math.PI ? -1 : 1)
+                * (side.getRotation().getRadians() == 0 ? -1 : 1)),
         side.getY()
             + (Math.cos(2 * side.getRotation().getRadians())
                 * AlignConstants.POLE_SPACING.in(Meters)
                 * (rightPole ? 1 : -1)
                 * (isBlue ? 1 : -1)
-                * (side.getRotation().getRadians() == Math.PI ? -1 : 1)));
+                * (side.getRotation().getRadians() == Math.PI ? -1 : 1)
+                * (side.getRotation().getRadians() == 0 ? -1 : 1)));
   }
 
   // ===================== Align Assist ===================== \\
@@ -309,14 +325,15 @@ public class Swerve extends SubsystemBase {
 
     LinearVelocity assistVelocity =
         MetersPerSecond.of(
-            Math.cbrt(distancePerpToVel.in(Meters)) * AlignConstants.TRANSLATE_PID.kp);
+            Math.sqrt(distancePerpToVel.in(Meters)) * AlignConstants.TRANSLATE_PID.kp);
 
     return new Pose2d(
         assistVelocity.in(MetersPerSecond) * angleToTarget.getCos(),
         assistVelocity.in(MetersPerSecond) * angleToTarget.getSin(),
         new Rotation2d(
             anglePID.calculate(
-                gyroAngle.getRadians(), targetAngle.getRadians() + (isBlue ? 0 : Math.PI))));
+                estimatedPosition.getRotation().getRadians(),
+                targetAngle.getRadians()))); // TODO: Change back to gyro
   }
 
   private Pose2d reefAlignAssist(double xInput, double yInput, double omega) {
@@ -340,17 +357,15 @@ public class Swerve extends SubsystemBase {
                 getPoleTranslation(closestSide, false).plus(getEffectorOffset(closestSide)),
                 closestSide.getRotation());
         break;
+      case algae:
+        pose = closestSide;
+        break;
       case disabled:
         alignTarget = Pose2d.kZero;
         return Pose2d.kZero;
       default:
         alignTarget = Pose2d.kZero;
         return Pose2d.kZero;
-    }
-
-    if (distanceToPose(pose).gte(AlignConstants.MIN_DISTANCE)) {
-      alignTarget = Pose2d.kZero;
-      return Pose2d.kZero;
     }
 
     Rotation2d movementDirection = Rotation2d.fromRadians(Math.atan2(yInput, xInput));
@@ -367,7 +382,17 @@ public class Swerve extends SubsystemBase {
                     % (2 * Math.PI)
                 - Math.PI)
         > angleRange.getRadians()) {
+      System.out.println("Failed angle");
       alignTarget = Pose2d.kZero;
+      return Pose2d.kZero;
+    }
+
+    speedScalar = (0.15 * distanceToPose(pose).in(Meters)) + 0.05;
+
+    if (distanceToPose(pose).gte(AlignConstants.MIN_DISTANCE)) {
+      System.out.println("failed distance");
+      alignTarget = Pose2d.kZero;
+      speedScalar = (distanceToPose(pose).gte(Meters.of(3))) ? 1 : speedScalar;
       return Pose2d.kZero;
     }
 
@@ -379,7 +404,8 @@ public class Swerve extends SubsystemBase {
   // ===================== Teleop Driving ===================== \\
 
   private void driveFieldRelativeScaler(double x, double y, double omega) {
-    double linearMagnitude = Math.pow(Math.hypot(x, y), SwerveConstants.TRANSLATION_SCALAR);
+    double linearMagnitude =
+        Math.pow(Math.hypot(x, y), SwerveConstants.TRANSLATION_SCALAR) * speedScalar;
 
     Rotation2d direction = new Rotation2d(y, x);
 
@@ -390,8 +416,7 @@ public class Swerve extends SubsystemBase {
     x =
         linearMagnitude
             * -direction.getSin()
-            * SwerveConstants.MAX_LINEAR_VELOCITY.in(MetersPerSecond)
-            * speedScalar;
+            * SwerveConstants.MAX_LINEAR_VELOCITY.in(MetersPerSecond);
 
     omega =
         Math.pow(omega, SwerveConstants.ROTATION_SCALAR)
@@ -403,11 +428,11 @@ public class Swerve extends SubsystemBase {
     driveFieldRelative(
         MetersPerSecond.of(
             MathUtil.applyDeadband(
-                x + (assist.getX() * Math.sqrt(linearMagnitude) * (isBlue ? -1 : 1)),
+                x + (assist.getX() * linearMagnitude * (1.0 / speedScalar) * (isBlue ? -1 : 1)),
                 SwerveConstants.DEADBAND)),
         MetersPerSecond.of(
             MathUtil.applyDeadband(
-                y + (assist.getY() * Math.sqrt(linearMagnitude) * (isBlue ? -1 : 1)),
+                y + (assist.getY() * linearMagnitude * (1.0 / speedScalar) * (isBlue ? -1 : 1)),
                 SwerveConstants.DEADBAND)),
         RadiansPerSecond.of(
             MathUtil.applyDeadband(

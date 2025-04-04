@@ -160,6 +160,7 @@ public class SwerveModule {
 
   public void setState(SwerveModuleState swerveModuleState) {
     swerveModuleState.optimize(Rotation2d.fromRadians(MathUtil.angleModulus(turnPosition)));
+
     swerveModuleState.speedMetersPerSecond *=
         Math.cos(swerveModuleState.angle.getRadians() - turnPosition);
 
