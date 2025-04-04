@@ -8,8 +8,6 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.MathUtil;
@@ -26,7 +24,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -43,6 +40,10 @@ public class Swerve extends SubsystemBase {
   private Rotation2d gyroAngle;
   private SwerveModuleState[] setpointStates;
   private final Pigeon2 gyro;
+
+  private double speedScalar;
+
+  private int periodicsSinceNone;
 
   private final PIDController xController =
       new PIDController(AutoConstants.X_CONTROLLER.kp, 0.0, 0.0);
@@ -84,8 +85,6 @@ public class Swerve extends SubsystemBase {
   private ReefAlignState reefAlignState;
   private Pose2d alignTarget;
 
-  RobotConfig config;
-
   public Swerve() {
 
     modules = new Modules();
@@ -123,6 +122,8 @@ public class Swerve extends SubsystemBase {
     alignTarget = new Pose2d();
 
     headingController.enableContinuousInput(-Math.PI, Math.PI);
+
+    speedScalar = 1;
   }
 
   public boolean getIsBlue() {
@@ -157,6 +158,20 @@ public class Swerve extends SubsystemBase {
     measuredStates[1] = modules.frontRight.getModuleState();
     measuredStates[2] = modules.backLeft.getModuleState();
     measuredStates[3] = modules.backRight.getModuleState();
+
+    if (reefAlignState == null) {
+      reefAlignState = ReefAlignState.disabled;
+    }
+
+    if (alignTarget.getX() == 0) {
+      periodicsSinceNone++;
+    } else {
+      periodicsSinceNone = 0;
+    }
+
+    if (periodicsSinceNone > 5) {
+      speedScalar = 1;
+    }
   }
 
   @Override
@@ -246,14 +261,16 @@ public class Swerve extends SubsystemBase {
     return new Translation2d(
         (Math.sin(2 * side.getRotation().getRadians())
             * AlignConstants.EFFECTOR_OFFSET.in(Meters)
-            * (side.getRotation().getRadians() >= Math.PI / 3.0
-                    && side.getRotation().getRadians() <= (2 * Math.PI) / 3.0
+            * ((side.getRotation().getRadians() == 0
+                    || side.getRotation().getRadians() == (2 * Math.PI) / 3.0
+                    || side.getRotation().getRadians() == (4 * Math.PI) / 3.0)
                 ? 1
                 : -1)),
         (Math.cos(2 * side.getRotation().getRadians())
             * AlignConstants.EFFECTOR_OFFSET.in(Meters)
-            * (side.getRotation().getRadians() >= Math.PI / 3.0
-                    && side.getRotation().getRadians() <= (2 * Math.PI) / 3.0
+            * ((side.getRotation().getRadians() == 0
+                    || side.getRotation().getRadians() == (2 * Math.PI) / 3.0
+                    || side.getRotation().getRadians() == (4 * Math.PI) / 3.0)
                 ? 1
                 : -1)));
   }
@@ -265,13 +282,15 @@ public class Swerve extends SubsystemBase {
                 * AlignConstants.POLE_SPACING.in(Meters)
                 * (rightPole ? 1 : -1)
                 * (isBlue ? 1 : -1)
-                * (side.getRotation().getRadians() == Math.PI ? -1 : 1)),
+                * (side.getRotation().getRadians() == Math.PI ? -1 : 1)
+                * (side.getRotation().getRadians() == 0 ? -1 : 1)),
         side.getY()
             + (Math.cos(2 * side.getRotation().getRadians())
                 * AlignConstants.POLE_SPACING.in(Meters)
                 * (rightPole ? 1 : -1)
                 * (isBlue ? 1 : -1)
-                * (side.getRotation().getRadians() == Math.PI ? -1 : 1)));
+                * (side.getRotation().getRadians() == Math.PI ? -1 : 1)
+                * (side.getRotation().getRadians() == 0 ? -1 : 1)));
   }
 
   // ===================== Align Assist ===================== \\
@@ -306,14 +325,15 @@ public class Swerve extends SubsystemBase {
 
     LinearVelocity assistVelocity =
         MetersPerSecond.of(
-            Math.cbrt(distancePerpToVel.in(Meters)) * AlignConstants.TRANSLATE_PID.kp);
+            Math.sqrt(distancePerpToVel.in(Meters)) * AlignConstants.TRANSLATE_PID.kp);
 
     return new Pose2d(
         assistVelocity.in(MetersPerSecond) * angleToTarget.getCos(),
         assistVelocity.in(MetersPerSecond) * angleToTarget.getSin(),
         new Rotation2d(
             anglePID.calculate(
-                gyroAngle.getRadians(), targetAngle.getRadians() + (isBlue ? 0 : Math.PI))));
+                estimatedPosition.getRotation().getRadians(),
+                targetAngle.getRadians()))); // TODO: Change back to gyro
   }
 
   private Pose2d reefAlignAssist(double xInput, double yInput, double omega) {
@@ -337,17 +357,15 @@ public class Swerve extends SubsystemBase {
                 getPoleTranslation(closestSide, false).plus(getEffectorOffset(closestSide)),
                 closestSide.getRotation());
         break;
+      case algae:
+        pose = closestSide;
+        break;
       case disabled:
         alignTarget = Pose2d.kZero;
         return Pose2d.kZero;
       default:
         alignTarget = Pose2d.kZero;
         return Pose2d.kZero;
-    }
-
-    if (distanceToPose(pose).gte(AlignConstants.MIN_DISTANCE)) {
-      alignTarget = Pose2d.kZero;
-      return Pose2d.kZero;
     }
 
     Rotation2d movementDirection = Rotation2d.fromRadians(Math.atan2(yInput, xInput));
@@ -364,7 +382,17 @@ public class Swerve extends SubsystemBase {
                     % (2 * Math.PI)
                 - Math.PI)
         > angleRange.getRadians()) {
+      System.out.println("Failed angle");
       alignTarget = Pose2d.kZero;
+      return Pose2d.kZero;
+    }
+
+    speedScalar = (0.15 * distanceToPose(pose).in(Meters)) + 0.05;
+
+    if (distanceToPose(pose).gte(AlignConstants.MIN_DISTANCE)) {
+      System.out.println("failed distance");
+      alignTarget = Pose2d.kZero;
+      speedScalar = (distanceToPose(pose).gte(Meters.of(3))) ? 1 : speedScalar;
       return Pose2d.kZero;
     }
 
@@ -376,7 +404,8 @@ public class Swerve extends SubsystemBase {
   // ===================== Teleop Driving ===================== \\
 
   private void driveFieldRelativeScaler(double x, double y, double omega) {
-    double linearMagnitude = Math.pow(Math.hypot(x, y), SwerveConstants.TRANSLATION_SCALAR);
+    double linearMagnitude =
+        Math.pow(Math.hypot(x, y), SwerveConstants.TRANSLATION_SCALAR) * speedScalar;
 
     Rotation2d direction = new Rotation2d(y, x);
 
@@ -391,49 +420,26 @@ public class Swerve extends SubsystemBase {
 
     omega =
         Math.pow(omega, SwerveConstants.ROTATION_SCALAR)
-            * SwerveConstants.MAX_ANGULAR_VELOCITY.in(RadiansPerSecond);
+            * SwerveConstants.MAX_ANGULAR_VELOCITY.in(RadiansPerSecond)
+            * speedScalar;
 
     Pose2d assist = reefAlignAssist(-x, y, omega);
 
     driveFieldRelative(
         MetersPerSecond.of(
             MathUtil.applyDeadband(
-                x + (assist.getX() * Math.sqrt(linearMagnitude) * (isBlue ? -1 : 1)),
+                x + (assist.getX() * linearMagnitude * (1.0 / speedScalar) * (isBlue ? -1 : 1)),
                 SwerveConstants.DEADBAND)),
         MetersPerSecond.of(
             MathUtil.applyDeadband(
-                y + (assist.getY() * Math.sqrt(linearMagnitude) * (isBlue ? -1 : 1)),
+                y + (assist.getY() * linearMagnitude * (1.0 / speedScalar) * (isBlue ? -1 : 1)),
                 SwerveConstants.DEADBAND)),
         RadiansPerSecond.of(
             MathUtil.applyDeadband(
                 -omega + (assist.getRotation().getRadians()), SwerveConstants.DEADBAND)));
   }
 
-  private void testModeScaler(double x, double y, double omega) {
-    double linearMagnitude = Math.pow(Math.hypot(x, y), SwerveConstants.TRANSLATION_SCALAR);
-
-    Rotation2d direction = new Rotation2d(y, x);
-
-    y =
-        linearMagnitude
-            * -direction.getCos()
-            * SwerveConstants.MAX_LINEAR_VELOCITY.in(MetersPerSecond);
-    x =
-        linearMagnitude
-            * -direction.getSin()
-            * SwerveConstants.MAX_LINEAR_VELOCITY.in(MetersPerSecond);
-
-    omega =
-        Math.pow(omega, SwerveConstants.ROTATION_SCALAR)
-            * SwerveConstants.MAX_ANGULAR_VELOCITY.in(RadiansPerSecond);
-
-    driveFieldRelativeTest(
-        MetersPerSecond.of(MathUtil.applyDeadband(x, SwerveConstants.DEADBAND)),
-        MetersPerSecond.of(MathUtil.applyDeadband(y, SwerveConstants.DEADBAND)),
-        RadiansPerSecond.of(MathUtil.applyDeadband(-omega, SwerveConstants.DEADBAND)));
-  }
-
-  public void driveRobotRelative(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
+  public void driveRobotRelative(ChassisSpeeds speeds) {
     setpointStates = SwerveConstants.KINEMATICS.toSwerveModuleStates(speeds);
 
     SwerveDriveKinematics.desaturateWheelSpeeds(
@@ -453,43 +459,8 @@ public class Swerve extends SubsystemBase {
     driveFieldRelative(speeds);
   }
 
-  private void driveFieldRelativeTest(LinearVelocity x, LinearVelocity y, AngularVelocity omega) {
-    ChassisSpeeds speeds =
-        ChassisSpeeds.fromFieldRelativeSpeeds(
-            x.in(MetersPerSecond), y.in(MetersPerSecond), omega.in(RadiansPerSecond), gyroAngle);
-
-    driveTestMode(speeds);
-  }
-
-  private void driveTestMode(ChassisSpeeds speeds) {
-    setpointStates = SwerveConstants.KINEMATICS.toSwerveModuleStates(speeds);
-
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        setpointStates, SwerveConstants.MAX_LINEAR_VELOCITY);
-
-    if (SmartDashboard.getBoolean("SwerveTest/FL", true)) {
-      modules.frontLeft.setState(setpointStates[0]);
-    }
-    if (SmartDashboard.getBoolean("SwerveTest/FR", true)) {
-      modules.frontRight.setState(setpointStates[1]);
-    }
-    if (SmartDashboard.getBoolean("SwerveTest/BL", true)) {
-      modules.backLeft.setState(setpointStates[2]);
-    }
-    if (SmartDashboard.getBoolean("SwerveTest/BR", true)) {
-      modules.backRight.setState(setpointStates[3]);
-    }
-  }
-
   private void driveFieldRelative(ChassisSpeeds speeds) {
-    driveRobotRelative(
-        speeds,
-        new DriveFeedforwards(
-            new double[] {0.0},
-            new double[] {0.0},
-            new double[] {0.0},
-            new double[] {0.0},
-            new double[] {0.0}));
+    driveRobotRelative(speeds);
   }
 
   public void followTrajectory(SwerveSample sample) {
@@ -506,6 +477,10 @@ public class Swerve extends SubsystemBase {
     driveFieldRelative(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, pose.getRotation()));
   }
 
+  private void toggleSpeed() {
+    speedScalar = (speedScalar == 1) ? 0.5 : 1;
+  }
+
   // ===================== Commands ===================== \\
 
   public Command driveFieldRelativeCommand(
@@ -519,21 +494,15 @@ public class Swerve extends SubsystemBase {
         this);
   }
 
-  public Command testModeDriveCommand(DoubleSupplier x, DoubleSupplier y, DoubleSupplier omega) {
-    return Commands.run(
-        () ->
-            testModeScaler(
-                MathUtil.applyDeadband(x.getAsDouble(), SwerveConstants.DEADBAND),
-                MathUtil.applyDeadband(y.getAsDouble(), SwerveConstants.DEADBAND),
-                MathUtil.applyDeadband(omega.getAsDouble(), SwerveConstants.DEADBAND)),
-        this);
-  }
-
   public Command zeroGyroCommand(boolean colour) {
     return Commands.runOnce(() -> zeroGyro(), this);
   }
 
   public Command setReefAlignStateCommand(ReefAlignState state) {
     return Commands.runOnce(() -> this.setReefAlignState(state));
+  }
+
+  public Command toggleSpeedCommand() {
+    return Commands.runOnce(() -> this.toggleSpeed());
   }
 }

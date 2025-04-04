@@ -38,12 +38,10 @@ import frc.robot.Constants.RobotConstants;
 public class Elevator extends SubsystemBase {
 
   @NotLogged private final SparkMax mainMotor;
-  @NotLogged private final SparkMax secondaryMotor;
 
   @NotLogged private final DigitalInput hallEffectSensor;
 
   @NotLogged private final SparkMaxConfig mainMotorConfig;
-  @NotLogged private final SparkMaxConfig secondaryMotorConfig;
 
   @NotLogged private final RelativeEncoder encoder;
 
@@ -60,9 +58,7 @@ public class Elevator extends SubsystemBase {
   private Distance position;
   private LinearVelocity velocity;
   private Voltage mainVoltage;
-  private Voltage secondaryVoltage;
   private Current mainCurrent;
-  private Current secondaryCurrent;
 
   public Elevator() {
     profile =
@@ -72,7 +68,6 @@ public class Elevator extends SubsystemBase {
                 ElevatorConstants.MAX_ACCELRATION.in(MetersPerSecondPerSecond)));
 
     mainMotor = new SparkMax(ElevatorConstants.MAIN_MOTOR_ID, MotorType.kBrushless);
-    secondaryMotor = new SparkMax(ElevatorConstants.SECONDARY_MOTOR_ID, MotorType.kBrushless);
 
     mainMotorConfig = new SparkMaxConfig();
 
@@ -90,18 +85,8 @@ public class Elevator extends SubsystemBase {
         ElevatorConstants.CONVERSION_FACTOR / 60.0);
     mainMotorConfig.alternateEncoder.inverted(true);
 
-    secondaryMotorConfig = new SparkMaxConfig();
-
-    secondaryMotorConfig.idleMode(IdleMode.kCoast);
-
-    secondaryMotorConfig.follow(ElevatorConstants.MAIN_MOTOR_ID);
-
-    secondaryMotorConfig.smartCurrentLimit((int) ElevatorConstants.CURRENT_LIMIT.in(Amps));
-
     mainMotor.configure(
         mainMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    secondaryMotor.configure(
-        secondaryMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     encoder = mainMotor.getAlternateEncoder();
 
@@ -125,12 +110,8 @@ public class Elevator extends SubsystemBase {
 
     mainVoltage =
         Voltage.ofBaseUnits(mainMotor.getBusVoltage() * mainMotor.getAppliedOutput(), Volts);
-    secondaryVoltage =
-        Voltage.ofBaseUnits(
-            secondaryMotor.getBusVoltage() * secondaryMotor.getAppliedOutput(), Volts);
 
     mainCurrent = Current.ofBaseUnits(mainMotor.getOutputCurrent(), Amps);
-    secondaryCurrent = Current.ofBaseUnits(secondaryMotor.getOutputCurrent(), Amps);
   }
 
   @Override
@@ -151,12 +132,8 @@ public class Elevator extends SubsystemBase {
 
     mainVoltage =
         Voltage.ofBaseUnits(mainMotor.getBusVoltage() * mainMotor.getAppliedOutput(), Volts);
-    secondaryVoltage =
-        Voltage.ofBaseUnits(
-            secondaryMotor.getBusVoltage() * secondaryMotor.getAppliedOutput(), Volts);
 
     mainCurrent = Current.ofBaseUnits(mainMotor.getOutputCurrent(), Amps);
-    secondaryCurrent = Current.ofBaseUnits(secondaryMotor.getOutputCurrent(), Amps);
   }
 
   public boolean atPosition(Distance desieredPostion) {
@@ -173,6 +150,10 @@ public class Elevator extends SubsystemBase {
     setpoint = position;
   }
 
+  private void resetProfile() {
+    motorSetpoint = new TrapezoidProfile.State(encoder.getPosition(), 0);
+  }
+
   public Command setPositionCommand(Distance position) {
     return Commands.runOnce(() -> this.setPosition(position), this);
   }
@@ -186,5 +167,9 @@ public class Elevator extends SubsystemBase {
                 this),
             Commands.waitUntil(() -> hallEffectSensor.get() == true)),
         Commands.runOnce(() -> encoder.setPosition(0), this));
+  }
+
+  public Command resetProfileCommand() {
+    return Commands.runOnce(this::resetProfile, this);
   }
 }
